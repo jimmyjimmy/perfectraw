@@ -19,7 +19,7 @@ ExeOutput=bin
 ObjectOutput=obj
 OverrideOutput=1
 OverrideOutputName=dcraw.dll
-HostApplication=test.exe
+HostApplication=bin\test.exe
 Folders=
 CommandLine=raws\1.cr2
 UseCustomMakefile=0
@@ -27,7 +27,7 @@ CustomMakefile=
 IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=0
-CompilerSettings=0010000001100000000000
+CompilerSettings=0010000001000000000000
 
 [Unit1]
 FileName=src\dll.c

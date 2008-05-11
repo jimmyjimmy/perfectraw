@@ -7,8 +7,8 @@
 # define DLLIMPORT __declspec (dllimport)
 #endif /* Not BUILDING_DLL */
 
-// Estructura para informar fuera de la DLL de la imagen
-// Falta DNG version y camera white balance coef.
+// Image info struct
+// DNG version and camera white balance coef. still missing
 typedef struct DCRAW_ImageInfo
 {
        char  *timestamp;
@@ -30,9 +30,48 @@ typedef struct DCRAW_ImageInfo
        char  *filter_pattern;
 }IMAGE_INFO;
 
+// Struct for passing parameters to the development process
+typedef struct DCRAW_Parameters
+{       
+       float    threshold;         // -n -> buffer 2
+       double   aber[4];           // -r -> buffer 2
+       int      use_auto_wb;       // -a -> buffer 2
+       int      use_camera_wb;     // -w -> buffer 2
+       unsigned greybox[4];        // -A -> buffer 2      
+       int      user_black;        // -K -> buffer 2
+       int      user_sat;          // -S -> buffer 2
+       int      test_pattern;      //    -> buffer 2       
+       int      level_greens;      // -l -> buffer 2       
+       int      user_qual;         // -q -> buffer 3
+       int      four_color_rgb;    // -f -> buffer 3
+       int      med_passes;        // -m -> buffer 4
+       int      highlight;         // -H -> buffer 4
+       int      output_color;      // -o -> buffer 5                     
+       int      use_fuji_rotate;   // -J -> buffer 5
+       float    user_gamma;        // -g -> buffer 5       
+}DLL_PARAMETERS;
+
+// Struct for saving and restoring DLL state
+typedef struct DCRAW_State
+{
+       int    filters;
+       int    colors;
+       int    shrink;
+       int    half_size;
+       int    mix_green;
+       int    width;
+       int    height;
+       int    iwidth;
+       int    iheight;
+       int    top_margin;
+       int    left_margin;       
+       unsigned short (*buffer)[4];
+}DLL_STATE;
+
+DLLIMPORT void DCRAW_DefaultParameters(DLL_PARAMETERS *);
 DLLIMPORT int  DCRAW_Init(char *,int *,int *);
 DLLIMPORT void DCRAW_GetInfo(IMAGE_INFO *);
-DLLIMPORT unsigned short *DCRAW_Process(int);
+DLLIMPORT unsigned short *DCRAW_Process(DLL_PARAMETERS *);
 DLLIMPORT void DCRAW_End();
 
 #endif /* _DLL_H_ */
