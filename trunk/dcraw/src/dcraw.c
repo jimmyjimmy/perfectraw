@@ -25,8 +25,8 @@
 
 
 #define VERSION    "8.86"
-#define SUBVERSION "0.85"  // added by Manuel Llorens
-#define COMPILER   "Cygwin"  // added by Manuel Llorens
+#define SUBVERSION "0.90"  // added by Manuel Llorens
+#define COMPILER   "MinGW"  // added by Manuel Llorens
 #define AUTHOR     "M. Llorens"  // added by Manuel Llorens
 
 #define _GNU_SOURCE
@@ -50,12 +50,6 @@
 #include <string.h>
 #include <time.h>
 #include <sys/types.h>
-
-#define NO_JPEG
-#define NO_LCMS
-#define DJGPP
-#define _MINGW_
-
 /*
    NO_JPEG disables decoding of compressed Kodak DC120 files.
    NO_LCMS disables the "-p" option.
@@ -199,7 +193,7 @@ ushort shrink, iheight, iwidth, fuji_width, thumb_width, thumb_height;
 int flip, tiff_flip, colors;
 double pixel_aspect, aber[4]={1,1,1,1};
 float user_gamma=1; // added by Manuel Llorens
-int equilibrate_greens=0;
+int level_greens=0; // added by Manuel Llorens
 ushort (*image)[4], white[8][8], curve[0x4001], cr2_slice[3], sraw_mul[4];
 float bright=1, user_mul[4]={0,0,0,0}, threshold=0;
 int half_size=0, four_color_rgb=0, document_mode=0, highlight=0;
@@ -3980,7 +3974,7 @@ void CLASS test_patterns()
       w = width;
     	
       // Equilibrado de canales verdes G1 y G2
-      if(equilibrate_greens>0){    
+      if(level_greens>0){    
           if (verbose) fprintf (stderr,_("Equilibrating green channels with mode "));
           // Calculamos los valores medios quitando los muy bajos y los muy altos
           long double val[3];
@@ -3997,18 +3991,18 @@ void CLASS test_patterns()
          v[3]=(long double)val[3]/(long double)cnt[3];     
         	
          long double fc1,fc2;
-         if(equilibrate_greens==2) {fc1=v[1]/v[3];if (verbose) fprintf (stderr,_("G2->G1. G2-G1 distance %f\n"),v[3]-v[1]);}
-         if(equilibrate_greens==1) {fc2=v[3]/v[1];if (verbose) fprintf (stderr,_("G1->G2. G2-G1 distance %f\n"),v[3]-v[1]);}
-         if(equilibrate_greens==3) {fc1=((v[1]+v[3])/2)/v[3];fc2=((v[1]+v[3])/2)/v[1];if (verbose) fprintf (stderr,_("G1-><-G2. G2-G1 distance %f\n"),v[3]-v[1]);}
+         if(level_greens==2) {fc1=v[1]/v[3];if (verbose) fprintf (stderr,_("G2->G1. G2-G1 distance %f\n"),v[3]-v[1]);}
+         if(level_greens==1) {fc2=v[3]/v[1];if (verbose) fprintf (stderr,_("G1->G2. G2-G1 distance %f\n"),v[3]-v[1]);}
+         if(level_greens==3) {fc1=((v[1]+v[3])/2)/v[3];fc2=((v[1]+v[3])/2)/v[1];if (verbose) fprintf (stderr,_("G1-><-G2. G2-G1 distance %f\n"),v[3]-v[1]);}
          
          // Reequilibramos los niveles
          for (row=0; row < h; row++)
            for (col=0; col < w; col++) {
              c = FC(row,col);
-             if((c==3)&&(equilibrate_greens==2)) BAYER(row,col)=(ushort)CLIPF((double)BAYER(row,col)*fc1);
-        	 if((c==1)&&(equilibrate_greens==1)) BAYER(row,col)=(ushort)CLIPF((double)BAYER(row,col)*fc2);
-        	 if((c==3)&&(equilibrate_greens==3)) BAYER(row,col)=(ushort)CLIPF((double)BAYER(row,col)*fc1);
-          	 if((c==1)&&(equilibrate_greens==3)) BAYER(row,col)=(ushort)CLIPF((double)BAYER(row,col)*fc2);
+             if((c==3)&&(level_greens==2)) BAYER(row,col)=(ushort)CLIPF((double)BAYER(row,col)*fc1);
+        	 if((c==1)&&(level_greens==1)) BAYER(row,col)=(ushort)CLIPF((double)BAYER(row,col)*fc2);
+        	 if((c==3)&&(level_greens==3)) BAYER(row,col)=(ushort)CLIPF((double)BAYER(row,col)*fc1);
+          	 if((c==1)&&(level_greens==3)) BAYER(row,col)=(ushort)CLIPF((double)BAYER(row,col)*fc2);
            }
       }
 }
@@ -8484,7 +8478,7 @@ int CLASS main (int argc, char **argv)
       case 'T':  output_tiff       = 1;  break;
       case '4':  output_bps        = 16;  break;
       case 'g':  user_gamma_str    = argv[arg++];  break; // added by Manuel Llorens
-      case 'l':  equilibrate_greens = atoi(argv[arg++]);  break; // added by Manuel Llorens
+      case 'l':  level_greens = atoi(argv[arg++]);  break; // added by Manuel Llorens
       default:	
 	fprintf (stderr,_("Unknown option \"-%c\".\n"), opt);
 	return 1;
@@ -8669,7 +8663,7 @@ next:
 #endif
     
     //test_patterns(); // added by Manuel Llorens
-    if(equilibrate_greens) eq_greens(); // added by Manuel Llorens
+    if(level_greens) eq_greens(); // added by Manuel Llorens
 
     if (is_foveon && !document_mode) foveon_interpolate();
     if (!is_foveon && document_mode < 2) scale_colors();
@@ -8742,20 +8736,199 @@ cleanup:
   return status;
 }
 
+// ************************************************************************************
+// ************************************************************************************
+// ************************************************************************************
 #ifdef BUILDING_DLL // From here to end of dcraw.c has been added by Manuel Llorens
-/// DLL functions
+
+/// DLL global variables and functions
+
+DLL_STATE state[5];
+DLL_PARAMETERS params;
+int user_black,user_sat,user_qual,level_greens,use_fuji_rotate,quality,test_pattern;
+int first_time=1;
+
+void SaveState(int ID){
+    state[ID].filters=filters;
+    state[ID].colors=colors;
+    state[ID].shrink=shrink;
+    state[ID].half_size=half_size;
+    state[ID].mix_green=mix_green;
+    state[ID].width=width;
+    state[ID].height=height;
+    state[ID].iwidth=iwidth;
+    state[ID].iheight=iheight;
+    state[ID].top_margin=top_margin;
+    state[ID].left_margin=left_margin;    
+           
+    if(state[ID].buffer) free(state[ID].buffer);            
+    state[ID].buffer=(ushort (*)[4]) calloc (iheight*iwidth, sizeof *image);
+    memcpy(state[ID].buffer,image,iheight*iwidth*sizeof *image);
+    if(verbose) printf("Saved state %i\n",ID);
+}
+
+void RestoreState(int ID){    
+    filters=state[ID].filters;
+    colors=state[ID].colors;
+    shrink=state[ID].shrink;
+    half_size=state[ID].half_size;
+    mix_green=state[ID].mix_green;
+    width=state[ID].width;
+    height=state[ID].height;
+    iwidth=state[ID].iwidth;
+    iheight=state[ID].iheight;
+    top_margin=state[ID].top_margin;
+    left_margin=state[ID].left_margin;    
+        
+    if(image) free(image);    
+    image = (ushort (*)[4]) calloc (iheight*iwidth, sizeof *image);     
+    memcpy(image,state[ID].buffer,iheight*iwidth*sizeof *image);
+    if(verbose) printf("Restored state %i\n",ID);
+}
+
+void SetParameters(DLL_PARAMETERS *p){
+    int c;
+    
+    threshold=p->threshold;
+    FORC4 aber[c]=p->aber[c];
+    use_auto_wb=p->use_auto_wb;
+    use_camera_wb=p->use_camera_wb;
+    FORC4 greybox[c]=p->greybox[c];
+    user_black=p->user_black;
+    user_sat=p->user_sat;
+    test_pattern=p->test_pattern;
+    level_greens=p->level_greens;
+    user_qual=p->user_qual;
+    four_color_rgb=p->four_color_rgb;
+    med_passes=p->med_passes;
+    highlight=p->highlight;
+    output_color=p->output_color;
+    use_fuji_rotate=p->use_fuji_rotate;
+    user_gamma=p->user_gamma;           
+    
+    quality = p->user_qual;
+    
+    // Actual parameters for later comparing
+    params.threshold=threshold;
+    FORC4 params.aber[c]=aber[c];
+    params.use_auto_wb=use_auto_wb;
+    params.use_camera_wb=use_camera_wb;
+    FORC4 params.greybox[c]=greybox[c];
+    params.user_black=user_black;
+    params.user_sat=user_sat;
+    params.test_pattern=test_pattern;
+    params.level_greens=level_greens;
+    params.user_qual=user_qual;
+    params.four_color_rgb=four_color_rgb;
+    params.med_passes=med_passes;
+    params.highlight=highlight;
+    params.output_color=output_color;
+    params.use_fuji_rotate=use_fuji_rotate;
+    params.user_gamma=user_gamma;           
+}
+
+void SetDefaults(void)
+{   
+    int c;
+    
+    user_gamma=1;    
+    output_bps=16;
+    threshold=0;
+    FORC4 aber[c]=1;
+    use_auto_wb=0;
+    use_camera_wb=0;
+    greybox[0] = 0;
+    greybox[1] = 0;
+    greybox[2] = UINT_MAX;
+    greybox[3] = UINT_MAX;
+    user_black=-1;
+    user_sat=-1;
+    test_pattern=0;
+    level_greens=0;
+    user_qual=-1;
+    four_color_rgb=0;
+    med_passes=0;
+    highlight=0;
+    output_color=0;    
+    use_fuji_rotate=0;              
+    user_gamma=1;
+    params.threshold=threshold;
+    FORC4 params.aber[c]=aber[c];
+    params.use_auto_wb=use_auto_wb;
+    params.use_camera_wb=use_camera_wb;
+    FORC4 params.greybox[c]=greybox[c];
+    params.user_black=user_black;
+    params.user_sat=user_sat;
+    params.test_pattern=test_pattern;
+    params.level_greens=level_greens;
+    params.user_qual=user_qual;
+    params.four_color_rgb=four_color_rgb;
+    params.med_passes=med_passes;
+    params.highlight=highlight;
+    params.output_color=output_color;
+    params.use_fuji_rotate=use_fuji_rotate;
+    params.user_gamma=user_gamma;           
+    
+    verbose=1;
+}
+
+int CompareParams(DLL_PARAMETERS *p)
+{
+    int c;    
+            
+    if(params.threshold!=p->threshold) return(2);
+    FORC4 if(params.aber[c]!=p->aber[c]) return(2);    
+    if(params.use_auto_wb!=p->use_auto_wb) return(2);    
+    if(params.use_camera_wb!=p->use_camera_wb) return(2);    
+    FORC4 if(params.greybox[c]!=p->greybox[c]) return(2);       
+    if(params.user_black!=p->user_black) return(2);    
+    if(params.user_sat!=p->user_sat) return(2);    
+    if(params.test_pattern!=p->test_pattern) return(2);
+    if(params.level_greens!=p->level_greens) return(2);    
+    if(params.user_qual!=p->user_qual) return(3);            
+    if(params.four_color_rgb!=p->four_color_rgb) return(3);
+    if(params.med_passes!=p->med_passes) return(4);    
+    if(params.highlight!=p->highlight) return(4);    
+    if(params.output_color!=p->output_color) return(5);    
+    if(params.use_fuji_rotate!=p->use_fuji_rotate) return(5);    
+    if(params.user_gamma!=p->user_gamma) return(5);           
+    
+    return(6); // Nothing changed
+}
+
+DLLIMPORT void DCRAW_DefaultParameters(DLL_PARAMETERS *p)
+{
+    int c;
+    
+    p->threshold=0;
+    FORC4 p->aber[c]=1;
+    p->use_auto_wb=0;
+    p->use_camera_wb=0;
+    p->greybox[0] = 0;
+    p->greybox[1] = 0;
+    p->greybox[2] = UINT_MAX;
+    p->greybox[3] = UINT_MAX;
+    p->user_black=-1;
+    p->user_sat=-1;    
+    p->test_pattern=0;
+    p->level_greens=0;
+    p->user_qual=-1;
+    p->four_color_rgb=0;
+    p->med_passes=0;
+    p->highlight=0;
+    p->output_color=0;
+    p->use_fuji_rotate=0;              
+    p->user_gamma=1;
+}
 
 DLLIMPORT int DCRAW_Init(char *ifname,int *w,int *h)
-{    
+{        
+    // Still missing: pass user_flip, bpfile, dark_frame and use_camera_matrix as parameters to this function
     int arg, status=0;
-    int timestamp_only=0, thumbnail_only=0, identify_only=0;
-    int user_qual=-1, user_black=-1, user_sat=-1, user_flip=-1;
-    int i, c;  
+    int i, c,user_flip=0;  
     char opm, opt, *ofname, *sp, *cp, *bpfile=0, *dark_frame=0;
-    int use_fuji_rotate=1, write_to_stdout=0, quality;
-    user_gamma=1;    
-    use_auto_wb=1;
-    verbose=1;
+    
+    SetDefaults();
     
     #ifndef LOCALTIME
       putenv ("TZ=UTC");
@@ -8805,13 +8978,14 @@ DLLIMPORT int DCRAW_Init(char *ifname,int *w,int *h)
     fclose(ifp);
     
     // Here we take buffer 0
+    SaveState(0);
     
     if (zero_is_bad) remove_zeroes();
     bad_pixels (bpfile);
     if (dark_frame) subtract (dark_frame);
-    quality = 2 + !fuji_width;
     
     // Here we take buffer 1
+    SaveState(1);
 
     *w=iwidth;
     *h=iheight;
@@ -8840,7 +9014,7 @@ DLLIMPORT void DCRAW_GetInfo(IMAGE_INFO *info)
    info->out_height=iheight;
    info->raw_colors=colors;
    
-   // More info to implement later
+   // More info to implement later plus camera white balance coefs.
 /*      if (dng_version) {
 	printf (_("DNG Version: "));
 	for (i=24; i >= 0; i -= 8)
@@ -8855,73 +9029,63 @@ DLLIMPORT void DCRAW_GetInfo(IMAGE_INFO *info)
     return info;
 }
 
-/*ushort (*test)[4];
-int    bk_filters;
-int    bk_colors;
-int    bk_shrink;
-int    bk_half_size;
-int    bk_mix_green;
-int    bk_width;
-int    bk_height;
-int    bk_iwidth;
-int    bk_iheight;
-int    bk_top_margin;
-int    bk_left_margin;*/
-
-DLLIMPORT unsigned short * DCRAW_Process(int etapa)
+DLLIMPORT unsigned short * DCRAW_Process(DLL_PARAMETERS *p)
 {    
     ushort *ppm;    
     ushort *img;
     long c, row, col, soff, rstep, cstep;
     int i;
-    output_bps=16;
-    user_gamma=1;
-    output_color=0;    
-    int use_fuji_rotate=1, write_to_stdout=0, quality=0;
-    int test_pattern=0;
+    int s;
+    
+    // Decide development point based in params value    
+    if(first_time==0){
+        s=CompareParams(p);        
+        if(verbose) printf("Developing again from stage %i\n",s);
         
-   /* if(etapa==2){
-      colors=bk_colors;
-      filters=bk_filters;
-      shrink=bk_shrink;
-      half_size=bk_half_size;
-      mix_green=bk_mix_green;
-      width=bk_width;
-      height=bk_height;
-      iwidth=bk_iwidth;
-      iheight=bk_iheight;
-      top_margin=bk_top_margin;
-      left_margin=bk_left_margin;
-      quality=2;
-      free(image);
-      image = (ushort (*)[4]) calloc (iheight*iwidth, sizeof *image);
-      memcpy(image,test,iheight*iwidth);            
-      goto ETAPA2;            
-    }*/
-        
+        SetParameters(p);
+        switch(s){
+            case 0:
+                 break;
+            case 1:
+                 break;             
+            case 2:
+                 RestoreState(1);
+                 goto STAGE2;
+                 break;
+            case 3:
+                 RestoreState(2);
+                 goto STAGE3;
+                 break;
+            case 4:
+                 RestoreState(3);
+                 goto STAGE4;
+                 break;
+            case 5:
+                 RestoreState(4);
+                 goto STAGE5;
+                 break;
+            case 6:             
+                 // Nothing changed
+                 goto STAGE6;
+                 break;
+        }        
+    }else{
+          // If it is first time speedup a little
+          SetParameters(p);
+          first_time=0;
+    }
+    
+STAGE2:    
+            
     if(test_pattern) test_patterns();
-    if(equilibrate_greens)eq_greens();
+    if(level_greens) eq_greens();
     if (!is_foveon && document_mode < 2) scale_colors();
     // Here we take buffer 2
-
-    /*test=(char *)malloc(iheight*iwidth*4);        
-    memcpy(test,image,iheight*iwidth);
-                
-    bk_filters=filters;
-    bk_colors=colors;
-    bk_shrink=shrink;
-    bk_half_size=half_size;
-    bk_mix_green=mix_green;
-    bk_width=width;
-    bk_height=height;
-    bk_iwidth=iwidth;
-    bk_iheight=iheight;
-    bk_top_margin=top_margin;
-    bk_left_margin=left_margin;*/
-//ETAPA2:            
+    SaveState(2);
        
+STAGE3:    
     if (is_foveon && !document_mode) foveon_interpolate();  // Beware, this have been changed from it's main() position
-    pre_interpolate();
+    pre_interpolate();    
     if (filters && !document_mode) {
       if (quality == 0)
 	lin_interpolate();
@@ -8933,13 +9097,17 @@ DLLIMPORT unsigned short * DCRAW_Process(int etapa)
     }
     if (mix_green) for (colors=3, i=0; i < height*width; i++) image[i][1] = (image[i][1] + image[i][3]) >> 1;
     // Here we take buffer 3
+    SaveState(3);
     
+STAGE4:       
     if (!is_foveon && colors == 3) median_filter();
     if (!is_foveon && highlight == 2) blend_highlights();
     if (!is_foveon && highlight > 2) recover_highlights();
     if (use_fuji_rotate) fuji_rotate();
     // Here we take buffer 4
+    SaveState(4);
 
+STAGE5:
     convert_to_rgb();
     if (use_fuji_rotate) stretch();
     
@@ -8954,19 +9122,26 @@ DLLIMPORT unsigned short * DCRAW_Process(int etapa)
         memcpy(img+row*width*colors,ppm,width*colors*2);
     }      
     // Here we take buffer 5
+    SaveState(5);
     
     free(ppm);
     free(image);
     image=img;
+STAGE6:
     return (unsigned short *) image;
 }
 
 DLLIMPORT void DCRAW_End(void)
 {
-    // Release buffers
+    int i;
+    
     if (indpow01) free (indpow01);
     if (meta_data) free (meta_data);
     if (image) free (image);        
-    //if (test) free (test);
+    
+    // Release state buffers
+    for(i=0;i<5;i++){
+       if(state[i].buffer) free(state[i].buffer);
+    }
 }
 #endif
