@@ -1,6 +1,6 @@
 CP   = copy
-PRAWDIR   = ..\PefectRAW\bin\Debug
-PRAWDIRD   = ..\PefectRAW\bin\Release
+PRAWDIR   = ..\PerfectRAW\bin\Debug
+PRAWDIRD   = ..\PerfectRAW\bin\Release
 
 all-after:
 	$(CP) bin\dcraw.dll $(PRAWDIR)
