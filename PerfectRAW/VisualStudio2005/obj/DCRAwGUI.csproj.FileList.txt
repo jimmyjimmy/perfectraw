@@ -1,0 +1,7 @@
+bin\Debug\DCRAwGUI.exe
+bin\Debug\DCRAwGUI.pdb
+obj\Debug\ResolveAssemblyReference.cache
+obj\Debug\DCRAwGUI.Form1.resources
+obj\Debug\DCRAwGUI.csproj.GenerateResource.Cache
+obj\Debug\DCRAwGUI.exe
+obj\Debug\DCRAwGUI.pdb
