@@ -5,3 +5,8 @@ obj\Debug\DCRAwGUI.Form1.resources
 obj\Debug\DCRAwGUI.csproj.GenerateResource.Cache
 obj\Debug\DCRAwGUI.exe
 obj\Debug\DCRAwGUI.pdb
+obj\Release\ResolveAssemblyReference.cache
+obj\Release\DCRAwGUI.Form1.resources
+obj\Release\DCRAwGUI.csproj.GenerateResource.Cache
+bin\Release\DCRAwGUI.exe
+obj\Release\DCRAwGUI.exe
