@@ -1,9 +1,9 @@
 # Project: dcraw
 # Makefile created by Dev-C++ 4.9.9.2
 
-CPP  = g++.exe
-CC   = gcc.exe
-WINDRES = windres.exe
+CPP  = c:\Dev-Cpp\bin\g++.exe
+CC   = c:\Dev-Cpp\bin\gcc.exe
+WINDRES = c:\Dev-Cpp\bin\windres.exe
 RES  = 
 OBJ  = obj/dll.o obj/dcraw.o $(RES)
 LINKOBJ  = obj/dll.o obj/dcraw.o $(RES)
@@ -24,7 +24,7 @@ include copydll.mak
 clean: clean-custom
 	${RM} $(OBJ) $(BIN)
 
-DLLWRAP=dllwrap.exe
+DLLWRAP=c:\Dev-Cpp\bin\dllwrap.exe
 DEFFILE=bin/libdcraw.def
 STATICLIB=bin/libdcraw.a
 

@@ -207,13 +207,15 @@ namespace DCRAwGUI
 		private void button1_Click(object sender, System.EventArgs e)
 		{
             DCRAW_Thread dcraw= new DCRAW_Thread(textBox1.Text);
-            Thread thread=new Thread(new ThreadStart(dcraw.Process));
+            /*Thread thread=new Thread(new ThreadStart(dcraw.Process));
             thread.Priority = ThreadPriority.Lowest;
             thread.Start();            
             do{
                 Console.Write(".");
                 Thread.Sleep(50);
             }while (thread.IsAlive);
+            */
+            dcraw.Process();
             camera.Text = dcraw.info.camera_make + " " + dcraw.info.camera_model;
             pictureBox1.Image = (Image)dcraw.img;
 		}
