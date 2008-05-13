@@ -1,6 +1,6 @@
 CP              = xcopy /Y /Q /I /C
-PRAWDIR2005     = ..\perfectRAW\bin\Debug
-PRAWDIRD2005    = ..\perfectRAW\bin\Release
+PRAWDIR2005     = ..\perfectRAW\VisualStudio2005\bin\Debug
+PRAWDIRD2005    = ..\perfectRAW\VisualStudio2005\bin\Release
 PRAWDIR2008		= ..\PerfectRAW\VisualStudio2008\bin\Debug
 PRAWDIRD2008   	= ..\PerfectRAW\VisualStudio2008\bin\Release
 
