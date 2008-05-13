@@ -1,9 +1,0 @@
-C:\Documents and Settings\CarmenYManuel\Escritorio\dcraw\Win32\perfectRAW\bin\Debug\perfectRAW.exe
-C:\Documents and Settings\CarmenYManuel\Escritorio\dcraw\Win32\perfectRAW\bin\Debug\perfectRAW.pdb
-C:\Documents and Settings\CarmenYManuel\Escritorio\dcraw\Win32\perfectRAW\obj\Debug\ResolveAssemblyReference.cache
-C:\Documents and Settings\CarmenYManuel\Escritorio\dcraw\Win32\perfectRAW\obj\Debug\perfectRAW.MainForm.resources
-C:\Documents and Settings\CarmenYManuel\Escritorio\dcraw\Win32\perfectRAW\obj\Debug\perfectRAW.Properties.Resources.resources
-C:\Documents and Settings\CarmenYManuel\Escritorio\dcraw\Win32\perfectRAW\obj\Debug\perfectRAW.csproj.GenerateResource.Cache
-C:\Documents and Settings\CarmenYManuel\Escritorio\dcraw\Win32\perfectRAW\obj\Debug\perfectRAW.exe
-C:\Documents and Settings\CarmenYManuel\Escritorio\dcraw\Win32\perfectRAW\obj\Debug\perfectRAW.pdb
-C:\Documents and Settings\CarmenYManuel\Escritorio\dcraw\Win32\perfectRAW\bin\Debug\perfectRAW.exe.config
