@@ -6139,7 +6139,7 @@ void CLASS parse_foveon()
 	  data_offset = off+24;
 	}
 	fseek (ifp, off+28, SEEK_SET);
-	if (fgetc(ifp) == 0xff && fgetc(ifp) == 0xd8) 
+	if (fgetc(ifp) == 0xff && fgetc(ifp) == 0xd8 
         && thumb_length < len-28) {
 	  thumb_offset = off+28;
 	  thumb_length = len-28;
