@@ -1,0 +1,16 @@
+bin\Debug\pruLoadDLL.exe
+bin\Debug\pruLoadDLL.pdb
+obj\Debug\ResolveAssemblyReference.cache
+obj\Debug\pruLoadDLL.frmPruLoadDLL.resources
+obj\Debug\pruLoadDLL.Properties.Resources.resources
+obj\Debug\pruLoadDLL.csproj.GenerateResource.Cache
+obj\Debug\pruLoadDLL.exe
+obj\Debug\pruLoadDLL.pdb
+bin\x86\Debug\pruLoadDLL.exe
+bin\x86\Debug\pruLoadDLL.pdb
+obj\x86\Debug\ResolveAssemblyReference.cache
+obj\x86\Debug\pruLoadDLL.frmPruLoadDLL.resources
+obj\x86\Debug\pruLoadDLL.Properties.Resources.resources
+obj\x86\Debug\pruLoadDLL.csproj.GenerateResource.Cache
+obj\x86\Debug\pruLoadDLL.exe
+obj\x86\Debug\pruLoadDLL.pdb
