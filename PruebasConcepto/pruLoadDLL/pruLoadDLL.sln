@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pruLoadDLL", "pruLoadDLL\pr
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pruDLL", "pruDLL\pruDLL.vcproj", "{C9DB4686-2F22-435A-B56E-D3EF3A7C69AD}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pruDLL2", "pruDLL2\pruDLL2.vcproj", "{AF2BFE28-9D11-4E24-9A9F-C47B4BBDBF07}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,20 @@ Global
 		{C9DB4686-2F22-435A-B56E-D3EF3A7C69AD}.Release|Win32.Build.0 = Release|Win32
 		{C9DB4686-2F22-435A-B56E-D3EF3A7C69AD}.Release|x64.ActiveCfg = Release|Win32
 		{C9DB4686-2F22-435A-B56E-D3EF3A7C69AD}.Release|x86.ActiveCfg = Release|Win32
+		{AF2BFE28-9D11-4E24-9A9F-C47B4BBDBF07}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{AF2BFE28-9D11-4E24-9A9F-C47B4BBDBF07}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{AF2BFE28-9D11-4E24-9A9F-C47B4BBDBF07}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{AF2BFE28-9D11-4E24-9A9F-C47B4BBDBF07}.Debug|Win32.ActiveCfg = Debug|Win32
+		{AF2BFE28-9D11-4E24-9A9F-C47B4BBDBF07}.Debug|Win32.Build.0 = Debug|Win32
+		{AF2BFE28-9D11-4E24-9A9F-C47B4BBDBF07}.Debug|x64.ActiveCfg = Debug|Win32
+		{AF2BFE28-9D11-4E24-9A9F-C47B4BBDBF07}.Debug|x86.ActiveCfg = Debug|Win32
+		{AF2BFE28-9D11-4E24-9A9F-C47B4BBDBF07}.Release|Any CPU.ActiveCfg = Release|Win32
+		{AF2BFE28-9D11-4E24-9A9F-C47B4BBDBF07}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{AF2BFE28-9D11-4E24-9A9F-C47B4BBDBF07}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{AF2BFE28-9D11-4E24-9A9F-C47B4BBDBF07}.Release|Win32.ActiveCfg = Release|Win32
+		{AF2BFE28-9D11-4E24-9A9F-C47B4BBDBF07}.Release|Win32.Build.0 = Release|Win32
+		{AF2BFE28-9D11-4E24-9A9F-C47B4BBDBF07}.Release|x64.ActiveCfg = Release|Win32
+		{AF2BFE28-9D11-4E24-9A9F-C47B4BBDBF07}.Release|x86.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -30,12 +30,14 @@
         {
             this.btnRevelar = new System.Windows.Forms.Button();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.txtResultado2 = new System.Windows.Forms.TextBox();
             this.txtResultado = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnRevelar
             // 
+            this.btnRevelar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnRevelar.Location = new System.Drawing.Point(194, 221);
             this.btnRevelar.Name = "btnRevelar";
             this.btnRevelar.Size = new System.Drawing.Size(75, 23);
@@ -50,8 +52,9 @@
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel1.ColumnCount = 2;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 34.76563F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 65.23438F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 40.625F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 59.375F));
+            this.tableLayoutPanel1.Controls.Add(this.txtResultado2, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.txtResultado, 1, 0);
             this.tableLayoutPanel1.Location = new System.Drawing.Point(13, 13);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -60,16 +63,28 @@
             this.tableLayoutPanel1.Size = new System.Drawing.Size(256, 186);
             this.tableLayoutPanel1.TabIndex = 1;
             // 
+            // txtResultado2
+            // 
+            this.txtResultado2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtResultado2.Location = new System.Drawing.Point(3, 3);
+            this.txtResultado2.Multiline = true;
+            this.txtResultado2.Name = "txtResultado2";
+            this.txtResultado2.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txtResultado2.Size = new System.Drawing.Size(98, 180);
+            this.txtResultado2.TabIndex = 1;
+            // 
             // txtResultado
             // 
             this.txtResultado.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtResultado.Location = new System.Drawing.Point(92, 3);
+            this.txtResultado.Location = new System.Drawing.Point(107, 3);
             this.txtResultado.Multiline = true;
             this.txtResultado.Name = "txtResultado";
             this.txtResultado.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtResultado.Size = new System.Drawing.Size(161, 180);
+            this.txtResultado.Size = new System.Drawing.Size(146, 180);
             this.txtResultado.TabIndex = 0;
             // 
             // frmPruLoadDLL
@@ -92,6 +107,7 @@
         private System.Windows.Forms.Button btnRevelar;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.TextBox txtResultado;
+        private System.Windows.Forms.TextBox txtResultado2;
     }
 }
 
