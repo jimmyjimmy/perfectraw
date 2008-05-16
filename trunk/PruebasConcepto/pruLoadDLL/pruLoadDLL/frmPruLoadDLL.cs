@@ -11,8 +11,11 @@ namespace pruLoadDLL
 {
     public partial class frmPruLoadDLL : Form
     {
-        [DllImport("pruDLL.dll",CharSet=CharSet.Ansi)]
+        [DllImport("pruDLL.dll")]
         static extern int revelar();
+        [DllImport("pruDLL2.dll")]
+        static extern int revelar2();
+
         public frmPruLoadDLL()
         {
             InitializeComponent();
@@ -21,8 +24,12 @@ namespace pruLoadDLL
         private void btnRevelar_Click(object sender, EventArgs e)
         {
             int i = revelar();
-            this.txtResultado.Lines.SetValue(i,this.txtResultado.Lines.Length);
+            this.txtResultado.AppendText(i + "\n");
+            i = revelar2();
+            this.txtResultado2.AppendText(i + "\n");
+
 
         }
-    }
+
+         }
 }

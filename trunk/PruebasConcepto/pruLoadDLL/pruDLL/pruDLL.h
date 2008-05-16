@@ -9,14 +9,6 @@
 #else
 #define PRUDLL_API __declspec(dllimport)
 #endif
-
-// Clase exportada de pruDLL.dll
-class PRUDLL_API CpruDLL {
-public:
-	CpruDLL(void);
-	// TODO: agregar métodos aquí.
-};
-
 extern PRUDLL_API int contador;
 
 PRUDLL_API int revelar(void);

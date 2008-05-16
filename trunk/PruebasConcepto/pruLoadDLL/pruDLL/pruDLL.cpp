@@ -33,14 +33,8 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 PRUDLL_API int contador=0;
 
 // Ejemplo de función exportada.
-PRUDLL_API int revelar(void)
+//extern "C" 
+PRUDLL_API int  revelar(void)
 {
 	return ++contador;
-}
-
-// Constructor de clase exportada.
-// Consultar pruDLL.h para definir la clase
-CpruDLL::CpruDLL()
-{
-	return;
 }
