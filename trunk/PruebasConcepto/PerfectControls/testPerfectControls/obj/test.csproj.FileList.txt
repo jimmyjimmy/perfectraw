@@ -1,0 +1,9 @@
+..\PerfectControls\bin\Debug\test.exe
+..\PerfectControls\bin\Debug\test.pdb
+obj\Debug\ResolveAssemblyReference.cache
+obj\Debug\test.Form1.resources
+obj\Debug\test.Form2.resources
+obj\Debug\test.Properties.Resources.resources
+obj\Debug\test.csproj.GenerateResource.Cache
+obj\Debug\test.exe
+obj\Debug\test.pdb
