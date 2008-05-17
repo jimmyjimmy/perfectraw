@@ -1,0 +1,7 @@
+bin\Debug\PerfectControls.dll
+bin\Debug\PerfectControls.pdb
+obj\Debug\ResolveAssemblyReference.cache
+obj\Debug\PerfectControls.dll
+obj\Debug\PerfectControls.pdb
+obj\Debug\PerfectControls.PerfectView.resources
+obj\Debug\PerfectControls.csproj.GenerateResource.Cache
