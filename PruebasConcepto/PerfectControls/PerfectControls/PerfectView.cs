@@ -24,7 +24,6 @@ namespace PerfectControls
         int wDataImg, hDataImg;
         int extra;
         bool bref;
-
         [DllImport(@"PerfectImageDLL.dll")]
         static extern void FastDrawImage(byte* buffer, byte* buffer2, int width, int height, int width2, int heigh2, int extra, int extra2, int x, int y, float z, byte color);
 
