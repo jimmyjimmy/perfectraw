@@ -38,8 +38,10 @@ namespace PerfectControls
         {
             img.UnlockBits(dataImg);
             //Una vez hecho el unlock no debería de volver a utilizarse imgData.
-            //Asegurarse de que se produzca una excepción si se utiliza.
+            //Asegurarse de que se produzca una excepción si se utiliza. y liberar
+            //la memoria utilizada.
             dataImg = null;
+            img.Dispose();
         }
 
         //Convertir Image en privada. La propiedad Image quedará sustituída
@@ -54,22 +56,23 @@ namespace PerfectControls
             set
             {
                 img = value;
-                //¿No debería ser PixelFormat.Format48bppRgb o bien img.PixelFormat?
-                dataImg = img.LockBits(new Rectangle(0, 0, img.Width, img.Height), 
-                    ImageLockMode.ReadOnly, 
-                    System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-                //Si el PixelFormat no es de 8bits no se debería de multiplicar por 3
-                //sino por el número de bytes por pixels de la imagen img.PixelFormat/8
-                extra = dataImg.Stride - dataImg.Width * 3;
-                ptr2bk = (byte*)(dataImg.Scan0);
-                wDataImg = dataImg.Width;
-                hDataImg = dataImg.Height;
-
+                LoadBitmap();
             }
             get
             {
                 return img;
             }
+        }
+        private void LoadBitmap()
+        {
+                dataImg = img.LockBits(new Rectangle(0, 0, img.Width, img.Height), 
+                    ImageLockMode.ReadOnly, 
+                    System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+                extra = dataImg.Stride - dataImg.Width * 3;
+                ptr2bk = (byte*)(dataImg.Scan0);
+                wDataImg = dataImg.Width;
+                hDataImg = dataImg.Height;
+
         }
         public float Zoom
         {
@@ -107,11 +110,22 @@ namespace PerfectControls
             Zoom= zoom *zoomQ;
             return zoom;
         }
+
+        //Propiedad para establecer u obtener el path de la imagen.
+        //Si se establece se elimina el Bitmap que pudiera existir previamente.
+        //Posteriormente habrá que hacer un Load para cargar la imagen.
         public new string ImageLocation
         {
             set 
             {
                 base.ImageLocation = value;
+                if (img != null)
+                {
+                    img.UnlockBits(dataImg);
+                    dataImg = null;
+                    img.Dispose();
+                    img = null;
+                }
             }
             get
             {
@@ -121,8 +135,21 @@ namespace PerfectControls
 
         public new void Load()
         {
+            string path = ImageLocation;
+            if ( (path != "") && (path != null))
+            {
+                img=(Bitmap)Image.FromFile(path);
+                LoadBitmap();
+            }
+            //Comprobar si ya está cargado un
             base.Load();
         }
+        public new void Load(string path)
+        {
+            ImageLocation=path;
+            this.Load();
+        }
+
         protected override void OnMouseDown(MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
