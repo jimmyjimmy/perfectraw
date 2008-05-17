@@ -45,10 +45,7 @@
             this.pictureBox1.Size = new System.Drawing.Size(228, 265);
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
-            this.pictureBox1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.PictureBox1_OnMouseMove);
-            this.pictureBox1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PictureBox1_OnMouseDown);
             this.pictureBox1.MouseHover += new System.EventHandler(this.PictureBox1_OnMouseHover);
-            this.pictureBox1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.PictureBox1_OnMouseUp);
             // 
             // pictureBox2
             // 
@@ -58,10 +55,7 @@
             this.pictureBox2.Size = new System.Drawing.Size(217, 265);
             this.pictureBox2.TabIndex = 1;
             this.pictureBox2.TabStop = false;
-            this.pictureBox2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.PictureBox2_OnMouseMove);
-            this.pictureBox2.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PictureBox2_OnMouseDown);
             this.pictureBox2.MouseHover += new System.EventHandler(this.PictureBox2_OnMouseHover);
-            this.pictureBox2.MouseUp += new System.Windows.Forms.MouseEventHandler(this.PictureBox2_OnMouseUp);
             // 
             // button1
             // 
