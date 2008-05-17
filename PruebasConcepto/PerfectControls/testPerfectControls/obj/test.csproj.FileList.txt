@@ -7,3 +7,4 @@ obj\Debug\test.Properties.Resources.resources
 obj\Debug\test.csproj.GenerateResource.Cache
 obj\Debug\test.exe
 obj\Debug\test.pdb
+..\PerfectControls\bin\Debug\test.exe.config

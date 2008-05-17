@@ -17,7 +17,6 @@ namespace test
         static extern void FastDrawImage(byte* buffer, byte* buffer2, int width, int height, int width2, int heigh2, int extra, int extra2, int x, int y, float z, byte color);
         private const int WHEEL_DELTA = 120;
 
-        int view = 1;
         public Form2()
         {
             InitializeComponent();
@@ -38,9 +37,10 @@ namespace test
         }
         protected override void OnMouseWheel(MouseEventArgs e)
         {
-            PerfectControls.PerfectView pv;
-            if (view == 0) pv = this.pictureBox1;
-            else pv = this.pictureBox2;
+            Control ctrlOnFocus = this.GetChildAtPoint(e.Location);
+            if (!(ctrlOnFocus is PerfectControls.PerfectView))return;
+         
+            PerfectControls.PerfectView pv= (PerfectControls.PerfectView)ctrlOnFocus;
             if (e.Delta == WHEEL_DELTA)
             {
                 pv.MakeZoom(2);
@@ -67,45 +67,12 @@ namespace test
 
         private void PictureBox1_OnMouseHover(object sender, EventArgs e)
         {
-            view = 0;
             label1.Text = "0";
         }
 
         private void PictureBox2_OnMouseHover(object sender, EventArgs e)
         {
-            view = 1;
             label1.Text = "1";
-        }
-
-        private void PictureBox1_OnMouseDown(object sender, MouseEventArgs e)
-        {
-            view = 0;
-        }
-
-        private void PictureBox1_OnMouseMove(object sender, MouseEventArgs e)
-        {            
-
-            view = 0;
-        }
-
-        private void PictureBox1_OnMouseUp(object sender, MouseEventArgs e)
-        {
-            view = 0;
-        }
-
-        private void PictureBox2_OnMouseDown(object sender, MouseEventArgs e)
-        {
-            view = 1;
-        }
-
-        private void PictureBox2_OnMouseMove(object sender, MouseEventArgs e)
-        {
-            view = 1;
-        }
-
-        private void PictureBox2_OnMouseUp(object sender, MouseEventArgs e)
-        {
-            view = 1;
         }
 
         private void button1_Click(object sender, EventArgs e)
