@@ -14,7 +14,13 @@ namespace test
     public unsafe partial class Form1 : Form
     {
         [DllImport(@"PerfectImageDLL.dll")]
-        static extern void FastDrawImage(byte * buffer, byte* buffer2, int width, int height, int width2, int heigh2, int extra, int extra2, int x, int y, float z, byte color);
+        static extern void FastDrawImage(byte* buffer, byte* buffer2, int width, int height, int width2, int heigh2, int extra, int extra2, int x, int y, float z, byte color);
+
+        [DllImport(@"PerfectImageDLL.dll")]
+        static extern void FastDrawBiVImage(byte* buffer, byte* buffer1, byte* buffer3, int width, int height, int width2, int heigh2, int extra, int extra2, int x, int y, float z, byte color);
+
+        [DllImport(@"PerfectImageDLL.dll")]
+        static extern void FastDrawImageFlash(byte* buffer, byte* buffer2, int width, int height, int width2, int heigh2, int extra, int extra2, int x, int y, float z, byte color, int flash);
 
         int []state=new int[2];
         int []dragFromX=new int[2];
@@ -38,6 +44,8 @@ namespace test
         int extra22;
         bool flag=false;
         bool []bref=new bool[2];
+        Timer timer = new Timer();
+        int flash=-1;
 
         public Form1()
         {
@@ -45,10 +53,22 @@ namespace test
             Zoom[0] = Zoom[1] = 1;
             state[0] = state[1] = 0;
             pX[0] = pX[1] = pY[0] = pY[1] = 0;
+            timer.Interval = 250;
+            timer.Tick += new System.EventHandler(TimerTick);
+            timer.Enabled = true;
+        }
+
+        void TimerTick(object sender, EventArgs e)
+        {
+            // Cambiamos este flag para que parpadee (entre -1 y 1)
+            flash = -flash;            
+            bref[0] = true;
+            this.Refresh();                        
         }
 
         ~Form1()
         {
+            timer.Enabled = false;
             while (flag) ;
             img1.UnlockBits(data21);
             img2.UnlockBits(data22);
@@ -61,12 +81,19 @@ namespace test
             ptr2bk1 = (byte*)(data21.Scan0);
             w21 = data21.Width;
             h21 = data21.Height;
-
+            
             data22 = img2.LockBits(new Rectangle(0, 0, img2.Width, img2.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
             extra22 = data22.Stride - data22.Width * 3;
             ptr2bk2 = (byte*)(data22.Scan0);
             w22 = data22.Width;
             h22 = data22.Height;
+            unsafe
+            {
+                for (int i = 0; i < (w22+extra22) * h22*3; i++)
+                {
+                    if(ptr2bk2[i]<225) ptr2bk2[i] += 30;
+                }
+            }               
             
             ResizeViews();            
         }                        
@@ -186,6 +213,7 @@ namespace test
 
         protected override void OnMouseWheel(MouseEventArgs e)
         {            
+            base.OnMouseWheel(e);
 
             if (e.Delta == WHEEL_DELTA)
             {
@@ -197,7 +225,6 @@ namespace test
                 MakeZoom(1/2F);
             }
             Refresh();
-            base.OnMouseWheel(e);
         }
 
         private void MakeZoom(float ZoomQ)
@@ -231,47 +258,42 @@ namespace test
         }
 
         private void Form1_OnPaint(object sender, PaintEventArgs e)
-        {
-            // La DLL no es reentrante, así que hay que evitar que colapsen las llamadas a ella
-            // aunque sí debería serlo, ¿no?
-            if (flag == false)
-            {
-                flag = true;
-                
-                int aview = 0;
-                if (bref[aview])
-                {                    
-                    Bitmap bmp = new Bitmap(w[aview], h[aview], System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-                    BitmapData data1 = bmp.LockBits(new Rectangle(0, 0, w[aview], h[aview]), ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-                    int extra = data1.Stride - data1.Width * 3;
-                    unsafe
-                    {
-                        byte* ptr = (byte*)(data1.Scan0);
-                        byte* ptr2 = ptr2bk1;
-                        FastDrawImage(ptr, ptr2, w[aview], h[aview], w21, h21, extra, extra21, pX[aview], pY[aview], Zoom[aview], 128);
-                    }
-                    bmp.UnlockBits(data1);                    
-                    pictureBox1.Image = bmp;                    
-                    bref[aview] = false;
-                }
-
-                aview = 1;
-                if (bref[aview])
+        {               
+            int aview = 0;
+            if (bref[aview])
+            {                    
+                Bitmap bmp = new Bitmap(w[aview], h[aview], System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+                BitmapData data1 = bmp.LockBits(new Rectangle(0, 0, w[aview], h[aview]), ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+                int extra = data1.Stride - data1.Width * 3;
+                unsafe
                 {
-                    Bitmap bmp = new Bitmap(w[aview], h[aview], System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-                    BitmapData data1 = bmp.LockBits(new Rectangle(0, 0, w[aview], h[aview]), ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-                    int extra = data1.Stride - data1.Width * 3;
-                    unsafe
-                    {
-                        byte* ptr = (byte*)(data1.Scan0);
-                        byte* ptr2 = ptr2bk2;
-                        FastDrawImage(ptr, ptr2, w[aview], h[aview], w22, h22, extra, extra22, pX[aview], pY[aview], Zoom[aview], 128);
-                    }
-                    bmp.UnlockBits(data1);
-                    pictureBox2.Image = bmp;
-                    bref[aview] = false;
+                    byte* ptr = (byte*)(data1.Scan0);
+                    byte* ptr2 = ptr2bk1;
+                    FastDrawImageFlash(ptr, ptr2, w[aview], h[aview], w21, h21, extra, extra21, pX[aview], pY[aview], Zoom[aview], 128, flash);
                 }
-                flag = false;
+                bmp.UnlockBits(data1);
+                if(pictureBox1.Image!=null) pictureBox1.Image.Dispose();
+                pictureBox1.Image = bmp;                    
+                bref[aview] = false;
+            }
+
+            aview = 1;
+            if (bref[aview])
+            {
+                Bitmap bmp = new Bitmap(w[aview], h[aview], System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+                BitmapData data1 = bmp.LockBits(new Rectangle(0, 0, w[aview], h[aview]), ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+                int extra = data1.Stride - data1.Width * 3;
+                unsafe
+                {
+                    byte* ptr = (byte*)(data1.Scan0);
+                    byte* ptr2 = ptr2bk2;
+                    byte* ptr3 = ptr2bk1;
+                    FastDrawBiVImage(ptr, ptr2, ptr3, w[aview], h[aview], w22, h22, extra, extra22, pX[aview], pY[aview], Zoom[aview], 128);
+                }
+                bmp.UnlockBits(data1);
+                if (pictureBox2.Image != null) pictureBox2.Image.Dispose();
+                pictureBox2.Image = bmp;                    
+                bref[aview] = false;
             }
         }
 
@@ -301,7 +323,7 @@ namespace test
                 {
                     byte* ptr = (byte*)(data1.Scan0);
                     byte* ptr2 = ptr2bk1;
-                    FastDrawImage(ptr, ptr2, w[aview], h[aview], w21, h21, extra, extra21, pX[aview], pY[aview], 1/32F, 128);
+                    FastDrawBiVImage(ptr, ptr2, ptr, w[aview], h[aview], w21, h21, extra, extra21, pX[aview], pY[aview], 1/32F, 128);
                 }
             }
             bmp.UnlockBits(data1);

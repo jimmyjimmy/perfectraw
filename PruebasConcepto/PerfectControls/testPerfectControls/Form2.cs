@@ -13,21 +13,41 @@ namespace test
 {
     public unsafe partial class Form2 : Form
     {
-        [DllImport(@"PerfectImageDLL.dll")]
-        static extern void FastDrawImage(byte* buffer, byte* buffer2, int width, int height, int width2, int heigh2, int extra, int extra2, int x, int y, float z, byte color);
         private const int WHEEL_DELTA = 120;
+        protected Bitmap img, imgOld;
 
         public Form2()
         {
             InitializeComponent();
         }
-
+        ~Form2()
+        {
+            if (img != null) img.Dispose();
+            if (imgOld != null) imgOld.Dispose();
+        }
 
         private void Form2_Load(object sender, EventArgs e)
         {
-            this.pictureBox1.Bitmap = (Bitmap)Bitmap.FromFile(@"salón.jpg");
-            this.pictureBox2.Bitmap = (Bitmap)Bitmap.FromFile(@"salón.jpg");
-           
+            img = (Bitmap)Bitmap.FromFile(@"salón.jpg");
+            imgOld= (Bitmap)Bitmap.FromFile(@"salón.jpg");
+            //Make some changes to the original image to appreciate the split view working mode.
+            perfectView2.OldBitmap = imgOld;
+            BitmapData data = img.LockBits(new Rectangle(0, 0, img.Width, img.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+            int extra = data.Stride - data.Width * 3;
+            byte *ptr2bk = (byte*)(data.Scan0);
+            int w = data.Width;
+            int h = data.Height;
+            unsafe
+            {
+                for (int i = 0; i < (w + extra) * h * 3; i++)
+                {
+                    if (ptr2bk[i] < 225) ptr2bk[i] += 30;
+                }
+            }
+            img.UnlockBits(data);
+            perfectView2.Bitmap = img;
+            
+            perfectView1.Bitmap = img;
             ResizeViews();            
         }                        
 
@@ -59,10 +79,10 @@ namespace test
             int sw = this.Width;
             int sh = this.Height;
             
-            pictureBox1.Width = sw / 2;
-            pictureBox2.Width = sw - sw / 2;
-            pictureBox2.Left = sw - pictureBox2.Width;
-            pictureBox1.Height = pictureBox2.Height = sh - 250;
+            perfectView1.Width = sw / 2;
+            perfectView2.Width = sw - sw / 2;
+            perfectView2.Left = sw - perfectView2.Width;
+            perfectView1.Height = perfectView2.Height = sh - 250;
         }
 
         private void PictureBox1_OnMouseHover(object sender, EventArgs e)
@@ -83,7 +103,19 @@ namespace test
         private void button2_Click(object sender, EventArgs e)
         {
             // Tests de velocidad
-            pictureBox1.TestVelocidad();
+            perfectView1.TestVelocidad();
+        }
+
+        private void showBurnedPixels_CheckedChanged(object sender, EventArgs e)
+        {
+            if (showBurnedPixels.CheckState == CheckState.Checked)
+            {
+                perfectView1.ShowBurnedPixels = true;
+            }
+            else
+            {
+                perfectView1.ShowBurnedPixels = false;
+            }
         }
     }
 }

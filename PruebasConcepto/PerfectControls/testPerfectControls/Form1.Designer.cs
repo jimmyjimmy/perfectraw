@@ -28,10 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            //this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            //this.pictureBox2 = new System.Windows.Forms.PictureBox();
-            this.pictureBox1 = new  PerfectControls.PerfectView();
-            this.pictureBox2 = new  PerfectControls.PerfectView();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.button1 = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.button2 = new System.Windows.Forms.Button();
@@ -122,10 +120,8 @@
 
         #endregion
 
-        //private System.Windows.Forms.PictureBox pictureBox1;
-        //private System.Windows.Forms.PictureBox pictureBox2;
-        private PerfectControls.PerfectView pictureBox1;
-        private PerfectControls.PerfectView pictureBox2;
+        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.PictureBox pictureBox2;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button button2;

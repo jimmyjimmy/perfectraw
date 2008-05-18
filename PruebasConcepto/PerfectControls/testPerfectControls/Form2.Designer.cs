@@ -28,34 +28,15 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.pictureBox1 = new PerfectControls.PerfectView();
-            this.pictureBox2 = new PerfectControls.PerfectView();
             this.button1 = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.button2 = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
+            this.showBurnedPixels = new System.Windows.Forms.CheckBox();
+            this.perfectView2 = new PerfectControls.PerfectView();
+            this.perfectView1 = new PerfectControls.PerfectView();
+            ((System.ComponentModel.ISupportInitialize)(this.perfectView2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.perfectView1)).BeginInit();
             this.SuspendLayout();
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Cursor = System.Windows.Forms.Cursors.SizeAll;
-            this.pictureBox1.Location = new System.Drawing.Point(0, 33);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(228, 265);
-            this.pictureBox1.TabIndex = 0;
-            this.pictureBox1.TabStop = false;
-            this.pictureBox1.MouseHover += new System.EventHandler(this.PictureBox1_OnMouseHover);
-            // 
-            // pictureBox2
-            // 
-            this.pictureBox2.Cursor = System.Windows.Forms.Cursors.SizeAll;
-            this.pictureBox2.Location = new System.Drawing.Point(313, 33);
-            this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(217, 265);
-            this.pictureBox2.TabIndex = 1;
-            this.pictureBox2.TabStop = false;
-            this.pictureBox2.MouseHover += new System.EventHandler(this.PictureBox2_OnMouseHover);
             // 
             // button1
             // 
@@ -89,23 +70,65 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
-            // Form1
+            // showBurnedPixels
+            // 
+            this.showBurnedPixels.AutoSize = true;
+            this.showBurnedPixels.Location = new System.Drawing.Point(228, 570);
+            this.showBurnedPixels.Name = "showBurnedPixels";
+            this.showBurnedPixels.Size = new System.Drawing.Size(142, 17);
+            this.showBurnedPixels.TabIndex = 5;
+            this.showBurnedPixels.Text = "Mostrar pixels quemados";
+            this.showBurnedPixels.UseVisualStyleBackColor = true;
+            this.showBurnedPixels.CheckedChanged += new System.EventHandler(this.showBurnedPixels_CheckedChanged);
+            // 
+            // perfectView2
+            // 
+            this.perfectView2.Bitmap = null;
+            this.perfectView2.Cursor = System.Windows.Forms.Cursors.SizeAll;
+            this.perfectView2.Location = new System.Drawing.Point(313, 33);
+            this.perfectView2.Name = "perfectView2";
+            this.perfectView2.OldBitmap = null;
+            this.perfectView2.ShowBurnedPixels = false;
+            this.perfectView2.Size = new System.Drawing.Size(217, 265);
+            this.perfectView2.TabIndex = 1;
+            this.perfectView2.TabStop = false;
+            this.perfectView2.ViewMode = PerfectControls.PerfectViewMode.VerticalSplit;
+            this.perfectView2.Zoom = 1F;
+            this.perfectView2.MouseHover += new System.EventHandler(this.PictureBox2_OnMouseHover);
+            // 
+            // perfectView1
+            // 
+            this.perfectView1.Bitmap = null;
+            this.perfectView1.Cursor = System.Windows.Forms.Cursors.SizeAll;
+            this.perfectView1.Location = new System.Drawing.Point(0, 33);
+            this.perfectView1.Name = "perfectView1";
+            this.perfectView1.OldBitmap = null;
+            this.perfectView1.ShowBurnedPixels = false;
+            this.perfectView1.Size = new System.Drawing.Size(228, 265);
+            this.perfectView1.TabIndex = 0;
+            this.perfectView1.TabStop = false;
+            this.perfectView1.ViewMode = PerfectControls.PerfectViewMode.OneView;
+            this.perfectView1.Zoom = 1F;
+            this.perfectView1.MouseHover += new System.EventHandler(this.PictureBox1_OnMouseHover);
+            // 
+            // Form2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
             this.ClientSize = new System.Drawing.Size(800, 600);
+            this.Controls.Add(this.showBurnedPixels);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.button1);
-            this.Controls.Add(this.pictureBox2);
-            this.Controls.Add(this.pictureBox1);
+            this.Controls.Add(this.perfectView2);
+            this.Controls.Add(this.perfectView1);
             this.Name = "Form2";
             this.Text = "Form2";
-            this.Load += new System.EventHandler(this.Form2_Load);
             this.Resize += new System.EventHandler(this.Form2_OnResize);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
+            this.Load += new System.EventHandler(this.Form2_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.perfectView2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.perfectView1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -113,11 +136,12 @@
 
         #endregion
 
-        private PerfectControls.PerfectView pictureBox1;
-        private PerfectControls.PerfectView pictureBox2;
+        private PerfectControls.PerfectView perfectView1;
+        private PerfectControls.PerfectView perfectView2;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.CheckBox showBurnedPixels;
 
     }
 }
