@@ -9,6 +9,9 @@
 
 #define PX8 unsigned char
 
-DLLIMPORT void FastDrawImage(PX8 * ,PX8 * , int , int , int , int , int , int , int , int , float , PX8);
+DLLIMPORT void FastDrawImage(PX8 * ,PX8 * ,int ,int, int, int, int, int, int, int, float, PX8 );
+DLLIMPORT void FastDrawBiHImage(PX8 * ,PX8 *, PX8 *, int, int, int, int, int, int, int, int, float, PX8 );
+DLLIMPORT void FastDrawBiVImage(PX8 * ,PX8 *, PX8 *, int, int, int, int, int, int, int, int, float, PX8 );
+DLLIMPORT void FastDrawImageFlash(PX8 * ,PX8 *, int, int, int, int, int, int, int, int, float, PX8, int );
 
 #endif // _PERFECTIMAGEDLL_H_
