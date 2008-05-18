@@ -369,6 +369,18 @@ DLLIMPORT void FastDrawBiVImage(PX8 *buffer, PX8 *buffer1, PX8 *buffer3, int wid
    }
 }
 
+
+DLLIMPORT void FastFlashImage(PX8 *buffer, int width, int height, int flash)
+{
+   int j;
+   int nelem= width*height;
+   int MarkValue = (flash>0?255:0);
+   for(j=0;j<nelem;j++,buffer +=3)
+	   if((buffer[j]>240)||(buffer[j+1]>240)||(buffer[j+2]>240))
+		   buffer[j]=buffer[j+1]=buffer[j+2]=255;
+
+}
+
 // This only works with 24bpsRGB/24bpsBGR buffers
 DLLIMPORT void FastDrawImageFlash(PX8 *buffer, PX8 *buffer2, int width, int height, int width2, int height2, int extra, int extra2, int x, int y, float z, PX8 color, int flash)
 {
