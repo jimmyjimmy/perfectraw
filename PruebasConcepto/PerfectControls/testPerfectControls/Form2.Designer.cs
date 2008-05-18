@@ -32,8 +32,13 @@
             this.label1 = new System.Windows.Forms.Label();
             this.button2 = new System.Windows.Forms.Button();
             this.showBurnedPixels = new System.Windows.Forms.CheckBox();
+            this.gbModoVista = new System.Windows.Forms.GroupBox();
+            this.rbVistaSimple = new System.Windows.Forms.RadioButton();
+            this.rbVistaVertical = new System.Windows.Forms.RadioButton();
+            this.rbVistaHorizontal = new System.Windows.Forms.RadioButton();
             this.perfectView2 = new PerfectControls.PerfectView();
             this.perfectView1 = new PerfectControls.PerfectView();
+            this.gbModoVista.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.perfectView2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.perfectView1)).BeginInit();
             this.SuspendLayout();
@@ -72,6 +77,7 @@
             // 
             // showBurnedPixels
             // 
+            this.showBurnedPixels.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.showBurnedPixels.AutoSize = true;
             this.showBurnedPixels.Location = new System.Drawing.Point(228, 570);
             this.showBurnedPixels.Name = "showBurnedPixels";
@@ -80,6 +86,54 @@
             this.showBurnedPixels.Text = "Mostrar pixels quemados";
             this.showBurnedPixels.UseVisualStyleBackColor = true;
             this.showBurnedPixels.CheckedChanged += new System.EventHandler(this.showBurnedPixels_CheckedChanged);
+            // 
+            // gbModoVista
+            // 
+            this.gbModoVista.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.gbModoVista.Controls.Add(this.rbVistaHorizontal);
+            this.gbModoVista.Controls.Add(this.rbVistaVertical);
+            this.gbModoVista.Controls.Add(this.rbVistaSimple);
+            this.gbModoVista.Location = new System.Drawing.Point(397, 525);
+            this.gbModoVista.Name = "gbModoVista";
+            this.gbModoVista.Size = new System.Drawing.Size(200, 63);
+            this.gbModoVista.TabIndex = 6;
+            this.gbModoVista.TabStop = false;
+            this.gbModoVista.Text = "Modo Vista";
+            // 
+            // rbVistaSimple
+            // 
+            this.rbVistaSimple.AutoSize = true;
+            this.rbVistaSimple.Location = new System.Drawing.Point(7, 20);
+            this.rbVistaSimple.Name = "rbVistaSimple";
+            this.rbVistaSimple.Size = new System.Drawing.Size(56, 17);
+            this.rbVistaSimple.TabIndex = 0;
+            this.rbVistaSimple.Text = "Simple";
+            this.rbVistaSimple.UseVisualStyleBackColor = true;
+            this.rbVistaSimple.CheckedChanged += new System.EventHandler(this.rbVistaSimple_CheckedChanged);
+            // 
+            // rbVistaVertical
+            // 
+            this.rbVistaVertical.AutoSize = true;
+            this.rbVistaVertical.Checked = true;
+            this.rbVistaVertical.Location = new System.Drawing.Point(84, 20);
+            this.rbVistaVertical.Name = "rbVistaVertical";
+            this.rbVistaVertical.Size = new System.Drawing.Size(96, 17);
+            this.rbVistaVertical.TabIndex = 1;
+            this.rbVistaVertical.TabStop = true;
+            this.rbVistaVertical.Text = "Partida Vertical";
+            this.rbVistaVertical.UseVisualStyleBackColor = true;
+            this.rbVistaVertical.CheckedChanged += new System.EventHandler(this.rbVistaVertical_CheckedChanged);
+            // 
+            // rbVistaHorizontal
+            // 
+            this.rbVistaHorizontal.AutoSize = true;
+            this.rbVistaHorizontal.Location = new System.Drawing.Point(84, 43);
+            this.rbVistaHorizontal.Name = "rbVistaHorizontal";
+            this.rbVistaHorizontal.Size = new System.Drawing.Size(108, 17);
+            this.rbVistaHorizontal.TabIndex = 2;
+            this.rbVistaHorizontal.Text = "Partida Horizontal";
+            this.rbVistaHorizontal.UseVisualStyleBackColor = true;
+            this.rbVistaHorizontal.CheckedChanged += new System.EventHandler(this.rbVistaHorizontal_CheckedChanged);
             // 
             // perfectView2
             // 
@@ -117,6 +171,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
             this.ClientSize = new System.Drawing.Size(800, 600);
+            this.Controls.Add(this.gbModoVista);
             this.Controls.Add(this.showBurnedPixels);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.label1);
@@ -127,6 +182,8 @@
             this.Text = "Form2";
             this.Resize += new System.EventHandler(this.Form2_OnResize);
             this.Load += new System.EventHandler(this.Form2_Load);
+            this.gbModoVista.ResumeLayout(false);
+            this.gbModoVista.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.perfectView2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.perfectView1)).EndInit();
             this.ResumeLayout(false);
@@ -142,6 +199,10 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.CheckBox showBurnedPixels;
+        private System.Windows.Forms.GroupBox gbModoVista;
+        private System.Windows.Forms.RadioButton rbVistaHorizontal;
+        private System.Windows.Forms.RadioButton rbVistaVertical;
+        private System.Windows.Forms.RadioButton rbVistaSimple;
 
     }
 }

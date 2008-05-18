@@ -117,5 +117,20 @@ namespace test
                 perfectView1.ShowBurnedPixels = false;
             }
         }
+
+        private void rbVistaSimple_CheckedChanged(object sender, EventArgs e)
+        {
+            perfectView2.ViewMode = PerfectControls.PerfectViewMode.OneView;
+        }
+
+        private void rbVistaVertical_CheckedChanged(object sender, EventArgs e)
+        {
+            perfectView2.ViewMode = PerfectControls.PerfectViewMode.VerticalSplit;
+        }
+
+        private void rbVistaHorizontal_CheckedChanged(object sender, EventArgs e)
+        {
+            perfectView2.ViewMode = PerfectControls.PerfectViewMode.HorizontalSplit;
+        }
     }
 }

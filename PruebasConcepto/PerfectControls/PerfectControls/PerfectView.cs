@@ -27,19 +27,18 @@ namespace PerfectControls
         private static extern void FastDrawBiVImage(byte* buffer, byte* buffer1, byte* buffer3, int width, int height, int width2, int heigh2, int extra, int extra2, int x, int y, float z, byte color);
 
         [DllImport(@"PerfectImageDLL.dll")]
-        private static extern void FastDrawImageFlash(byte* buffer, byte* buffer2, int width, int height, int width2, int heigh2, int extra, int extra2, int x, int y, float z, byte color, int flash);
+        private static extern void FastDrawImageFlash(byte* buffer, byte* buffer2, int width, int height, int width2, int heigh2, int extra, int extra2, int x, int y, float z, byte color,int flash);
+
+        [DllImport(@"PerfectImageDLL.dll")]
+        private static extern void FastFlashImage(byte* buffer, int width, int height, int flash);
 
         
         //Bitmap de la imagen original y de la previa (Old de un anterior revelado)
         Bitmap img,imgOld;
-        BitmapData dataImg,dataImgOld;
         float zoom;
         int stateDragging, pX, pY;
         int dragFromX, dragFromY;
-        byte* ptr2bk,ptr2bkOld;
         int wDispImg, hDispImg;
-        int wDispImgOld, hDispImgOld;
-        int extra,extraOld;
         bool bref;
         int showBurnedPixelsFlash;
         Timer timer;
@@ -54,8 +53,6 @@ namespace PerfectControls
         }
         ~PerfectView()
         {
-            FreeImg();
-            FreeOldImg();
         }
 
         //Convertir Image en privada. La propiedad Image quedará sustituída
@@ -103,6 +100,8 @@ namespace PerfectControls
                     timer.Interval = 250;
                     timer.Tick += new System.EventHandler(TimerTick);
                     timer.Enabled = true;
+                    bref = true;
+                    this.Refresh();
                 }
                 else
                 {
@@ -135,6 +134,8 @@ namespace PerfectControls
             set
             {
                 viewMode = value;
+                bref = true;
+                this.Refresh();
             }
             get
             {
@@ -146,46 +147,16 @@ namespace PerfectControls
             //During control initialization we may receive null bitmaps (if they are not set
             //in control properties window. Do nothing in that case.
             if (bitmap == null) return;
-            FreeImg();
             img = bitmap;
-            dataImg = img.LockBits(new Rectangle(0, 0, img.Width, img.Height), 
-                ImageLockMode.ReadOnly, 
-                System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-            extra = dataImg.Stride - dataImg.Width * 3;
-            ptr2bk = (byte*)(dataImg.Scan0);
-            wDispImg = dataImg.Width;
-            hDispImg = dataImg.Height;
-
+            wDispImg = img.Width;
+            hDispImg = img.Height;
         }
         private void LoadOldBitmap(Bitmap bitmap)
         {
             //During control initialization we may receive null bitmaps (if they are not set
             //in control properties window. Do nothing in that case.
             if (bitmap == null) return;
-            FreeOldImg();
             imgOld = bitmap;
-            dataImgOld = imgOld.LockBits(new Rectangle(0, 0, imgOld.Width, imgOld.Height),
-                ImageLockMode.ReadOnly,
-                System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-            extraOld = dataImgOld.Stride - dataImgOld.Width * 3;
-            ptr2bkOld = (byte*)(dataImgOld.Scan0);
-            wDispImgOld = dataImgOld.Width;
-            hDispImgOld = dataImgOld.Height;
-
-        }
-        private void FreeImg()
-        {
-            if (img == null) return;
-            img.UnlockBits(dataImg);
-            dataImg = null;
-            img = null;
-        }
-        private void FreeOldImg()
-        {
-            if (imgOld == null) return;
-            imgOld.UnlockBits(dataImgOld);
-            dataImgOld = null;
-            imgOld = null;
         }
 
         [Category("Appearance")]
@@ -246,7 +217,6 @@ namespace PerfectControls
             string path = ImageLocation;
             if ( (path != "") && (path != null))
             {
-                FreeImg();
                 LoadBitmap((Bitmap)Image.FromFile(path));
             }
             base.Load();
@@ -311,13 +281,22 @@ namespace PerfectControls
             Bitmap bmp = new Bitmap(Width, Height, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
             BitmapData dataBmp = bmp.LockBits(new Rectangle(0, 0, Width, Height), ImageLockMode.WriteOnly, 
                 System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+            byte* ptrBmp = (byte*)(dataBmp.Scan0);
             int extBmp = dataBmp.Stride - dataBmp.Width * 3;
-            switch (viewMode ){
+
+            BitmapData dataImg = img.LockBits(new Rectangle(0, 0, img.Width, img.Height),
+                ImageLockMode.ReadOnly,
+                System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+            int extra = dataImg.Stride - dataImg.Width * 3;
+            byte *ptr2bk = (byte*)(dataImg.Scan0);
+
+            switch (viewMode)
+            {
                 case PerfectViewMode.OneView:
                     unsafe
                     {
                         if(showBurnedPixelsFlash==0)
-                            FastDrawImage((byte *)dataBmp.Scan0, ptr2bk, Width, Height, wDispImg,hDispImg,
+                            FastDrawImage(ptrBmp, ptr2bk, Width, Height, wDispImg, hDispImg,
                                     extBmp, extra, pX, pY, zoom, 128);
                         else
                             FastDrawImageFlash((byte*)dataBmp.Scan0, ptr2bk, Width, Height, wDispImg, hDispImg,
@@ -326,13 +305,23 @@ namespace PerfectControls
                     break;
                 case PerfectViewMode.VerticalSplit:
                 case PerfectViewMode.HorizontalSplit:
+                    BitmapData dataImgOld = imgOld.LockBits(new Rectangle(0, 0, imgOld.Width, imgOld.Height),
+                       ImageLockMode.ReadOnly,
+                       System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+                    byte *ptr2bkOld = (byte*)(dataImgOld.Scan0);
                     unsafe
                     {
-                        FastDrawBiVImage((byte*)dataBmp.Scan0, ptr2bk, ptr2bkOld, Width, Height, wDispImg, hDispImg,
+                        FastDrawBiVImage(ptrBmp, ptr2bk, ptr2bkOld, Width, Height, wDispImg, hDispImg,
                                 extBmp, extra, pX, pY, zoom, 128);
                     }
+                    imgOld.UnlockBits(dataImgOld);
                     break;
             }
+            /*
+            if (showBurnedPixelsFlash != 0)
+                FastFlashImage(ptrBmp, Width, Height,showBurnedPixelsFlash);
+             */
+            img.UnlockBits(dataImg);
             bmp.UnlockBits(dataBmp);
             /*
                 //Dibujar las máscaras de selección de objetos o Histograma.
@@ -356,6 +345,11 @@ namespace PerfectControls
         public void TestVelocidad()
         {
             // Tests de velocidad
+            BitmapData dataImg = img.LockBits(new Rectangle(0, 0, img.Width, img.Height),
+                ImageLockMode.ReadOnly,
+                System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+            int extra = dataImg.Stride - dataImg.Width * 3;
+            byte* ptr2bk = (byte*)(dataImg.Scan0);
 
             Bitmap bmp = new Bitmap(Width,Height,
                 System.Drawing.Imaging.PixelFormat.Format24bppRgb);
@@ -375,6 +369,7 @@ namespace PerfectControls
                           ext, extra, pX, pY, 1 / 32F, 128);
                 }
             }
+            img.UnlockBits(dataImg);
             bmp.UnlockBits(data1);
             this.Image = bmp;
             t2 = Environment.TickCount;
