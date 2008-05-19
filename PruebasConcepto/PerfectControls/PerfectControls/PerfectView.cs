@@ -323,21 +323,21 @@ namespace PerfectControls
              */
             img.UnlockBits(dataImg);
             bmp.UnlockBits(dataBmp);
-            /*
-                //Dibujar las máscaras de selección de objetos o Histograma.
-                Graphics gc = Graphics.FromImage(bmp);
-                Matrix transMat = new Matrix();
-                transMat.Translate(-pX, -pY, MatrixOrder.Prepend);
-                transMat.Scale(zoom, zoom, MatrixOrder.Prepend);
-                gc.Transform = transMat;
-                DibujarSeleccion(gc);
-                gc.Dispose();
-                transMat.Dispose();
-             */
+            
+            //Dibujar las máscaras de selección de objetos o Histograma.
+            Graphics gc = Graphics.FromImage(bmp);
+            Matrix transMat = new Matrix();
+            transMat.Translate(-pX * zoom, -pY* zoom);
+            transMat.Scale(zoom, zoom);
+            gc.Transform = transMat;
+            DibujarSeleccion(gc);
+            gc.Dispose();
+            transMat.Dispose();
+             
 
             //Change image in PictureBox with generated image.
-            //PictureBox is supposed to make the dispose of the 
-            if (base.Image != null) base.Image.Dispose();
+            //PictureBox is supposed to make the dispose of the image
+            //when changed.
             base.Image = bmp;
             bref = false;
             base.OnPaint(pe);
@@ -379,8 +379,8 @@ namespace PerfectControls
         protected void DibujarSeleccion(Graphics gc)
         {
             SolidBrush br = new SolidBrush(Color.FromArgb(70, Color.Aquamarine));
- 
-            gc.FillEllipse(br ,img.Width/2,img.Height/2,img.Width/4,img.Height/4);
+
+            gc.FillEllipse(br, wDispImg/4, hDispImg/4, wDispImg/2, hDispImg/2);
             br.Dispose();
         }
 
