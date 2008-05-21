@@ -30,6 +30,12 @@ typedef struct DCRAW_ImageInfo
        char  *filter_pattern;
 }IMAGE_INFO;
 
+typedef struct DLL_TEST
+{
+        int  a;
+        char *b;
+}TEST;
+            
 // Struct for passing parameters to the development process
 typedef struct DCRAW_Parameters
 {       

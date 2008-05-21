@@ -9131,12 +9131,17 @@ DLLIMPORT int DCRAW_Init(char *ifname,int *w,int *h)
     return status;
 }
 
+DLLIMPORT void test(TEST *t)
+{
+   t->a=5;
+   t->b="¡Hola Fernando!";
+}
+
 DLLIMPORT void DCRAW_GetInfo(IMAGE_INFO *info)
 {
    int i;   
    
-   //info->timestamp=ctime(&timestamp);
-   info->timestamp="";
+   info->timestamp=ctime(&timestamp);   
    info->camera_make=make;
    info->camera_model=model;   
    info->artist=artist;
@@ -9165,9 +9170,7 @@ DLLIMPORT void DCRAW_GetInfo(IMAGE_INFO *info)
 	  if (!cdesc[3]) cdesc[3] = 'G';
 	  for (i=0; i < 16; i++)
 	    putchar (cdesc[fc(i >> 1,i & 1)]);
-   }*/		
-	
-    return info;
+   }*/			    
 }
 
 DLLIMPORT unsigned short * DCRAW_Process(DLL_PARAMETERS *p)
