@@ -49,6 +49,8 @@ typedef struct DCRAW_Parameters
        int      output_color;      // -o -> buffer 5                     
        int      use_fuji_rotate;   // -J -> buffer 5
        float    user_gamma;        // -g -> buffer 5       
+       float    exposure;          //    -> buffer 3
+       int      exposure_mode;     //    -> buffer 3
 }DLL_PARAMETERS;
 
 // Struct for saving and restoring DLL state
@@ -64,7 +66,8 @@ typedef struct DCRAW_State
        int    iwidth;
        int    iheight;
        int    top_margin;
-       int    left_margin;       
+       int    left_margin;     
+       int    raw_color;  
        unsigned short (*buffer)[4];
 }DLL_STATE;
 
@@ -73,5 +76,6 @@ DLLIMPORT int  DCRAW_Init(char *,int *,int *);
 DLLIMPORT void DCRAW_GetInfo(IMAGE_INFO *);
 DLLIMPORT unsigned short *DCRAW_Process(DLL_PARAMETERS *);
 DLLIMPORT void DCRAW_End();
+DLLIMPORT int Coffin(int, char **);
 
 #endif /* _DLL_H_ */

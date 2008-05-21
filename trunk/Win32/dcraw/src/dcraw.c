@@ -25,7 +25,7 @@
 
 
 #define VERSION    "8.86"
-#define SUBVERSION "0.90"  // added by Manuel Llorens
+#define SUBVERSION "0.91"  // added by Manuel Llorens
 #define COMPILER   "MinGW"  // added by Manuel Llorens
 #define AUTHOR     "M. Llorens"  // added by Manuel Llorens
 
@@ -240,7 +240,7 @@ struct {
 #define LIM(x,min,max) MAX(min,MIN(x,max))
 #define ULIM(x,y,z) ((y) < (z) ? LIM(x,y,z) : LIM(x,z,y))
 #define CLIP(x) LIM(x,0,65535)
-#define CLIPF(x) LIM(x,0.,65535.)
+#define CLIPF(x) LIM(x,0.,65535.) // Added by Manuel Llorens
 #define SWAP(a,b) { a ^= b; a ^= (b ^= a); }
 
 /*
@@ -8743,11 +8743,12 @@ cleanup:
 #ifdef BUILDING_DLL // From here to end of dcraw.c has been added by Manuel Llorens
 
 /// DLL global variables and functions
-
-DLL_STATE state[5];
+DLL_STATE state[6];
 DLL_PARAMETERS params;
 int user_black,user_sat,user_qual,level_greens,use_fuji_rotate,quality,test_pattern;
-int first_time=1;
+int first_time,write_to_stdout;
+float exposure;
+int exposure_mode;
 
 void SaveState(int ID){
     state[ID].filters=filters;
@@ -8761,8 +8762,12 @@ void SaveState(int ID){
     state[ID].iheight=iheight;
     state[ID].top_margin=top_margin;
     state[ID].left_margin=left_margin;    
-           
-    if(state[ID].buffer) free(state[ID].buffer);            
+    state[ID].raw_color=raw_color;
+                   
+    if(state[ID].buffer!=NULL){
+       free(state[ID].buffer);
+       state[ID].buffer=NULL;
+    }          
     state[ID].buffer=(ushort (*)[4]) calloc (iheight*iwidth, sizeof *image);
     memcpy(state[ID].buffer,image,iheight*iwidth*sizeof *image);
     if(verbose) printf("Saved state %i\n",ID);
@@ -8780,8 +8785,12 @@ void RestoreState(int ID){
     iheight=state[ID].iheight;
     top_margin=state[ID].top_margin;
     left_margin=state[ID].left_margin;    
-        
-    if(image) free(image);    
+    raw_color=state[ID].raw_color;
+    
+    if(image){
+       free(image);    
+       image=NULL;
+    }
     image = (ushort (*)[4]) calloc (iheight*iwidth, sizeof *image);     
     memcpy(image,state[ID].buffer,iheight*iwidth*sizeof *image);
     if(verbose) printf("Restored state %i\n",ID);
@@ -8806,8 +8815,12 @@ void SetParameters(DLL_PARAMETERS *p){
     output_color=p->output_color;
     use_fuji_rotate=p->use_fuji_rotate;
     user_gamma=p->user_gamma;           
+    exposure=p->exposure;
+    exposure_mode=p->exposure_mode;
     
-    quality = p->user_qual;
+    if (user_qual >= 0) quality = user_qual;
+    if (user_black >= 0) black = user_black;
+    if (user_sat > 0) maximum = user_sat;
     
     // Actual parameters for later comparing
     params.threshold=threshold;
@@ -8826,12 +8839,17 @@ void SetParameters(DLL_PARAMETERS *p){
     params.output_color=output_color;
     params.use_fuji_rotate=use_fuji_rotate;
     params.user_gamma=user_gamma;           
+    params.exposure=exposure;
+    params.exposure_mode=exposure_mode;
 }
 
 void SetDefaults(void)
 {   
     int c;
     
+    // Set initial variable values
+    indpowexp=0;
+    first_time=1;
     user_gamma=1;    
     output_bps=16;
     threshold=0;
@@ -8846,13 +8864,49 @@ void SetDefaults(void)
     user_sat=-1;
     test_pattern=0;
     level_greens=0;
-    user_qual=-1;
+    user_qual=0;
     four_color_rgb=0;
     med_passes=0;
     highlight=0;
     output_color=0;    
-    use_fuji_rotate=0;              
-    user_gamma=1;
+    use_fuji_rotate=0;                         
+    black=0;
+    maximum=0;
+    mix_green=0;
+    raw_color=1;
+    use_gamma=0;
+    zero_is_bad=0;
+    zero_after_ff=0;
+    is_raw=0;
+    dng_version=0;
+    is_foveon=0;
+    data_error=0;
+    raw_height=0;
+    raw_width=0;
+    height=0;
+    width=0;
+    top_margin=0;
+    left_margin=0;
+    shrink=0;
+    iheight=0;
+    iwidth=0;
+    fuji_width=0;
+    thumb_width=0;
+    thumb_height=0;
+    flip=0;
+    tiff_flip=0;
+    colors=0;
+    pixel_aspect=0.0;
+    half_size=0;
+    four_color_rgb=0;
+    document_mode=0;
+    use_camera_matrix=-1;
+    output_color=1;
+    no_auto_bright=0;  
+    exposure=1.0;
+    exposure_mode=0;
+    
+    // Default parameters
     params.threshold=threshold;
     FORC4 params.aber[c]=aber[c];
     params.use_auto_wb=use_auto_wb;
@@ -8868,9 +8922,34 @@ void SetDefaults(void)
     params.highlight=highlight;
     params.output_color=output_color;
     params.use_fuji_rotate=use_fuji_rotate;
-    params.user_gamma=user_gamma;           
+    params.user_gamma=user_gamma;
+    params.exposure=exposure;
+    params.exposure_mode=exposure_mode;
+    
+    if (user_qual >= 0) quality = user_qual;
+    if (user_black >= 0) black = user_black;
+    if (user_sat > 0) maximum = user_sat;
+    
+    // Clean up states
+    for(c=0;c<6;c++){
+        state[c].filters=filters;
+        state[c].colors=colors;
+        state[c].shrink=shrink;
+        state[c].half_size=half_size;
+        state[c].mix_green=mix_green;
+        state[c].width=width;
+        state[c].height=height;
+        state[c].iwidth=iwidth;
+        state[c].iheight=iheight;
+        state[c].top_margin=top_margin;
+        state[c].left_margin=left_margin;    
+        state[c].raw_color=raw_color;
+        if(state[c].buffer!=NULL) free(state[c].buffer);
+        state[c].buffer=NULL;
+    }
     
     verbose=1;
+    write_to_stdout=1;
 }
 
 int CompareParams(DLL_PARAMETERS *p)
@@ -8888,6 +8967,8 @@ int CompareParams(DLL_PARAMETERS *p)
     if(params.level_greens!=p->level_greens) return(2);    
     if(params.user_qual!=p->user_qual) return(3);            
     if(params.four_color_rgb!=p->four_color_rgb) return(3);
+    if(params.exposure!=p->exposure) return(3);
+    if(params.exposure_mode!=p->exposure_mode) return(3);
     if(params.med_passes!=p->med_passes) return(4);    
     if(params.highlight!=p->highlight) return(4);    
     if(params.output_color!=p->output_color) return(5);    
@@ -8913,13 +8994,69 @@ DLLIMPORT void DCRAW_DefaultParameters(DLL_PARAMETERS *p)
     p->user_sat=-1;    
     p->test_pattern=0;
     p->level_greens=0;
-    p->user_qual=-1;
+    p->user_qual=0;
     p->four_color_rgb=0;
     p->med_passes=0;
     p->highlight=0;
     p->output_color=0;
     p->use_fuji_rotate=0;              
-    p->user_gamma=1;
+    p->user_gamma=1;    
+    p->exposure=1.0;
+    p->exposure_mode=0;    
+}
+
+void exposure_correction(void){
+    int i;
+    float Y, Yp, exposure2, K1, K2;
+    
+    if(verbose) printf("Exposure correction ");
+    if(exposure_mode==0){
+       // Exposure correction without highlight preservation
+       if(verbose) printf("without highlight preservation\n");
+       for(i=0;i<height*width;i++){
+         image[i][0]=CLIPF((float)image[i][0]*exposure); // R
+         image[i][1]=CLIPF((float)image[i][1]*exposure); // G (mixed)
+         image[i][2]=CLIPF((float)image[i][2]*exposure); // B
+       }
+    }else{
+       // Exposure correction with highlight preservation
+       if(verbose) printf("with highlight preservation\n");
+       if(exposure>1){
+           K1=32768/exposure;
+           K2=65535-K1;
+           for(i=0;i<height*width;i++){
+             Y=0.299*(float)image[i][0]+0.587*(float)image[i][1]+0.114*(float)image[i][2]; // CIE luminosity
+             if(Y<K1){
+                image[i][0]=CLIPF((float)image[i][0]*exposure); // R
+                image[i][1]=CLIPF((float)image[i][1]*exposure); // G (mixed)
+                image[i][2]=CLIPF((float)image[i][2]*exposure); // B
+             }else{
+                Yp=32767*(Y-65535)/K2+65535;
+                exposure2=Yp/Y;
+                image[i][0]=CLIPF((float)image[i][0]*exposure2); // R
+                image[i][1]=CLIPF((float)image[i][1]*exposure2); // G (mixed)
+                image[i][2]=CLIPF((float)image[i][2]*exposure2); // B
+             }
+           }
+       }else{
+           K1=32768*exposure;
+           K2=65535-K1;           
+           for(i=0;i<height*width;i++){
+             Y=0.299*(float)image[i][0]+0.587*(float)image[i][1]+0.114*(float)image[i][2]; // CIE luminosity
+             if(Y<32768){
+                image[i][0]=CLIPF((float)image[i][0]*exposure); // R
+                image[i][1]=CLIPF((float)image[i][1]*exposure); // G (mixed)
+                image[i][2]=CLIPF((float)image[i][2]*exposure); // B
+             }else{
+                Yp=K2*(Y-65535)/32767+65535;
+                exposure2=Yp/Y;
+                image[i][0]=CLIPF((float)image[i][0]*exposure2); // R
+                image[i][1]=CLIPF((float)image[i][1]*exposure2); // G (mixed)
+                image[i][2]=CLIPF((float)image[i][2]*exposure2); // B
+             }
+           }             
+       }
+    }        
 }
 
 DLLIMPORT int DCRAW_Init(char *ifname,int *w,int *h)
@@ -8927,7 +9064,7 @@ DLLIMPORT int DCRAW_Init(char *ifname,int *w,int *h)
     // Still missing: pass user_flip, bpfile, dark_frame and use_camera_matrix as parameters to this function
     int arg, status=0;
     int i, c,user_flip=0;  
-    char opm, opt, *ofname, *sp, *cp, *bpfile=0, *dark_frame=0;
+    char opm, opt, *ofname, *sp, *cp, *bpfile=0, *dark_frame=0;    
     
     SetDefaults();
     
@@ -8984,6 +9121,7 @@ DLLIMPORT int DCRAW_Init(char *ifname,int *w,int *h)
     if (zero_is_bad) remove_zeroes();
     bad_pixels (bpfile);
     if (dark_frame) subtract (dark_frame);
+    quality = 2 + !fuji_width;
     
     // Here we take buffer 1
     SaveState(1);
@@ -8997,7 +9135,8 @@ DLLIMPORT void DCRAW_GetInfo(IMAGE_INFO *info)
 {
    int i;   
    
-   info->timestamp=ctime(&timestamp);
+   //info->timestamp=ctime(&timestamp);
+   info->timestamp="";
    info->camera_make=make;
    info->camera_model=model;   
    info->artist=artist;
@@ -9014,6 +9153,7 @@ DLLIMPORT void DCRAW_GetInfo(IMAGE_INFO *info)
    info->out_width=iwidth;
    info->out_height=iheight;
    info->raw_colors=colors;
+   info->filter_pattern="";
    
    // More info to implement later plus camera white balance coefs.
 /*      if (dng_version) {
@@ -9036,19 +9176,24 @@ DLLIMPORT unsigned short * DCRAW_Process(DLL_PARAMETERS *p)
     ushort *img;
     long c, row, col, soff, rstep, cstep;
     int i;
-    int s;
-    
-    // Decide development point based in params value    
+    int s;        
+          
+    // Decide development point based in params value        
     if(first_time==0){
-        s=CompareParams(p);        
+        s=CompareParams(p);
+        
         if(verbose) printf("Developing again from stage %i\n",s);
         
         SetParameters(p);
         switch(s){
             case 0:
+                 RestoreState(1);
+                 goto STAGE2;            
                  break;
             case 1:
-                 break;             
+                 RestoreState(1);
+                 goto STAGE2;
+                 break;       
             case 2:
                  RestoreState(1);
                  goto STAGE2;
@@ -9066,18 +9211,19 @@ DLLIMPORT unsigned short * DCRAW_Process(DLL_PARAMETERS *p)
                  goto STAGE5;
                  break;
             case 6:             
-                 // Nothing changed
+                 // Nothing changed                 
                  goto STAGE6;
                  break;
         }        
     }else{
-          // If it is first time speedup a little
+          // For the first time
+          RestoreState(1);
           SetParameters(p);
           first_time=0;
     }
     
-STAGE2:    
-            
+STAGE2:
+    //ShowDebug("STAGE2");      
     if(test_pattern) test_patterns();
     if(level_greens) eq_greens();
     if (!is_foveon && document_mode < 2) scale_colors();
@@ -9085,6 +9231,7 @@ STAGE2:
     SaveState(2);
        
 STAGE3:    
+    //ShowDebug("STAGE3");      
     if (is_foveon && !document_mode) foveon_interpolate();  // Beware, this have been changed from it's main() position
     pre_interpolate();    
     if (filters && !document_mode) {
@@ -9096,24 +9243,25 @@ STAGE3:
 	ppg_interpolate();
       else ahd_interpolate();
     }
-    if (mix_green) for (colors=3, i=0; i < height*width; i++) image[i][1] = (image[i][1] + image[i][3]) >> 1;
+    if (mix_green) for (colors=3, i=0; i < height*width; i++) image[i][1] = (image[i][1] + image[i][3]) >> 1;    
     // Here we take buffer 3
-    SaveState(3);
+    SaveState(3);         
     
 STAGE4:       
+    //ShowDebug("STAGE4");      
     if (!is_foveon && colors == 3) median_filter();
     if (!is_foveon && highlight == 2) blend_highlights();
     if (!is_foveon && highlight > 2) recover_highlights();
-    if (use_fuji_rotate) fuji_rotate();
-    // Here we take buffer 4
-    SaveState(4);
+    if (exposure!=1.0) exposure_correction();    
+    if (use_fuji_rotate) fuji_rotate();    
+    // Here we take buffer 4        
+    SaveState(4);        
 
 STAGE5:
     convert_to_rgb();
     if (use_fuji_rotate) stretch();
-    
     ppm = (ushort *) calloc (width, colors*2);    
-    img=(ushort *) calloc (width*height, colors*2);
+    img = (ushort *) calloc (width*height, colors*2);
     soff  = flip_index (0, 0);
     cstep = flip_index (0, 1) - soff;
     rstep = flip_index (1, 0) - flip_index (0, width);
@@ -9123,12 +9271,12 @@ STAGE5:
         memcpy(img+row*width*colors,ppm,width*colors*2);
     }      
     // Here we take buffer 5
-    SaveState(5);
+    SaveState(5);           
     
     free(ppm);
     free(image);
     image=img;
-STAGE6:
+STAGE6:    
     return (unsigned short *) image;
 }
 
@@ -9139,10 +9287,410 @@ DLLIMPORT void DCRAW_End(void)
     if (indpow01) free (indpow01);
     if (meta_data) free (meta_data);
     if (image) free (image);        
+    indpow01=NULL;
+    meta_data=NULL;
+    image=NULL;
     
     // Release state buffers
-    for(i=0;i<5;i++){
-       if(state[i].buffer) free(state[i].buffer);
+    for(i=0;i<6;i++){
+       if(state[i].buffer!=NULL){
+          free(state[i].buffer);
+          state[i].buffer=NULL;
+       }
     }
 }
 #endif
+
+/////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
+
+DLLIMPORT int CLASS Coffin (int argc, char **argv)
+{     
+  int arg, status=0;
+  int timestamp_only=0, thumbnail_only=0, identify_only=0;
+  int user_qual=-1, user_black=-1, user_sat=-1, user_flip=-1;
+  int use_fuji_rotate=1, write_to_stdout=0, quality, i, c;  
+  char opm, opt, *ofname, *sp, *cp, *bpfile=0, *dark_frame=0;
+  const char *write_ext;
+  struct utimbuf ut;
+  user_gamma=1;
+  char *user_gamma_str=0;
+  FILE *ofp;
+#ifndef NO_LCMS
+  char *cam_profile=0, *out_profile=0;
+#endif
+
+#ifndef LOCALTIME
+  putenv ("TZ=UTC");
+#endif
+#ifdef LOCALEDIR
+  setlocale (LC_CTYPE, "");
+  setlocale (LC_MESSAGES, "");
+  bindtextdomain ("dcraw", LOCALEDIR);
+  textdomain ("dcraw");
+#endif
+
+  if (argc == 1) {
+    printf(_("\nRaw photo decoder \"dcraw\" v%s"), VERSION);
+    printf(_("\nby Dave Coffin, dcoffin a cybercom o net"));
+    printf(_("\n_GUI_ - Llorens 16 bit gamma version v%s"), SUBVERSION);
+    printf(_("\nCompiled with %s by %s\n"), COMPILER, AUTHOR);
+    printf(_("\nUsage:  %s [OPTION]... [FILE]...\n\n"), argv[0]);
+    puts(_("-v        Print verbose messages"));
+    puts(_("-c        Write image data to standard output"));
+    puts(_("-e        Extract embedded thumbnail image"));
+    puts(_("-i        Identify files without decoding them"));
+    puts(_("-i -v     Identify files and show metadata"));
+    puts(_("-z        Change file dates to camera timestamp"));
+    puts(_("-w        Use camera white balance, if possible"));
+    puts(_("-a        Average the whole image for white balance"));
+    puts(_("-A <x y w h> Average a grey box for white balance"));
+    puts(_("-r <r g b g> Set custom white balance"));
+    puts(_("+M/-M     Use/don't use an embedded color matrix"));
+    puts(_("-C <r b>  Correct chromatic aberration"));
+    puts(_("-P <file> Fix the dead pixels listed in this file"));
+    puts(_("-K <file> Subtract dark frame (16-bit raw PGM)"));
+    puts(_("-k <num>  Set the darkness level"));
+    puts(_("-S <num>  Set the saturation level"));
+    puts(_("-n <num>  Set threshold for wavelet denoising"));
+    puts(_("-H [0-9]  Highlight mode (0=clip, 1=unclip, 2=blend, 3+=rebuild)"));
+    puts(_("-t [0-7]  Flip image (0=none, 3=180, 5=90CCW, 6=90CW)"));
+    puts(_("-o [0-5]  Output colorspace (raw,sRGB,Adobe,Wide,ProPhoto,XYZ)"));
+    puts(_("-g <num>  Set gamma for 16-bit instead of linear. If 0 or sRGB sets sRGB gamma (default=1.0)")); // added by Manuel Llorens
+#ifndef NO_LCMS
+    puts(_("-o <file> Apply output ICC profile from file"));
+    puts(_("-p <file> Apply camera ICC profile from file or \"embed\""));
+#endif
+    puts(_("-d        Document mode (no color, no interpolation)"));
+    puts(_("-D        Document mode without scaling (totally raw)"));
+    puts(_("-j        Don't stretch or rotate raw pixels"));
+    puts(_("-W        Don't automatically brighten the image"));
+    puts(_("-b <num>  Adjust brightness (default = 1.0)"));
+    puts(_("-q [0-3]  Set the interpolation quality"));
+    puts(_("-h        Half-size color image (twice as fast as \"-q 0\")"));
+    puts(_("-f        Interpolate RGGB as four colors"));
+    puts(_("-l [0-3]  Equilibrate green channels (0=none, 1=G1->G2, 2=G2->G1, 3=G1-><-G2)"));
+    puts(_("-m <num>  Apply a 3x3 median filter to R-G and B-G"));
+    puts(_("-s [0..N-1] Select one raw image or \"all\" from each file"));
+    puts(_("-4        Write 16-bit linear instead of 8-bit with gamma"));
+    puts(_("-T        Write TIFF instead of PPM"));
+    puts("");
+    return 1;
+  }
+    
+  argv[argc] = "";
+  for (arg=1; (((opm = argv[arg][0]) - 2) | 2) == '+'; ) {
+    opt = argv[arg++][1];
+    if ((cp = strchr (sp="nbrkStqmHAC", opt)))
+      for (i=0; i < "11411111142"[cp-sp]-'0'; i++)
+	if (!isdigit(argv[arg+i][0])) {
+	  fprintf (stderr,_("Non-numeric argument to \"-%c\"\n"), opt);	  
+	  return 1;
+	}
+    switch (opt) {
+      case 'n':  threshold   = atof(argv[arg++]);  break;
+      case 'b':  bright      = atof(argv[arg++]);  break;
+      case 'r':
+	   FORC4 user_mul[c] = atof(argv[arg++]);  break;
+      case 'C':  aber[0] = 1 / atof(argv[arg++]);
+		 aber[2] = 1 / atof(argv[arg++]);  break;
+      case 'k':  user_black  = atoi(argv[arg++]);  break;
+      case 'S':  user_sat    = atoi(argv[arg++]);  break;
+      case 't':  user_flip   = atoi(argv[arg++]);  break;
+      case 'q':  user_qual   = atoi(argv[arg++]);  break;
+      case 'm':  med_passes  = atoi(argv[arg++]);  break;
+      case 'H':  highlight   = atoi(argv[arg++]);  break;
+      case 's':
+	shot_select = abs(atoi(argv[arg]));
+	multi_out = !strcmp(argv[arg++],"all");
+	break;
+      case 'o':
+	if (isdigit(argv[arg][0]) && !argv[arg][1])
+	  output_color = atoi(argv[arg++]);
+#ifndef NO_LCMS
+	else     out_profile = argv[arg++];
+	break;
+      case 'p':  cam_profile = argv[arg++];
+#endif
+	break;
+      case 'P':  bpfile     = argv[arg++];  break;
+      case 'K':  dark_frame = argv[arg++];  break;
+      case 'z':  timestamp_only    = 1;  break;
+      case 'e':  thumbnail_only    = 1;  break;
+      case 'i':  identify_only     = 1;  break;
+      case 'c':  write_to_stdout   = 1;  break;
+      case 'v':  verbose           = 1;  break;
+      case 'h':  half_size         = 1;		/* "-h" implies "-f" */
+      case 'f':  four_color_rgb    = 1;  break;
+      case 'A':  FORC4 greybox[c]  = atoi(argv[arg++]);
+      case 'a':  use_auto_wb       = 1;  break;
+      case 'w':  use_camera_wb     = 1;  break;
+      case 'M':  use_camera_matrix = (opm == '+');  break;
+      case 'D':
+      case 'd':  document_mode = 1 + (opt == 'D');
+      case 'j':  use_fuji_rotate   = 0;  break;
+      case 'W':  no_auto_bright    = 1;  break;
+      case 'T':  output_tiff       = 1;  break;
+      case '4':  output_bps        = 16;  break;
+      case 'g':  user_gamma_str    = argv[arg++];  break; // added by Manuel Llorens
+      case 'l':  level_greens = atoi(argv[arg++]);  break; // added by Manuel Llorens
+      default:	
+	fprintf (stderr,_("Unknown option \"-%c\".\n"), opt);		
+	return 1;
+    }
+  }            
+  
+  if(user_gamma_str!=0){  // added by Manuel Llorens
+    if(strcasecmp(user_gamma_str,"sRGB")==0) user_gamma=0; else sscanf(user_gamma_str,"%f",&user_gamma);  // added by Manuel Llorens
+  }  // added by Manuel Llorens
+  if(output_bps!=16) user_gamma=1; // added by Manuel Llorens
+  if (use_camera_matrix < 0)
+      use_camera_matrix = use_camera_wb;
+  if (arg == argc) {
+    fprintf (stderr,_("No files to process.\n"));
+    return 1;
+  }
+  if (write_to_stdout) {
+    if (isatty(1)) {
+      fprintf (stderr,_("Will not write an image to the terminal!\n"));
+      return 1;
+    }
+#if defined(WIN32) || defined(DJGPP) || defined(__CYGWIN__) || defined(_MSC_VER)
+    if (setmode(1,O_BINARY) < 0) {
+      perror ("setmode()");
+      return 1;
+    }
+#endif
+  }
+  for ( ; arg < argc; arg++) {
+    status = 1;
+    image = 0;
+    oprof = 0;
+    meta_data = ofname = 0;
+    ofp = stdout;
+    if (setjmp (failure)) {
+      if (fileno(ifp) > 2) fclose(ifp);
+      if (fileno(ofp) > 2) fclose(ofp);
+      status = 1;      
+      goto cleanup;
+    }
+    ifname = argv[arg];
+    if (!(ifp = fopen (ifname, "rb"))) {
+      perror (ifname);      
+      continue;
+    }        
+    
+    status = (identify(),!is_raw);    
+    if (user_flip >= 0)
+      flip = user_flip;
+    switch ((flip+3600) % 360) {
+      case 270:  flip = 5;  break;
+      case 180:  flip = 3;  break;
+      case  90:  flip = 6;
+    }
+    if (timestamp_only) {
+      if ((status = !timestamp))
+	fprintf (stderr,_("%s has no timestamp.\n"), ifname);
+      else if (identify_only)
+	printf ("%10ld%10d %s\n", (long) timestamp, shot_order, ifname);
+      else {
+	if (verbose)
+	  fprintf (stderr,_("%s time set to %d.\n"), ifname, (int) timestamp);
+	ut.actime = ut.modtime = timestamp;
+	utime (ifname, &ut);
+      }
+      goto next;
+    }
+    write_fun = &CLASS write_ppm_tiff;
+    if (thumbnail_only) {
+      if ((status = !thumb_offset)) {
+	fprintf (stderr,_("%s has no thumbnail.\n"), ifname);
+	goto next;
+      } else if (thumb_load_raw) {
+	load_raw = thumb_load_raw;
+	data_offset = thumb_offset;
+	height = thumb_height;
+	width  = thumb_width;
+	filters = 0;
+      } else {
+	fseek (ifp, thumb_offset, SEEK_SET);
+	write_fun = write_thumb;
+	goto thumbnail;
+      }
+    }
+    if (load_raw == &CLASS kodak_ycbcr_load_raw) {
+      height += height & 1;
+      width  += width  & 1;
+    }
+    if (identify_only && verbose && make[0]) {
+      printf (_("\nFilename: %s\n"), ifname);
+      printf (_("Timestamp: %s"), ctime(&timestamp));
+      printf (_("Camera: %s %s\n"), make, model);
+      if (artist[0])
+	printf (_("Owner: %s\n"), artist);
+      if (dng_version) {
+	printf (_("DNG Version: "));
+	for (i=24; i >= 0; i -= 8)
+	  printf ("%d%c", dng_version >> i & 255, i ? '.':'\n');
+      }
+      printf (_("ISO speed: %d\n"), (int) iso_speed);
+      printf (_("Shutter: "));
+      if (shutter > 0 && shutter < 1)
+	shutter = (printf ("1/"), 1 / shutter);
+      printf (_("%0.1f sec\n"), shutter);
+      printf (_("Aperture: f/%0.1f\n"), aperture);
+      printf (_("Focal length: %0.1f mm\n"), focal_len);
+      printf (_("Embedded ICC profile: %s\n"), profile_length ? _("yes"):_("no"));
+      printf (_("Number of raw images: %d\n"), is_raw);
+      if (pixel_aspect != 1)
+	printf (_("Pixel Aspect Ratio: %0.6f\n"), pixel_aspect);
+      if (thumb_offset)
+	printf (_("Thumb size:  %4d x %d\n"), thumb_width, thumb_height);
+      printf (_("Full size:   %4d x %d\n"), raw_width, raw_height);
+    } else if (!is_raw)
+      fprintf (stderr,_("Cannot decode file %s\n"), ifname);
+    if (!is_raw) goto next;
+    shrink = filters &&
+	(half_size || threshold || aber[0] != 1 || aber[2] != 1);
+    iheight = (height + shrink) >> shrink;
+    iwidth  = (width  + shrink) >> shrink;
+    if (identify_only) {
+      if (verbose) {
+	if (use_fuji_rotate) {
+	  if (fuji_width) {
+	    fuji_width = (fuji_width - 1 + shrink) >> shrink;
+	    iwidth = fuji_width / sqrt(0.5);
+	    iheight = (iheight - fuji_width) / sqrt(0.5);
+	  } else {
+	    if (pixel_aspect < 1) iheight = iheight / pixel_aspect + 0.5;
+	    if (pixel_aspect > 1) iwidth  = iwidth  * pixel_aspect + 0.5;
+	  }
+	}
+	if (flip & 4)
+	  SWAP(iheight,iwidth);
+	printf (_("Image size:  %4d x %d\n"), width, height);
+	printf (_("Output size: %4d x %d\n"), iwidth, iheight);
+	printf (_("Raw colors: %d"), colors);
+	if (filters) {
+	  printf (_("\nFilter pattern: "));
+	  if (!cdesc[3]) cdesc[3] = 'G';
+	  for (i=0; i < 16; i++)
+	    putchar (cdesc[fc(i >> 1,i & 1)]);
+	}
+	printf (_("\nDaylight multipliers:"));
+	FORCC printf (" %f", pre_mul[c]);
+	if (cam_mul[0] > 0) {
+	  printf (_("\nCamera multipliers:"));
+	  FORC4 printf (" %f", cam_mul[c]);
+	}
+	putchar ('\n');
+      } else
+	printf (_("%s is a %s %s image.\n"), ifname, make, model);
+next:
+      fclose(ifp);
+      continue;
+    }
+    if (use_camera_matrix && cmatrix[0][0] > 0.25) {
+      memcpy (rgb_cam, cmatrix, sizeof cmatrix);
+      raw_color = 0;
+    }
+    image = (ushort (*)[4]) calloc (iheight*iwidth, sizeof *image);
+    merror (image, "main()");
+    if (meta_length) {
+      meta_data = (char *) malloc (meta_length);
+      merror (meta_data, "main()");
+    }
+    if (verbose)
+      fprintf (stderr,_("Loading %s %s image from %s ...\n"),
+	make, model, ifname);
+    if (shot_select >= is_raw)
+      fprintf (stderr,_("%s: \"-s %d\" requests a nonexistent image!\n"),
+	ifname, shot_select);
+    fseeko (ifp, data_offset, SEEK_SET);
+    (*load_raw)();
+    if (zero_is_bad) remove_zeroes();
+    bad_pixels (bpfile);
+    if (dark_frame) subtract (dark_frame);
+    quality = 2 + !fuji_width;
+    if (user_qual >= 0) quality = user_qual;
+    if (user_black >= 0) black = user_black;
+    if (user_sat > 0) maximum = user_sat;
+#ifdef COLORCHECK
+    colorcheck();
+#endif    
+    //test_patterns(); // added by Manuel Llorens
+    if(level_greens) eq_greens(); // added by Manuel Llorens
+
+    if (is_foveon && !document_mode) foveon_interpolate();
+    if (!is_foveon && document_mode < 2) scale_colors();
+    
+    pre_interpolate();
+    if (filters && !document_mode) {
+      if (quality == 0)
+	lin_interpolate();
+      else if (quality == 1 || colors > 3)      
+	vng_interpolate();
+      else if (quality == 2)
+	ppg_interpolate();
+      else ahd_interpolate();
+    }
+    if (mix_green)
+      for (colors=3, i=0; i < height*width; i++)
+	image[i][1] = (image[i][1] + image[i][3]) >> 1;
+    if (!is_foveon && colors == 3) median_filter();
+    if (!is_foveon && highlight == 2) blend_highlights();
+    if (!is_foveon && highlight > 2) recover_highlights();
+    if (use_fuji_rotate) fuji_rotate();
+#ifndef NO_LCMS
+    if (cam_profile) apply_profile (cam_profile, out_profile);
+#endif
+    convert_to_rgb();
+    if (use_fuji_rotate) stretch();
+thumbnail:
+    if (write_fun == &CLASS jpeg_thumb)
+      write_ext = ".jpg";
+    else if (output_tiff && write_fun == &CLASS write_ppm_tiff)
+      write_ext = ".tiff";
+    else
+      write_ext = ".pgm\0.ppm\0.ppm\0.pam" + colors*5-5;
+    ofname = (char *) malloc (strlen(ifname) + 64);
+    merror (ofname, "main()");
+    if (write_to_stdout)
+      strcpy (ofname,_("standard output"));
+    else {
+      strcpy (ofname, ifname);
+      if ((cp = strrchr (ofname, '.'))) *cp = 0;
+      if (multi_out)
+	sprintf (ofname+strlen(ofname), "_%0*d",
+		snprintf(0,0,"%d",is_raw-1), shot_select);
+      if (thumbnail_only)
+	strcat (ofname, ".thumb");
+      strcat (ofname, write_ext);
+      ofp = fopen (ofname, "wb");
+      if (!ofp) {
+	status = 1;
+	perror (ofname);
+	goto cleanup;
+      }
+    }
+    if (verbose)
+      fprintf (stderr,_("Writing data to %s ...\n"), ofname);
+    (*write_fun)(ofp);
+    fclose(ifp);
+    if (ofp != stdout) fclose(ofp);
+cleanup:
+    if (indpow01) free (indpow01);
+    if (meta_data) free (meta_data);
+    if (ofname) free (ofname);
+    if (oprof) free (oprof);
+    if (image) free (image);
+    if (multi_out) {
+      if (++shot_select < is_raw) arg--;
+      else shot_select = 0;
+    }
+  }  
+  return status;
+
+}

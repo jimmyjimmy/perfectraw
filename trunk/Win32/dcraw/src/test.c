@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "dcraw.h"
 
 int main(int argc, char *argv[])
@@ -10,17 +11,19 @@ int main(int argc, char *argv[])
     
   int w,h;
   
-  printf("Resultado de leer el RAW: %i\n",DCRAW_Init("c:\\test\\IMG_4118.CR2",&w,&h));
+  printf("Resultado de leer el RAW: %i\n",DCRAW_Init("C:\\test\\a_1.dng",&w,&h));
   DCRAW_GetInfo(&info);  
-  printf("Camera Maker: %s\n",info.camera_make);  
   printf("Model: %s\n",info.camera_model);  
-  printf("Owner: %s\n",info.artist);  
   DCRAW_DefaultParameters(&params);  
+  params.user_gamma=0;
+  params.output_color=1;
+  params.exposure=pow(2,-1.0);
+  printf("%f\n",params.exposure);
+  params.exposure_mode=1;
   image=(unsigned short (*)[4])DCRAW_Process(&params);
-  system("PAUSE");	
-  params.user_qual=2;
-  image=(unsigned short (*)[4])DCRAW_Process(&params);  
+  //image=(unsigned short (*)[4])DCRAW_Process(&params);  
   DCRAW_End();
+  
   system("PAUSE");	
   return 0;            
 }
