@@ -9,7 +9,7 @@ Includes=
 Libs=
 PrivateResource=
 ResourceIncludes=
-MakeIncludes=
+MakeIncludes=copydll.mak
 Compiler=-ffast-math -msse -mfpmath=sse_@@_-DBUILDING_DLL=1_@@_
 CppCompiler=-DBUILDING_DLL=1_@@_
 Linker=--no-export-all-symbols --add-stdcall-alias_@@_
