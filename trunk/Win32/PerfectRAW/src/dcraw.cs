@@ -11,16 +11,16 @@ using System.Threading;
 namespace perfectRAW
 {
     unsafe public class Dcraw
-    {    
+    {
         // Estructura para informar fuera de la DLL de la imagen
         // Falta DNG version y camera white balance coef.
         [StructLayout(LayoutKind.Sequential)]
         public struct IMAGE_INFO
         {
-            public string timestamp;
-            public string camera_make;
-            public string camera_model;
-            public string artist;
+            public String timestamp;
+            public String camera_make;
+            public String camera_model;
+            public String artist;
             public int iso_speed;
             public float shutter;
             public float aperture;
@@ -33,7 +33,7 @@ namespace perfectRAW
             public int out_width;
             public int out_height;
             public int raw_colors;
-            public string filter_pattern;
+            public String filter_pattern;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -55,6 +55,8 @@ namespace perfectRAW
             public int output_color;
             public int use_fuji_rotate;
             public float user_gamma;
+            public float exposure;
+            public float exposure_mode;
         }
 
         [DllImport(@"dcraw.dll")]
@@ -64,30 +66,27 @@ namespace perfectRAW
         static extern int DCRAW_Init(string rawfile, int* Width, int* Height);
 
         [DllImport(@"dcraw.dll")]
-        static extern void DCRAW_End();
-
-        [DllImport(@"dcraw.dll")]
         static extern void DCRAW_GetInfo(ref IMAGE_INFO info);
 
         [DllImport(@"dcraw.dll")]
         static extern ushort* DCRAW_Process(ref DLL_PARAMETERS p);
 
-        private string _FileName;
+        [DllImport(@"dcraw.dll")]
+        static extern void DCRAW_End();
+
+        [DllImport(@"image.dll")]
+        static extern void Convert48RGBto24BGR(ushort* buffer16, byte* buffer8, int width, int height, int extra);
+
         public IMAGE_INFO info; // Esto hay que convertirlo en propiedad
+        public DLL_PARAMETERS parameters;
         public Bitmap img;      // Esto hay que convertirlo en propiedad
         int status;
-        int w, h;
-        public DLL_PARAMETERS parameters;
+        int w, h;        
+        string _FileName;
+        bool init = false;
 
-        public Dcraw(string FileName)
+        public Dcraw()
         {
-            int _w, _h;
-
-            this._FileName = FileName;
-            status = DCRAW_Init(this._FileName, &_w, &_h);
-            w = _w;
-            h = _h;
-            DCRAW_DefaultParameters(ref parameters);
         }
 
         ~Dcraw()
@@ -95,40 +94,53 @@ namespace perfectRAW
             DCRAW_End();
         }
 
+        public int Init()
+        {
+            int _w, _h;
+            info = new IMAGE_INFO();
+            parameters = new DLL_PARAMETERS();
+            status = DCRAW_Init(_FileName, &_w, &_h);
+            w = _w;
+            h = _h;            
+            DCRAW_DefaultParameters(ref parameters);
+            init = true;            
+            return status;
+        }
+
+        public void SetRAWFile(string FileName)
+        {
+            _FileName = FileName;
+        }
+
+        public void End()
+        {
+            DCRAW_End();
+            init = false;
+        }
+
         public void GetInfo()
         {
-            DCRAW_GetInfo(ref info);
+            if (!init) Init();            
+            //DCRAW_GetInfo(ref info);
+
         }
-        
+
         public void Process()
         {
-            if (status == 0)
-            {                
-                img = new Bitmap(w, h);
-                BitmapData data = img.LockBits(new Rectangle(0, 0, img.Width, img.Height), ImageLockMode.ReadWrite, PixelFormat.Format48bppRgb);
-                unsafe
-                {
-                    ushort* image = DCRAW_Process(ref parameters);
+            if (!init) Init();
+            img = new Bitmap(w, h);
+            int extra;
+            //BitmapData data = img.LockBits(new Rectangle(0, 0, img.Width, img.Height), ImageLockMode.ReadWrite, PixelFormat.Format48bppRgb);
+            BitmapData data = img.LockBits(new Rectangle(0, 0, img.Width, img.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+            unsafe
+            {
+                ushort* image = DCRAW_Process(ref parameters);
 
-                    byte* ptr = (byte*)(data.Scan0);
-                    for (int i = 0; i < data.Height; i++)
-                    {
-                        for (int j = 0; j < data.Width; j++)
-                        {
-                            ptr[0] = (byte)(image[2] >> 4 & 0xff);
-                            ptr[1] = (byte)(image[2] >> 12);
-                            ptr[2] = (byte)(image[1] >> 4 & 0xff);
-                            ptr[3] = (byte)(image[1] >> 12);
-                            ptr[4] = (byte)(image[0] >> 4 & 0xff);
-                            ptr[5] = (byte)(image[0] >> 12);
-                            image += 3;
-                            ptr += 6;
-                        }
-                        ptr += data.Stride - data.Width * 6;
-                    }
-                }
-                img.UnlockBits(data);
-            }            
-        }    
+                byte* ptr = (byte*)(data.Scan0);
+                extra = data.Stride - data.Width * 3;
+                Convert48RGBto24BGR(image, ptr, data.Width, data.Height, extra);
+            }
+            img.UnlockBits(data);
+        }
     }
 }
