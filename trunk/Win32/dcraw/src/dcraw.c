@@ -8968,7 +8968,7 @@ int CompareParams(DLL_PARAMETERS *p)
     if(params.user_qual!=p->user_qual) return(3);            
     if(params.four_color_rgb!=p->four_color_rgb) return(3);
     if(params.exposure!=p->exposure) return(3);
-    if(params.exposure_mode!=p->exposure_mode) return(3);
+    if((params.exposure_mode!=p->exposure_mode)&&(params.exposure!=1)) return(3);
     if(params.med_passes!=p->med_passes) return(4);    
     if(params.highlight!=p->highlight) return(4);    
     if(params.output_color!=p->output_color) return(5);    
@@ -9007,55 +9007,95 @@ DLLIMPORT void DCRAW_DefaultParameters(DLL_PARAMETERS *p)
 
 void exposure_correction(void){
     int i;
-    float Y, Yp, exposure2, K1, K2;
+    float Y, Yp, exposure2, K1, K2, EV;
     
     if(verbose) printf("Exposure correction ");
-    if(exposure_mode==0){
-       // Exposure correction without highlight preservation
-       if(verbose) printf("without highlight preservation\n");
-       for(i=0;i<height*width;i++){
-         image[i][0]=CLIPF((float)image[i][0]*exposure); // R
-         image[i][1]=CLIPF((float)image[i][1]*exposure); // G (mixed)
-         image[i][2]=CLIPF((float)image[i][2]*exposure); // B
-       }
-    }else{
-       // Exposure correction with highlight preservation
-       if(verbose) printf("with highlight preservation\n");
-       if(exposure>1){
-           K1=32768/exposure;
-           K2=65535-K1;
+    switch(exposure_mode){
+       case 0:
+           // Exposure correction without highlight preservation
+           if(verbose) printf("without highlight preservation\n");
            for(i=0;i<height*width;i++){
-             Y=0.299*(float)image[i][0]+0.587*(float)image[i][1]+0.114*(float)image[i][2]; // CIE luminosity
-             if(Y<K1){
-                image[i][0]=CLIPF((float)image[i][0]*exposure); // R
-                image[i][1]=CLIPF((float)image[i][1]*exposure); // G (mixed)
-                image[i][2]=CLIPF((float)image[i][2]*exposure); // B
-             }else{
-                Yp=32767*(Y-65535)/K2+65535;
-                exposure2=Yp/Y;
-                image[i][0]=CLIPF((float)image[i][0]*exposure2); // R
-                image[i][1]=CLIPF((float)image[i][1]*exposure2); // G (mixed)
-                image[i][2]=CLIPF((float)image[i][2]*exposure2); // B
-             }
+             image[i][0]=CLIP((float)image[i][0]*exposure); // R
+             image[i][1]=CLIP((float)image[i][1]*exposure); // G (mixed)
+             image[i][2]=CLIP((float)image[i][2]*exposure); // B
            }
-       }else{
-           K1=32768*exposure;
-           K2=65535-K1;           
-           for(i=0;i<height*width;i++){
-             Y=0.299*(float)image[i][0]+0.587*(float)image[i][1]+0.114*(float)image[i][2]; // CIE luminosity
-             if(Y<32768){
-                image[i][0]=CLIPF((float)image[i][0]*exposure); // R
-                image[i][1]=CLIPF((float)image[i][1]*exposure); // G (mixed)
-                image[i][2]=CLIPF((float)image[i][2]*exposure); // B
-             }else{
-                Yp=K2*(Y-65535)/32767+65535;
-                exposure2=Yp/Y;
-                image[i][0]=CLIPF((float)image[i][0]*exposure2); // R
-                image[i][1]=CLIPF((float)image[i][1]*exposure2); // G (mixed)
-                image[i][2]=CLIPF((float)image[i][2]*exposure2); // B
-             }
-           }             
-       }
+           break;
+       case 1:
+           // Exposure correction with highlight preservation, mode 1
+           if(verbose) printf("with highlight preservation\n");
+           if(exposure>1){
+               K1=32768/exposure;
+               K2=65535-K1;
+               for(i=0;i<height*width;i++){
+                 Y=0.299*(float)image[i][0]+0.587*(float)image[i][1]+0.114*(float)image[i][2]; // CIE luminosity
+                 if(Y<K1){
+                    image[i][0]=CLIP((float)image[i][0]*exposure); // R
+                    image[i][1]=CLIP((float)image[i][1]*exposure); // G (mixed)
+                    image[i][2]=CLIP((float)image[i][2]*exposure); // B
+                 }else{
+                    Yp=32767*(Y-65535)/K2+65535;
+                    exposure2=Yp/Y;
+                    image[i][0]=CLIP((float)image[i][0]*exposure2); // R
+                    image[i][1]=CLIP((float)image[i][1]*exposure2); // G (mixed)
+                    image[i][2]=CLIP((float)image[i][2]*exposure2); // B
+                 }
+               }
+           }else{
+               K1=32768*exposure;
+               K2=65535-K1;           
+               for(i=0;i<height*width;i++){
+                 Y=0.299*(float)image[i][0]+0.587*(float)image[i][1]+0.114*(float)image[i][2]; // CIE luminosity
+                 if(Y<32768){
+                    image[i][0]=CLIP((float)image[i][0]*exposure); // R
+                    image[i][1]=CLIP((float)image[i][1]*exposure); // G (mixed)
+                    image[i][2]=CLIP((float)image[i][2]*exposure); // B
+                 }else{
+                    Yp=K2*(Y-65535)/32767+65535;
+                    exposure2=Yp/Y;
+                    image[i][0]=CLIP((float)image[i][0]*exposure2); // R
+                    image[i][1]=CLIP((float)image[i][1]*exposure2); // G (mixed)
+                    image[i][2]=CLIP((float)image[i][2]*exposure2); // B
+                 }
+               }             
+           }
+           break;
+       case 2:
+           // Exposure correction with highlight preservation, mode 2
+           if(verbose) printf("with highlight preservation\n");
+           if(exposure>1){
+               K1=32768/exposure;
+               K2=65535-K1;
+               for(i=0;i<height*width;i++){
+                 Y=0.299*(float)image[i][0]+0.587*(float)image[i][1]+0.114*(float)image[i][2]; // CIE luminosity
+                 if(Y<K1){
+                    image[i][0]=CLIP((float)image[i][0]*exposure); // R
+                    image[i][1]=CLIP((float)image[i][1]*exposure); // G (mixed)
+                    image[i][2]=CLIP((float)image[i][2]*exposure); // B
+                 }else{
+                    Yp=32767*(Y-65535)/K2+65535;
+                    exposure2=Yp/Y;
+                    image[i][0]=CLIP((float)image[i][0]*exposure2); // R
+                    image[i][1]=CLIP((float)image[i][1]*exposure2); // G (mixed)
+                    image[i][2]=CLIP((float)image[i][2]*exposure2); // B
+                 }
+               }
+           }else{
+               EV=log(exposure)/log(2.0);
+               for(i=0;i<height*width;i++){
+                 Y=0.299*(float)image[i][0]+0.587*(float)image[i][1]+0.114*(float)image[i][2]; // CIE luminosity
+                 if(Y<32768){
+                    image[i][0]=CLIP((float)image[i][0]*exposure); // R
+                    image[i][1]=CLIP((float)image[i][1]*exposure); // G (mixed)
+                    image[i][2]=CLIP((float)image[i][2]*exposure); // B
+                 }else{                    
+                    exposure2=powF(2,-2*EV*(Y/65535.0-1));
+                    image[i][0]=CLIP((float)image[i][0]*exposure2); // R
+                    image[i][1]=CLIP((float)image[i][1]*exposure2); // G (mixed)
+                    image[i][2]=CLIP((float)image[i][2]*exposure2); // B
+                 }
+               }             
+           }
+           break;                
     }        
 }
 
@@ -9116,7 +9156,7 @@ DLLIMPORT int DCRAW_Init(char *ifname,int *w,int *h)
     fclose(ifp);
     
     // Here we take buffer 0
-    SaveState(0);
+    //SaveState(0);
     
     if (zero_is_bad) remove_zeroes();
     bad_pixels (bpfile);

@@ -18,7 +18,6 @@ namespace perfectRAW
     {
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.PictureBox pictureBox1;
-        private Label label1;
         private Label camera;
         private TextBox textBox1;
         private Label label2;
@@ -27,9 +26,14 @@ namespace perfectRAW
         private Label label3;
         private NumericUpDown numericUpDown1;
         private Label label5;
-        private CheckBox checkBox1;
         Dcraw dcraw = new Dcraw();
         private Button button3;
+        private NumericUpDown numericUpDown2;
+        private Label label4;
+        private Label label6;
+        private Label label7;
+        private NumericUpDown numericUpDown3;
+        private GroupBox groupBox1;
 
         /// <summary>
         /// Variable del diseñador requerida.
@@ -46,7 +50,7 @@ namespace perfectRAW
             //
             // TODO: agregar código de constructor después de llamar a InitializeComponent
             //            
-            MessageBox.Show("perfectRAW\nMódulo revelador\nVersión de prueba nº 1\n21 de mayo de 2008 a las 23:22");
+            MessageBox.Show("perfectRAW\nMódulo revelador\nVersión de prueba nº 2\n22 de mayo de 2008 a las 14:45");
         }
 
         ~MainForm()
@@ -77,7 +81,6 @@ namespace perfectRAW
         {
             this.button1 = new System.Windows.Forms.Button();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.label1 = new System.Windows.Forms.Label();
             this.camera = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -86,17 +89,25 @@ namespace perfectRAW
             this.label3 = new System.Windows.Forms.Label();
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.label5 = new System.Windows.Forms.Label();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.button3 = new System.Windows.Forms.Button();
+            this.numericUpDown2 = new System.Windows.Forms.NumericUpDown();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.numericUpDown3 = new System.Windows.Forms.NumericUpDown();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(12, 712);
+            this.button1.Location = new System.Drawing.Point(11, 685);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(85, 24);
+            this.button1.Size = new System.Drawing.Size(85, 50);
             this.button1.TabIndex = 0;
             this.button1.Text = "REVELAR";
             this.button1.Click += new System.EventHandler(this.button1_Click);
@@ -106,19 +117,10 @@ namespace perfectRAW
             this.pictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pictureBox1.Location = new System.Drawing.Point(12, 34);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(1005, 672);
+            this.pictureBox1.Size = new System.Drawing.Size(1005, 642);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1.TabIndex = 1;
             this.pictureBox1.TabStop = false;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(400, 720);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(46, 13);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "Cámara:";
             // 
             // camera
             // 
@@ -163,7 +165,7 @@ namespace perfectRAW
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(583, 721);
+            this.label3.Location = new System.Drawing.Point(721, 11);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(49, 13);
             this.label3.TabIndex = 7;
@@ -177,7 +179,7 @@ namespace perfectRAW
             0,
             0,
             131072});
-            this.numericUpDown1.Location = new System.Drawing.Point(170, 716);
+            this.numericUpDown1.Location = new System.Drawing.Point(76, 18);
             this.numericUpDown1.Maximum = new decimal(new int[] {
             8,
             0,
@@ -189,32 +191,24 @@ namespace perfectRAW
             0,
             -2147483648});
             this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(77, 20);
+            this.numericUpDown1.Size = new System.Drawing.Size(47, 20);
             this.numericUpDown1.TabIndex = 8;
+            this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(103, 719);
+            this.label5.Location = new System.Drawing.Point(9, 21);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(61, 13);
             this.label5.TabIndex = 10;
             this.label5.Text = "Exposición:";
-            // 
-            // checkBox1
-            // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(258, 719);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(99, 17);
-            this.checkBox1.TabIndex = 11;
-            this.checkBox1.Text = "Preservar luces";
-            this.checkBox1.UseVisualStyleBackColor = true;
+            this.label5.Click += new System.EventHandler(this.label5_Click);
             // 
             // button3
             // 
-            this.button3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.button3.Location = new System.Drawing.Point(921, 712);
+            this.button3.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.button3.Location = new System.Drawing.Point(907, 7);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(97, 23);
             this.button3.TabIndex = 12;
@@ -222,28 +216,97 @@ namespace perfectRAW
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
+            // numericUpDown2
+            // 
+            this.numericUpDown2.Location = new System.Drawing.Point(366, 17);
+            this.numericUpDown2.Maximum = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+            this.numericUpDown2.Name = "numericUpDown2";
+            this.numericUpDown2.Size = new System.Drawing.Size(28, 20);
+            this.numericUpDown2.TabIndex = 14;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(133, 20);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(231, 13);
+            this.label4.TabIndex = 15;
+            this.label4.Text = "Modo de preservación de luces altas (0 = OFF):";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(600, 11);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(120, 13);
+            this.label6.TabIndex = 16;
+            this.label6.Text = "Estado de perfectRAW:";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(516, 705);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(232, 13);
+            this.label7.TabIndex = 18;
+            this.label7.Text = "Modo de recuperación de luces altas (0 = OFF):";
+            // 
+            // numericUpDown3
+            // 
+            this.numericUpDown3.Location = new System.Drawing.Point(750, 702);
+            this.numericUpDown3.Maximum = new decimal(new int[] {
+            9,
+            0,
+            0,
+            0});
+            this.numericUpDown3.Name = "numericUpDown3";
+            this.numericUpDown3.Size = new System.Drawing.Size(29, 20);
+            this.numericUpDown3.TabIndex = 17;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.label5);
+            this.groupBox1.Controls.Add(this.numericUpDown1);
+            this.groupBox1.Controls.Add(this.label4);
+            this.groupBox1.Controls.Add(this.numericUpDown2);
+            this.groupBox1.Location = new System.Drawing.Point(103, 686);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(407, 47);
+            this.groupBox1.TabIndex = 19;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Control de exposición";
+            // 
             // MainForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-            this.ClientSize = new System.Drawing.Size(1029, 748);
+            this.ClientSize = new System.Drawing.Size(1016, 741);
+            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.numericUpDown3);
+            this.Controls.Add(this.label6);
             this.Controls.Add(this.button3);
-            this.Controls.Add(this.checkBox1);
-            this.Controls.Add(this.label5);
-            this.Controls.Add(this.numericUpDown1);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.camera);
-            this.Controls.Add(this.label1);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.button1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "MainForm";
             this.Text = "perfectRAW";
             this.Load += new System.EventHandler(this.MainForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).EndInit();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -290,8 +353,8 @@ namespace perfectRAW
             dcraw.parameters.user_gamma = 1; // Sin aplicar gamma
             dcraw.parameters.output_color = 1; // Convertimos a sRGB
             dcraw.parameters.exposure = (float)Math.Pow(2.0, (double)numericUpDown1.Value);
-            if (checkBox1.Checked) dcraw.parameters.exposure_mode = 1; else dcraw.parameters.exposure_mode = 0;
-            //dcraw.parameters.highlight = 9;
+            dcraw.parameters.exposure_mode =(int)numericUpDown2.Value;
+            dcraw.parameters.highlight = (int)numericUpDown3.Value;
             Thread thread1 = new Thread(new ThreadStart(dcraw.Process));
             thread1.Priority = ThreadPriority.Normal;
             thread1.Start();
@@ -329,6 +392,7 @@ namespace perfectRAW
         {
             textBox1.Text = @"C:\test\a_1.dng";
             dcraw.SetRAWFile(textBox1.Text);
+            
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
@@ -360,6 +424,16 @@ namespace perfectRAW
             eps.Param[0] = new EncoderParameter(Encoder.Quality, lCompression);
             ImageCodecInfo ici = GetEncoderInfo("image/jpeg");
             image.Save(szFileName, ici, eps);
+        }
+
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label5_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
