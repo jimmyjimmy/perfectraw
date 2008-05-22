@@ -13,14 +13,12 @@ namespace test
 {
     public unsafe partial class Form1 : Form
     {
-        [DllImport(@"PerfectImageDLL.dll")]
-        static extern void FastDrawImage(byte* buffer, byte* buffer2, int width, int height, int width2, int heigh2, int extra, int extra2, int x, int y, float z, byte color);
 
         [DllImport(@"PerfectImageDLL.dll")]
-        static extern void FastDrawBiVImage(byte* buffer, byte* buffer1, byte* buffer3, int width, int height, int width2, int heigh2, int extra, int extra2, int x, int y, float z, byte color);
+        static extern void FastDrawImage16MarkBP(byte* buffer, ushort* buffer2, int width, int height, int width2, int heigh2, int extra, int extra2, int x, int y, float z, byte color);
 
         [DllImport(@"PerfectImageDLL.dll")]
-        static extern void FastDrawImageFlash(byte* buffer, byte* buffer2, int width, int height, int width2, int heigh2, int extra, int extra2, int x, int y, float z, byte color, int flash);
+        static extern void FastDrawImage16(byte* buffer, ushort* buffer2, int width, int height, int width2, int heigh2, int extra, int extra2, int x, int y, float z, byte color);
 
         int []state=new int[2];
         int []dragFromX=new int[2];
@@ -30,8 +28,8 @@ namespace test
         int []pY = new int[2];
         private const int WHEEL_DELTA = 120;
         float []Zoom = new float[2];        
-        Bitmap img1 = (Bitmap)Image.FromFile(@"salón.jpg");
-        Bitmap img2 = (Bitmap)Image.FromFile(@"salón.jpg");
+        Bitmap img1 = (Bitmap)Image.FromFile(@"imgPrueba.tif");
+        Bitmap img2 = (Bitmap)Image.FromFile(@"imgPrueba.tif");
         BitmapData data21;
         BitmapData data22;
         byte* ptr2bk1;
@@ -45,7 +43,7 @@ namespace test
         bool flag=false;
         bool []bref=new bool[2];
         Timer timer = new Timer();
-        int flash=-1;
+        int flash=0;
 
         public Form1()
         {
@@ -53,7 +51,7 @@ namespace test
             Zoom[0] = Zoom[1] = 1;
             state[0] = state[1] = 0;
             pX[0] = pX[1] = pY[0] = pY[1] = 0;
-            timer.Interval = 250;
+            timer.Interval = 500;
             timer.Tick += new System.EventHandler(TimerTick);
             timer.Enabled = true;
         }
@@ -61,8 +59,8 @@ namespace test
         void TimerTick(object sender, EventArgs e)
         {
             // Cambiamos este flag para que parpadee (entre -1 y 1)
-            flash = -flash;            
-            bref[0] = true;
+            if (flash == 1) flash = 0; else flash = 1;
+            bref[0] = bref[1] = true;
             this.Refresh();                        
         }
 
@@ -74,6 +72,13 @@ namespace test
             img2.UnlockBits(data22);
         }
 
+        private ushort CLIPF(double v)
+        {
+            if (v > 65535.0) v = 65535.0;
+            if (v < 0) v = 0.0;
+            return (ushort)v;
+        }
+
         private void Form1_Load(object sender, EventArgs e)
         {                        
             data21 = img1.LockBits(new Rectangle(0, 0, img1.Width, img1.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
@@ -82,21 +87,25 @@ namespace test
             w21 = data21.Width;
             h21 = data21.Height;
             
-            data22 = img2.LockBits(new Rectangle(0, 0, img2.Width, img2.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-            extra22 = data22.Stride - data22.Width * 3;
+            data22 = img2.LockBits(new Rectangle(0, 0, img2.Width, img2.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format48bppRgb);
+            extra22 = data22.Stride - data22.Width * 6;
             ptr2bk2 = (byte*)(data22.Scan0);
+            ushort* test = (ushort*)ptr2bk2;
             w22 = data22.Width;
             h22 = data22.Height;
             unsafe
             {
-                for (int i = 0; i < (w22+extra22) * h22*3; i++)
+                for (int i = 0; i < (w22+extra22) * h22*3; i+=3)
                 {
-                    if(ptr2bk2[i]<225) ptr2bk2[i] += 30;
+                    test[i + 0] = CLIPF(65535.0*2.8*Math.Pow((double)test[i + 0]/65535.0, 1 / 2.2));
+                    test[i + 1] = CLIPF(65535.0*2.8*Math.Pow((double)test[i + 1]/65535.0, 1 / 2.2));
+                    test[i + 2] = CLIPF(65535.0*2.8*Math.Pow((double)test[i + 2]/65535.0, 1 / 2.2));                   
                 }
-            }               
+            }
             
             ResizeViews();            
         }                        
+
 
         private void Form1_OnResize(object sender, EventArgs e)
         {
@@ -268,8 +277,13 @@ namespace test
                 unsafe
                 {
                     byte* ptr = (byte*)(data1.Scan0);
-                    byte* ptr2 = ptr2bk1;
-                    FastDrawImageFlash(ptr, ptr2, w[aview], h[aview], w21, h21, extra, extra21, pX[aview], pY[aview], Zoom[aview], 128, flash);
+                    byte* ptr2 = ptr2bk2;
+                    if (flash == 1)
+                    {
+                        FastDrawImage16MarkBP(ptr, (ushort*)ptr2, w[aview], h[aview], w22, h22, extra, extra22, pX[aview], pY[aview], Zoom[aview], 128);
+                    }else{
+                        FastDrawImage16(ptr, (ushort*)ptr2, w[aview], h[aview], w22, h22, extra, extra22, pX[aview], pY[aview], Zoom[aview], 128);
+                    }
                 }
                 bmp.UnlockBits(data1);
                 if(pictureBox1.Image!=null) pictureBox1.Image.Dispose();
@@ -287,8 +301,7 @@ namespace test
                 {
                     byte* ptr = (byte*)(data1.Scan0);
                     byte* ptr2 = ptr2bk2;
-                    byte* ptr3 = ptr2bk1;
-                    FastDrawBiVImage(ptr, ptr2, ptr3, w[aview], h[aview], w22, h22, extra, extra22, pX[aview], pY[aview], Zoom[aview], 128);
+                    FastDrawImage16(ptr, (ushort*)ptr2, w[aview], h[aview], w22, h22, extra, extra22, pX[aview], pY[aview], Zoom[aview], 128);
                 }
                 bmp.UnlockBits(data1);
                 if (pictureBox2.Image != null) pictureBox2.Image.Dispose();
@@ -310,6 +323,7 @@ namespace test
             // Tests de velocidad
             int aview = 1;
 
+            timer.Enabled = false;
             Bitmap bmp = new Bitmap(w[aview], h[aview], System.Drawing.Imaging.PixelFormat.Format24bppRgb);
             BitmapData data1 = bmp.LockBits(new Rectangle(0, 0, w[aview], h[aview]), ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
             int extra = data1.Stride - data1.Width * 3;
@@ -322,8 +336,8 @@ namespace test
                 unsafe
                 {
                     byte* ptr = (byte*)(data1.Scan0);
-                    byte* ptr2 = ptr2bk1;
-                    FastDrawBiVImage(ptr, ptr2, ptr, w[aview], h[aview], w21, h21, extra, extra21, pX[aview], pY[aview], 1/32F, 128);
+                    byte* ptr2 = ptr2bk2;
+                    FastDrawImage16MarkBP(ptr, (ushort *)ptr2, w[aview], h[aview], w22, h22, extra, extra21, pX[aview], pY[aview], 1F, 128);
                 }
             }
             bmp.UnlockBits(data1);
@@ -331,6 +345,7 @@ namespace test
             t2 = Environment.TickCount;
             t = (t2 - t1) / 1000.0F;
             MessageBox.Show("1000 búcles + 1 volcado ("+(w21.ToString())+","+(h21.ToString())+"): " + t.ToString()+" segundos.");
+            timer.Enabled = true;
         }
     }
 }

@@ -117,4 +117,313 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="btnExit.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Left</value>
+  </data>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="btnExit.Location" type="System.Drawing.Point, System.Drawing">
+    <value>12, 565</value>
+  </data>
+  <data name="btnExit.Size" type="System.Drawing.Size, System.Drawing">
+    <value>66, 23</value>
+  </data>
+  <assembly alias="mscorlib" name="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="btnExit.TabIndex" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="btnExit.Text" xml:space="preserve">
+    <value>Salir</value>
+  </data>
+  <data name="&gt;&gt;btnExit.Name" xml:space="preserve">
+    <value>btnExit</value>
+  </data>
+  <data name="&gt;&gt;btnExit.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;btnExit.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;btnExit.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="label1.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Left</value>
+  </data>
+  <data name="label1.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="label1.Location" type="System.Drawing.Point, System.Drawing">
+    <value>84, 570</value>
+  </data>
+  <data name="label1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>35, 13</value>
+  </data>
+  <data name="label1.TabIndex" type="System.Int32, mscorlib">
+    <value>3</value>
+  </data>
+  <data name="label1.Text" xml:space="preserve">
+    <value>label1</value>
+  </data>
+  <data name="&gt;&gt;label1.Name" xml:space="preserve">
+    <value>label1</value>
+  </data>
+  <data name="&gt;&gt;label1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;label1.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;label1.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="btnTestSpeed.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Left</value>
+  </data>
+  <data name="btnTestSpeed.Location" type="System.Drawing.Point, System.Drawing">
+    <value>603, 563</value>
+  </data>
+  <data name="btnTestSpeed.Size" type="System.Drawing.Size, System.Drawing">
+    <value>63, 22</value>
+  </data>
+  <data name="btnTestSpeed.TabIndex" type="System.Int32, mscorlib">
+    <value>4</value>
+  </data>
+  <data name="btnTestSpeed.Text" xml:space="preserve">
+    <value>Test Vel.</value>
+  </data>
+  <data name="&gt;&gt;btnTestSpeed.Name" xml:space="preserve">
+    <value>btnTestSpeed</value>
+  </data>
+  <data name="&gt;&gt;btnTestSpeed.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;btnTestSpeed.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;btnTestSpeed.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="showBurnedPixels.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Right</value>
+  </data>
+  <data name="showBurnedPixels.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="showBurnedPixels.Location" type="System.Drawing.Point, System.Drawing">
+    <value>228, 570</value>
+  </data>
+  <data name="showBurnedPixels.Size" type="System.Drawing.Size, System.Drawing">
+    <value>142, 17</value>
+  </data>
+  <data name="showBurnedPixels.TabIndex" type="System.Int32, mscorlib">
+    <value>5</value>
+  </data>
+  <data name="showBurnedPixels.Text" xml:space="preserve">
+    <value>Mostrar pixels quemados</value>
+  </data>
+  <data name="&gt;&gt;showBurnedPixels.Name" xml:space="preserve">
+    <value>showBurnedPixels</value>
+  </data>
+  <data name="&gt;&gt;showBurnedPixels.Type" xml:space="preserve">
+    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;showBurnedPixels.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;showBurnedPixels.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="gbModoVista.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Right</value>
+  </data>
+  <data name="rbVistaHorizontal.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="rbVistaHorizontal.Location" type="System.Drawing.Point, System.Drawing">
+    <value>84, 43</value>
+  </data>
+  <data name="rbVistaHorizontal.Size" type="System.Drawing.Size, System.Drawing">
+    <value>108, 17</value>
+  </data>
+  <data name="rbVistaHorizontal.TabIndex" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="rbVistaHorizontal.Text" xml:space="preserve">
+    <value>Partida Horizontal</value>
+  </data>
+  <data name="&gt;&gt;rbVistaHorizontal.Name" xml:space="preserve">
+    <value>rbVistaHorizontal</value>
+  </data>
+  <data name="&gt;&gt;rbVistaHorizontal.Type" xml:space="preserve">
+    <value>System.Windows.Forms.RadioButton, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;rbVistaHorizontal.Parent" xml:space="preserve">
+    <value>gbModoVista</value>
+  </data>
+  <data name="&gt;&gt;rbVistaHorizontal.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="rbVistaVertical.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="rbVistaVertical.Location" type="System.Drawing.Point, System.Drawing">
+    <value>84, 20</value>
+  </data>
+  <data name="rbVistaVertical.Size" type="System.Drawing.Size, System.Drawing">
+    <value>96, 17</value>
+  </data>
+  <data name="rbVistaVertical.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="rbVistaVertical.Text" xml:space="preserve">
+    <value>Partida Vertical</value>
+  </data>
+  <data name="&gt;&gt;rbVistaVertical.Name" xml:space="preserve">
+    <value>rbVistaVertical</value>
+  </data>
+  <data name="&gt;&gt;rbVistaVertical.Type" xml:space="preserve">
+    <value>System.Windows.Forms.RadioButton, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;rbVistaVertical.Parent" xml:space="preserve">
+    <value>gbModoVista</value>
+  </data>
+  <data name="&gt;&gt;rbVistaVertical.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="rbVistaSimple.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="rbVistaSimple.Location" type="System.Drawing.Point, System.Drawing">
+    <value>7, 20</value>
+  </data>
+  <data name="rbVistaSimple.Size" type="System.Drawing.Size, System.Drawing">
+    <value>56, 17</value>
+  </data>
+  <data name="rbVistaSimple.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="rbVistaSimple.Text" xml:space="preserve">
+    <value>Simple</value>
+  </data>
+  <data name="&gt;&gt;rbVistaSimple.Name" xml:space="preserve">
+    <value>rbVistaSimple</value>
+  </data>
+  <data name="&gt;&gt;rbVistaSimple.Type" xml:space="preserve">
+    <value>System.Windows.Forms.RadioButton, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;rbVistaSimple.Parent" xml:space="preserve">
+    <value>gbModoVista</value>
+  </data>
+  <data name="&gt;&gt;rbVistaSimple.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="gbModoVista.Location" type="System.Drawing.Point, System.Drawing">
+    <value>397, 525</value>
+  </data>
+  <data name="gbModoVista.Size" type="System.Drawing.Size, System.Drawing">
+    <value>200, 63</value>
+  </data>
+  <data name="gbModoVista.TabIndex" type="System.Int32, mscorlib">
+    <value>6</value>
+  </data>
+  <data name="gbModoVista.Text" xml:space="preserve">
+    <value>Modo Vista</value>
+  </data>
+  <data name="&gt;&gt;gbModoVista.Name" xml:space="preserve">
+    <value>gbModoVista</value>
+  </data>
+  <data name="&gt;&gt;gbModoVista.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;gbModoVista.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;gbModoVista.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="btnOpenFile.Location" type="System.Drawing.Point, System.Drawing">
+    <value>125, 565</value>
+  </data>
+  <data name="btnOpenFile.Size" type="System.Drawing.Size, System.Drawing">
+    <value>75, 23</value>
+  </data>
+  <data name="btnOpenFile.TabIndex" type="System.Int32, mscorlib">
+    <value>7</value>
+  </data>
+  <data name="btnOpenFile.Text" xml:space="preserve">
+    <value>Abrir</value>
+  </data>
+  <data name="&gt;&gt;btnOpenFile.Name" xml:space="preserve">
+    <value>btnOpenFile</value>
+  </data>
+  <data name="&gt;&gt;btnOpenFile.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;btnOpenFile.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;btnOpenFile.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="perfectView2.Location" type="System.Drawing.Point, System.Drawing">
+    <value>313, 33</value>
+  </data>
+  <data name="perfectView2.Size" type="System.Drawing.Size, System.Drawing">
+    <value>217, 265</value>
+  </data>
+  <data name="perfectView2.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;perfectView2.Name" xml:space="preserve">
+    <value>perfectView2</value>
+  </data>
+  <data name="&gt;&gt;perfectView2.Type" xml:space="preserve">
+    <value>PerfectControls.PerfectView, PerfectControls, Version=1.0.3064.31692, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;perfectView2.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;perfectView2.ZOrder" xml:space="preserve">
+    <value>6</value>
+  </data>
+  <data name="perfectView1.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 33</value>
+  </data>
+  <data name="perfectView1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>228, 265</value>
+  </data>
+  <data name="perfectView1.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;perfectView1.Name" xml:space="preserve">
+    <value>perfectView1</value>
+  </data>
+  <data name="&gt;&gt;perfectView1.Type" xml:space="preserve">
+    <value>PerfectControls.PerfectView, PerfectControls, Version=1.0.3064.31692, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;perfectView1.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;perfectView1.ZOrder" xml:space="preserve">
+    <value>7</value>
+  </data>
+  <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
+    <value>6, 13</value>
+  </data>
+  <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
+    <value>800, 600</value>
+  </data>
+  <data name="$this.Text" xml:space="preserve">
+    <value>PerfectRAW GUI Test</value>
+  </data>
+  <data name="&gt;&gt;$this.Name" xml:space="preserve">
+    <value>Form2</value>
+  </data>
+  <data name="&gt;&gt;$this.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Form, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
 </root>
