@@ -50,7 +50,7 @@ namespace perfectRAW
             //
             // TODO: agregar código de constructor después de llamar a InitializeComponent
             //            
-            MessageBox.Show("perfectRAW\nMódulo revelador\nVersión de prueba nº 2\n22 de mayo de 2008 a las 14:45");
+            MessageBox.Show("perfectRAW\nMódulo revelador\nVersión de prueba nº 3\n22 de mayo de 2008 a las 16:11");
         }
 
         ~MainForm()
@@ -117,7 +117,7 @@ namespace perfectRAW
             this.pictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pictureBox1.Location = new System.Drawing.Point(12, 34);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(1005, 642);
+            this.pictureBox1.Size = new System.Drawing.Size(992, 642);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1.TabIndex = 1;
             this.pictureBox1.TabStop = false;
@@ -174,6 +174,7 @@ namespace perfectRAW
             // numericUpDown1
             // 
             this.numericUpDown1.DecimalPlaces = 2;
+            this.numericUpDown1.Font = new System.Drawing.Font("Arial Narrow", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.numericUpDown1.Increment = new decimal(new int[] {
             25,
             0,
@@ -191,7 +192,7 @@ namespace perfectRAW
             0,
             -2147483648});
             this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(47, 20);
+            this.numericUpDown1.Size = new System.Drawing.Size(47, 17);
             this.numericUpDown1.TabIndex = 8;
             this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
             // 
@@ -218,6 +219,7 @@ namespace perfectRAW
             // 
             // numericUpDown2
             // 
+            this.numericUpDown2.Font = new System.Drawing.Font("Arial Narrow", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.numericUpDown2.Location = new System.Drawing.Point(366, 17);
             this.numericUpDown2.Maximum = new decimal(new int[] {
             2,
@@ -225,7 +227,7 @@ namespace perfectRAW
             0,
             0});
             this.numericUpDown2.Name = "numericUpDown2";
-            this.numericUpDown2.Size = new System.Drawing.Size(28, 20);
+            this.numericUpDown2.Size = new System.Drawing.Size(28, 17);
             this.numericUpDown2.TabIndex = 14;
             // 
             // label4
@@ -257,6 +259,7 @@ namespace perfectRAW
             // 
             // numericUpDown3
             // 
+            this.numericUpDown3.Font = new System.Drawing.Font("Arial Narrow", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.numericUpDown3.Location = new System.Drawing.Point(750, 702);
             this.numericUpDown3.Maximum = new decimal(new int[] {
             9,
@@ -264,7 +267,7 @@ namespace perfectRAW
             0,
             0});
             this.numericUpDown3.Name = "numericUpDown3";
-            this.numericUpDown3.Size = new System.Drawing.Size(29, 20);
+            this.numericUpDown3.Size = new System.Drawing.Size(29, 17);
             this.numericUpDown3.TabIndex = 17;
             // 
             // groupBox1
@@ -273,9 +276,9 @@ namespace perfectRAW
             this.groupBox1.Controls.Add(this.numericUpDown1);
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.numericUpDown2);
-            this.groupBox1.Location = new System.Drawing.Point(103, 686);
+            this.groupBox1.Location = new System.Drawing.Point(103, 682);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(407, 47);
+            this.groupBox1.Size = new System.Drawing.Size(407, 51);
             this.groupBox1.TabIndex = 19;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Control de exposición";

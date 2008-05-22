@@ -8854,7 +8854,7 @@ void SetDefaults(void)
     output_bps=16;
     threshold=0;
     FORC4 aber[c]=1;
-    use_auto_wb=0;
+    use_auto_wb=1;
     use_camera_wb=0;
     greybox[0] = 0;
     greybox[1] = 0;
@@ -8984,7 +8984,7 @@ DLLIMPORT void DCRAW_DefaultParameters(DLL_PARAMETERS *p)
     
     p->threshold=0;
     FORC4 p->aber[c]=1;
-    p->use_auto_wb=0;
+    p->use_auto_wb=1;
     p->use_camera_wb=0;
     p->greybox[0] = 0;
     p->greybox[1] = 0;
@@ -9021,8 +9021,8 @@ void exposure_correction(void){
            }
            break;
        case 1:
-           // Exposure correction with highlight preservation, mode 1
-           if(verbose) printf("with highlight preservation\n");
+           // Exposure correction with highlight preservation, CIE luminosty
+           if(verbose) printf("with highlight preservation: CIE luminosity\n");
            if(exposure>1){
                K1=32768/exposure;
                K2=65535-K1;
@@ -9041,43 +9041,34 @@ void exposure_correction(void){
                  }
                }
            }else{
-               K1=32768*exposure;
-               K2=65535-K1;           
+               EV=log(exposure)/log(2.0);
                for(i=0;i<height*width;i++){
                  Y=0.299*(float)image[i][0]+0.587*(float)image[i][1]+0.114*(float)image[i][2]; // CIE luminosity
                  if(Y<32768){
                     image[i][0]=CLIP((float)image[i][0]*exposure); // R
                     image[i][1]=CLIP((float)image[i][1]*exposure); // G (mixed)
                     image[i][2]=CLIP((float)image[i][2]*exposure); // B
-                 }else{
-                    Yp=K2*(Y-65535)/32767+65535;
-                    exposure2=Yp/Y;
+                 }else{                    
+                    exposure2=powF(2,-2*EV*(Y/65535.0-1));
                     image[i][0]=CLIP((float)image[i][0]*exposure2); // R
                     image[i][1]=CLIP((float)image[i][1]*exposure2); // G (mixed)
                     image[i][2]=CLIP((float)image[i][2]*exposure2); // B
                  }
                }             
            }
-           break;
+           break;                
        case 2:
-           // Exposure correction with highlight preservation, mode 2
-           if(verbose) printf("with highlight preservation\n");
+           // Exposure correction with highlight preservation, HSV luminosity
+           if(verbose) printf("with highlight preservation: : HSV luminosity\n");
            if(exposure>1){
                K1=32768/exposure;
                K2=65535-K1;
                for(i=0;i<height*width;i++){
-                 Y=0.299*(float)image[i][0]+0.587*(float)image[i][1]+0.114*(float)image[i][2]; // CIE luminosity
-                 if(Y<K1){
-                    image[i][0]=CLIP((float)image[i][0]*exposure); // R
-                    image[i][1]=CLIP((float)image[i][1]*exposure); // G (mixed)
-                    image[i][2]=CLIP((float)image[i][2]*exposure); // B
-                 }else{
-                    Yp=32767*(Y-65535)/K2+65535;
-                    exposure2=Yp/Y;
-                    image[i][0]=CLIP((float)image[i][0]*exposure2); // R
-                    image[i][1]=CLIP((float)image[i][1]*exposure2); // G (mixed)
-                    image[i][2]=CLIP((float)image[i][2]*exposure2); // B
-                 }
+                 Y=MAX((float)image[i][0],MAX((float)image[i][1],(float)image[i][2])); // HSV luminosity
+                 exposure2=MIN(exposure,65535.0/Y);
+                 image[i][0]=CLIP((float)image[i][0]*exposure2); // R
+                 image[i][1]=CLIP((float)image[i][1]*exposure2); // G (mixed)
+                 image[i][2]=CLIP((float)image[i][2]*exposure2); // B
                }
            }else{
                EV=log(exposure)/log(2.0);
