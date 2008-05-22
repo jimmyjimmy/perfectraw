@@ -8749,6 +8749,7 @@ int user_black,user_sat,user_qual,level_greens,use_fuji_rotate,quality,test_patt
 int first_time,write_to_stdout;
 float exposure;
 int exposure_mode;
+char sD[1000];
 
 void SaveState(int ID){
     state[ID].filters=filters;
@@ -9257,7 +9258,6 @@ DLLIMPORT unsigned short * DCRAW_Process(DLL_PARAMETERS *p)
     }
     
 STAGE2:
-    //ShowDebug("STAGE2");      
     if(test_pattern) test_patterns();
     if(level_greens) eq_greens();
     if (!is_foveon && document_mode < 2) scale_colors();
@@ -9265,7 +9265,6 @@ STAGE2:
     SaveState(2);
        
 STAGE3:    
-    //ShowDebug("STAGE3");      
     if (is_foveon && !document_mode) foveon_interpolate();  // Beware, this have been changed from it's main() position
     pre_interpolate();    
     if (filters && !document_mode) {
@@ -9281,8 +9280,10 @@ STAGE3:
     // Here we take buffer 3
     SaveState(3);         
     
-STAGE4:       
-    //ShowDebug("STAGE4");      
+STAGE4:           
+    sprintf(sD,"%i %f %i\n",highlight,exposure,exposure_mode);
+    MessageBox(0,sD,"",0);
+    
     if (!is_foveon && colors == 3) median_filter();
     if (!is_foveon && highlight == 2) blend_highlights();
     if (!is_foveon && highlight > 2) recover_highlights();
