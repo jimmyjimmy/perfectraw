@@ -4,11 +4,11 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PerfectImageDLL", "PerfectImageDLL\PerfectImageDLL.vcproj", "{8E52C1DC-BF95-4148-AF52-DF861C383EC8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "test", "testPerfectControls\test.csproj", "{E2416F06-8E6A-445B-B4DA-61233DBA60EA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerfectControls", "PerfectControls\PerfectControls.csproj", "{2BB59524-EB71-4FAF-948A-2F07541EDE65}"
 	ProjectSection(ProjectDependencies) = postProject
 		{8E52C1DC-BF95-4148-AF52-DF861C383EC8} = {8E52C1DC-BF95-4148-AF52-DF861C383EC8}
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerfectControls", "PerfectControls\PerfectControls.csproj", "{2BB59524-EB71-4FAF-948A-2F07541EDE65}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

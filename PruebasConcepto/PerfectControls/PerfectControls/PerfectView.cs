@@ -21,18 +21,38 @@ namespace PerfectControls
     public unsafe partial class PerfectView : PictureBox
     {
         [DllImport(@"PerfectImageDLL.dll")]
-        private static extern void FastDrawImage(byte* buffer, byte* buffer2, int width, int height, int width2, int heigh2, int extra, int extra2, int x, int y, float z, byte color);
+        private static extern void FastDrawImage16MarkBP(byte *outputImg, ushort *inputImg, 
+            int outImgWidth, int outImgHeight, int inImgWidth, int inImgHeight, 
+            int outImgRowPadding, int inImgRowPadding, int x, int y, float z, 
+            byte fillColor);
+        [DllImport(@"PerfectImageDLL.dll")]
+        private static extern void FastDrawImage16(byte* outputImg, ushort* inputImg,
+            int outImgWidth, int outImgHeight, int inImgWidth, int inImgHeight,
+            int outImgRowPadding, int inImgRowPadding, int x, int y, float z,
+            byte fillColor);
 
         [DllImport(@"PerfectImageDLL.dll")]
-        private static extern void FastDrawBiVImage(byte* buffer, byte* buffer1, byte* buffer3, int width, int height, int width2, int heigh2, int extra, int extra2, int x, int y, float z, byte color);
-
+        private static extern void FastDrawImage16VSplit(byte *outputImg, ushort *inputLeftImg, ushort *inputRightImg,
+            int outImgWidth, int outImgHeight, int inImgWidth, int inImgHeight,
+            int outImgRowPadding, int inImgRowPadding, int x, int y, float z,
+            byte fillColor);
         [DllImport(@"PerfectImageDLL.dll")]
-        private static extern void FastDrawImageFlash(byte* buffer, byte* buffer2, int width, int height, int width2, int heigh2, int extra, int extra2, int x, int y, float z, byte color,int flash);
-
+        private static extern void FastDrawImage16VSplitMarkBP(byte* outputImg, ushort* inputLeftImg, ushort* inputRightImg,
+            int outImgWidth, int outImgHeight, int inImgWidth, int inImgHeight,
+            int outImgRowPadding, int inImgRowPadding, int x, int y, float z,
+            byte fillColor);
         [DllImport(@"PerfectImageDLL.dll")]
-        private static extern void FastFlashImage(byte* buffer, int width, int height, int flash);
+        private static extern void FastDrawImage16HSplit(byte* outputImg, ushort* inputTopImg, ushort* inputBottomImg,
+            int outImgWidth, int outImgHeight, int inImgWidth, int inImgHeight,
+            int outImgRowPadding, int inImgRowPadding, int x, int y, float z,
+            byte fillColor);
+        [DllImport(@"PerfectImageDLL.dll")]
+        private static extern void FastDrawImage16HSplitMarkBP(byte* outputImg, ushort* inputTopImg, ushort* inputBottomImg,
+            int outImgWidth, int outImgHeight, int inImgWidth, int inImgHeight,
+            int outImgRowPadding, int inImgRowPadding, int x, int y, float z,
+            byte fillColor);
 
-        
+
         //Bitmap de la imagen original y de la previa (Old de un anterior revelado)
         Bitmap img,imgOld;
         float zoom;
@@ -281,46 +301,66 @@ namespace PerfectControls
             Bitmap bmp = new Bitmap(Width, Height, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
             BitmapData dataBmp = bmp.LockBits(new Rectangle(0, 0, Width, Height), ImageLockMode.WriteOnly, 
                 System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+            //Calc number of extra dummy byte in a row pointer of the image.
             byte* ptrBmp = (byte*)(dataBmp.Scan0);
             int extBmp = dataBmp.Stride - dataBmp.Width * 3;
 
             BitmapData dataImg = img.LockBits(new Rectangle(0, 0, img.Width, img.Height),
                 ImageLockMode.ReadOnly,
-                System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-            int extra = dataImg.Stride - dataImg.Width * 3;
-            byte *ptr2bk = (byte*)(dataImg.Scan0);
+                System.Drawing.Imaging.PixelFormat.Format48bppRgb);
+            //Calc number of extra dummy byte in a row pointer of the image.
+            int extra = dataImg.Stride - dataImg.Width * 6;
+            ushort *ptr2bk = (ushort*)(dataImg.Scan0);
+
+            BitmapData dataImgOld;
+            ushort* ptr2bkOld;
 
             switch (viewMode)
             {
                 case PerfectViewMode.OneView:
                     unsafe
                     {
-                        if(showBurnedPixelsFlash==0)
-                            FastDrawImage(ptrBmp, ptr2bk, Width, Height, wDispImg, hDispImg,
+                        if(showBurnedPixelsFlash==1)
+                            FastDrawImage16MarkBP(ptrBmp, ptr2bk, Width, Height, wDispImg, hDispImg,
                                     extBmp, extra, pX, pY, zoom, 128);
                         else
-                            FastDrawImageFlash((byte*)dataBmp.Scan0, ptr2bk, Width, Height, wDispImg, hDispImg,
-                                    extBmp, extra, pX, pY, zoom, 128,showBurnedPixelsFlash);
+                            FastDrawImage16((byte*)dataBmp.Scan0, ptr2bk, Width, Height, wDispImg, hDispImg,
+                                    extBmp, extra, pX, pY, zoom, 128);
                     }
                     break;
                 case PerfectViewMode.VerticalSplit:
-                case PerfectViewMode.HorizontalSplit:
-                    BitmapData dataImgOld = imgOld.LockBits(new Rectangle(0, 0, imgOld.Width, imgOld.Height),
+                    dataImgOld = imgOld.LockBits(new Rectangle(0, 0, imgOld.Width, imgOld.Height),
                        ImageLockMode.ReadOnly,
-                       System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-                    byte *ptr2bkOld = (byte*)(dataImgOld.Scan0);
+                       System.Drawing.Imaging.PixelFormat.Format48bppRgb);
+                    ptr2bkOld = (ushort*)(dataImgOld.Scan0);
                     unsafe
                     {
-                        FastDrawBiVImage(ptrBmp, ptr2bk, ptr2bkOld, Width, Height, wDispImg, hDispImg,
+                        if (showBurnedPixelsFlash == 1)
+                            FastDrawImage16VSplitMarkBP(ptrBmp, ptr2bk, ptr2bkOld, Width, Height, wDispImg, hDispImg,
+                                extBmp, extra, pX, pY, zoom, 128);
+                        else
+                            FastDrawImage16VSplit(ptrBmp, ptr2bk, ptr2bkOld, Width, Height, wDispImg, hDispImg,
+                                extBmp, extra, pX, pY, zoom, 128);
+                    }
+                    imgOld.UnlockBits(dataImgOld);
+                    break;
+                case PerfectViewMode.HorizontalSplit:
+                    dataImgOld = imgOld.LockBits(new Rectangle(0, 0, imgOld.Width, imgOld.Height),
+                       ImageLockMode.ReadOnly,
+                       System.Drawing.Imaging.PixelFormat.Format48bppRgb);
+                    ptr2bkOld = (ushort*)(dataImgOld.Scan0);
+                    unsafe
+                    {
+                        if( showBurnedPixelsFlash==1)
+                            FastDrawImage16HSplitMarkBP(ptrBmp, ptr2bk, ptr2bkOld, Width, Height, wDispImg, hDispImg,
+                                extBmp, extra, pX, pY, zoom, 128);
+                        else
+                            FastDrawImage16HSplit(ptrBmp, ptr2bk, ptr2bkOld, Width, Height, wDispImg, hDispImg,
                                 extBmp, extra, pX, pY, zoom, 128);
                     }
                     imgOld.UnlockBits(dataImgOld);
                     break;
             }
-            /*
-            if (showBurnedPixelsFlash != 0)
-                FastFlashImage(ptrBmp, Width, Height,showBurnedPixelsFlash);
-             */
             img.UnlockBits(dataImg);
             bmp.UnlockBits(dataBmp);
             
@@ -330,7 +370,7 @@ namespace PerfectControls
             transMat.Translate(-pX * zoom, -pY* zoom);
             transMat.Scale(zoom, zoom);
             gc.Transform = transMat;
-            DibujarSeleccion(gc);
+            DrawSelection(gc);
             gc.Dispose();
             transMat.Dispose();
              
@@ -342,19 +382,21 @@ namespace PerfectControls
             bref = false;
             base.OnPaint(pe);
         }
-        public void TestVelocidad()
+        public void SpeedTest()
         {
             // Tests de velocidad
             BitmapData dataImg = img.LockBits(new Rectangle(0, 0, img.Width, img.Height),
                 ImageLockMode.ReadOnly,
-                System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-            int extra = dataImg.Stride - dataImg.Width * 3;
-            byte* ptr2bk = (byte*)(dataImg.Scan0);
+                System.Drawing.Imaging.PixelFormat.Format48bppRgb);
+            //Calc number of extra dummy byte in a row pointer of the image.
+            int extra = dataImg.Stride - dataImg.Width * 6;
+            ushort* ptr2bk = (ushort*)(dataImg.Scan0);
 
             Bitmap bmp = new Bitmap(Width,Height,
                 System.Drawing.Imaging.PixelFormat.Format24bppRgb);
             BitmapData data1 = bmp.LockBits(new Rectangle(0, 0, Width, Height),
                 ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+            //Calc number of extra dummy byte in a row pointer of the image.
             int ext = data1.Stride - data1.Width * 3;
 
             long t1, t2;
@@ -365,7 +407,7 @@ namespace PerfectControls
                 unsafe
                 {
                     byte* ptr = (byte*)(data1.Scan0);
-                    FastDrawImage(ptr, ptr2bk, Width, Height,wDispImg ,hDispImg,
+                    FastDrawImage16MarkBP(ptr, ptr2bk, Width, Height,wDispImg ,hDispImg,
                           ext, extra, pX, pY, 1 / 32F, 128);
                 }
             }
@@ -376,12 +418,15 @@ namespace PerfectControls
             t = (t2 - t1) / 1000.0F;
             MessageBox.Show("1000 búcles + 1 volcado (" + (wDispImg.ToString()) + "," + (hDispImg.ToString()) + "): " + t.ToString() + " segundos.");
         }
-        protected void DibujarSeleccion(Graphics gc)
+        protected void DrawSelection(Graphics gc)
         {
+            /*
             SolidBrush br = new SolidBrush(Color.FromArgb(70, Color.Aquamarine));
 
             gc.FillEllipse(br, wDispImg/4, hDispImg/4, wDispImg/2, hDispImg/2);
             br.Dispose();
+             * */
+            return;
         }
 
      }

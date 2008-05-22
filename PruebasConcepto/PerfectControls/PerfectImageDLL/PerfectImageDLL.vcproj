@@ -63,6 +63,9 @@
 				Name="VCLinkerTool"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
+				AssemblyDebug="1"
+				GenerateMapFile="true"
+				MapExports="true"
 				SubSystem="2"
 				TargetMachine="1"
 			/>
@@ -178,6 +181,26 @@
 			<File
 				RelativePath=".\PerfectImageDLL.cpp"
 				>
+			</File>
+			<File
+				RelativePath=".\PerfectImageDLL.inc.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\stdafx.c"
