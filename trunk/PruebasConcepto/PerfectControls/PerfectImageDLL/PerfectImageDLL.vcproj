@@ -177,7 +177,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\PerfectImageDLL.cpp"
+				RelativePath=".\PerfectImageDLL.c"
 				>
 			</File>
 		</Filter>
@@ -188,10 +188,6 @@
 			>
 			<File
 				RelativePath=".\PerfectImageDLL.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PerfectImageDLL.inc.h"
 				>
 			</File>
 		</Filter>
