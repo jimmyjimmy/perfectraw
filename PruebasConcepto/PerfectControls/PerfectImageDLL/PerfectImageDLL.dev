@@ -1,7 +1,7 @@
 [Project]
 FileName=PerfectImageDLL.dev
 Name=PerfectImageDLL
-UnitCount=2
+UnitCount=3
 Type=3
 Ver=1
 ObjFiles=
@@ -10,15 +10,15 @@ Libs=
 PrivateResource=
 ResourceIncludes=
 MakeIncludes=
-Compiler=-DBUILDING_DLL=1
-CppCompiler=-DBUILDING_DLL=1
-Linker=--no-export-all-symbols --add-stdcall-alias
+Compiler=-ffast-math_@@_-DBUILDING_DLL=1_@@_
+CppCompiler=-DBUILDING_DLL=1_@@_
+Linker=--no-export-all-symbols --add-stdcall-alias_@@_
 IsCpp=0
 Icon=
 ExeOutput=
 ObjectOutput=
 OverrideOutput=0
-OverrideOutputName=
+OverrideOutputName=PerfectImageDLL.dll
 HostApplication=
 Folders=
 CommandLine=
@@ -27,10 +27,10 @@ CustomMakefile=
 IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=0
-CompilerSettings=
+CompilerSettings=0010000001100000000000
 
 [Unit1]
-FileName=PerfectImageDLL.c
+FileName=PerfectImageDLL.cpp
 CompileCpp=0
 Folder=PerfectImageDLL
 Compile=1
@@ -41,6 +41,36 @@ BuildCmd=
 
 [Unit2]
 FileName=PerfectImageDLL.h
+CompileCpp=0
+Folder=PerfectImageDLL
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit3]
+FileName=PerfectImageDLL.inc.h
+CompileCpp=0
+Folder=PerfectImageDLL
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit4]
+FileName=PerfectImageDLL.h
+CompileCpp=0
+Folder=PerfectImageDLL
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit5]
+FileName=PerfectImageDLL.inc.h
 CompileCpp=0
 Folder=PerfectImageDLL
 Compile=1
