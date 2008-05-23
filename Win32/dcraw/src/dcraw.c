@@ -4480,8 +4480,7 @@ void CLASS blend_highlights()
   static const float itrans[2][4][4] =
   { { { 1,0.8660254,-0.5 }, { 1,-0.8660254,-0.5 }, { 1,0,1 } },
     { { 1,1,1,1 }, { 1,-1,1,-1 }, { 1,1,-1,-1 }, { 1,-1,-1,1 } } };
-  float cam[2][4], lab[2][4], sum[2], chratio;
-
+  float cam[2][4], lab[2][4], sum[2], chratio;  
   if ((unsigned) (colors-3) > 1) return;
   if (verbose) fprintf (stderr,_("Blending highlights...\n"));
   FORCC if (clip > (i = 65535*pre_mul[c])) clip = i;
@@ -4517,9 +4516,6 @@ void CLASS recover_highlights()
   ushort *pixel;
   static const signed char dir[8][2] =
     { {-1,-1}, {-1,0}, {-1,1}, {0,1}, {1,1}, {1,0}, {1,-1}, {0,-1} };
-
-  if (verbose) fprintf (stderr,_("Rebuilding highlights...\n"));
-
   grow = pow (2, 4-highlight);
   FORCC hsat[c] = 32000 * pre_mul[c];
   for (kc=0, c=1; c < colors; c++)
@@ -8764,7 +8760,11 @@ void SaveState(int ID){
     state[ID].top_margin=top_margin;
     state[ID].left_margin=left_margin;    
     state[ID].raw_color=raw_color;
-                   
+    memcpy(state[ID].cam_mul,cam_mul,sizeof cam_mul);
+    memcpy(state[ID].pre_mul,pre_mul,sizeof pre_mul);    
+    memcpy(state[ID].cmatrix,cmatrix,sizeof cmatrix);
+    memcpy(state[ID].rgb_cam,rgb_cam,sizeof rgb_cam);
+                  
     if(state[ID].buffer!=NULL){
        free(state[ID].buffer);
        state[ID].buffer=NULL;
@@ -8787,6 +8787,10 @@ void RestoreState(int ID){
     top_margin=state[ID].top_margin;
     left_margin=state[ID].left_margin;    
     raw_color=state[ID].raw_color;
+    memcpy(cam_mul,state[ID].cam_mul,sizeof cam_mul);
+    memcpy(pre_mul,state[ID].pre_mul,sizeof pre_mul);    
+    memcpy(cmatrix,state[ID].cmatrix,sizeof cmatrix);
+    memcpy(rgb_cam,state[ID].rgb_cam,sizeof cmatrix);
     
     if(image){
        free(image);    
@@ -8906,6 +8910,10 @@ void SetDefaults(void)
     no_auto_bright=0;  
     exposure=1.0;
     exposure_mode=0;
+    memset(cam_mul,0,sizeof cam_mul);
+    memset(pre_mul,0,sizeof pre_mul);
+    memset(cmatrix,0,sizeof cmatrix);
+    memset(rgb_cam,0,sizeof rgb_cam);
     
     // Default parameters
     params.threshold=threshold;
@@ -8965,13 +8973,13 @@ int CompareParams(DLL_PARAMETERS *p)
     if(params.user_black!=p->user_black) return(2);    
     if(params.user_sat!=p->user_sat) return(2);    
     if(params.test_pattern!=p->test_pattern) return(2);
-    if(params.level_greens!=p->level_greens) return(2);    
+    if(params.level_greens!=p->level_greens) return(2);
+    if(params.highlight!=p->highlight) return(2); 
     if(params.user_qual!=p->user_qual) return(3);            
     if(params.four_color_rgb!=p->four_color_rgb) return(3);
     if(params.exposure!=p->exposure) return(3);
     if((params.exposure_mode!=p->exposure_mode)&&(params.exposure!=1)) return(3);
-    if(params.med_passes!=p->med_passes) return(4);    
-    if(params.highlight!=p->highlight) return(4);    
+    if(params.med_passes!=p->med_passes) return(4);        
     if(params.output_color!=p->output_color) return(5);    
     if(params.use_fuji_rotate!=p->use_fuji_rotate) return(5);    
     if(params.user_gamma!=p->user_gamma) return(5);           
@@ -9216,7 +9224,6 @@ DLLIMPORT unsigned short * DCRAW_Process(DLL_PARAMETERS *p)
     // Decide development point based in params value        
     if(first_time==0){
         s=CompareParams(p);
-        
         if(verbose) printf("Developing again from stage %i\n",s);
         
         SetParameters(p);
@@ -9281,9 +9288,6 @@ STAGE3:
     SaveState(3);         
     
 STAGE4:           
-    sprintf(sD,"%i %f %i\n",highlight,exposure,exposure_mode);
-    MessageBox(0,sD,"",0);
-    
     if (!is_foveon && colors == 3) median_filter();
     if (!is_foveon && highlight == 2) blend_highlights();
     if (!is_foveon && highlight > 2) recover_highlights();
