@@ -237,6 +237,66 @@
   <data name="gbModoVista.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Right</value>
   </data>
+  <data name="&gt;&gt;rbVistaHorizontal.Name" xml:space="preserve">
+    <value>rbVistaHorizontal</value>
+  </data>
+  <data name="&gt;&gt;rbVistaHorizontal.Type" xml:space="preserve">
+    <value>System.Windows.Forms.RadioButton, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;rbVistaHorizontal.Parent" xml:space="preserve">
+    <value>gbModoVista</value>
+  </data>
+  <data name="&gt;&gt;rbVistaHorizontal.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;rbVistaVertical.Name" xml:space="preserve">
+    <value>rbVistaVertical</value>
+  </data>
+  <data name="&gt;&gt;rbVistaVertical.Type" xml:space="preserve">
+    <value>System.Windows.Forms.RadioButton, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;rbVistaVertical.Parent" xml:space="preserve">
+    <value>gbModoVista</value>
+  </data>
+  <data name="&gt;&gt;rbVistaVertical.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;rbVistaSimple.Name" xml:space="preserve">
+    <value>rbVistaSimple</value>
+  </data>
+  <data name="&gt;&gt;rbVistaSimple.Type" xml:space="preserve">
+    <value>System.Windows.Forms.RadioButton, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;rbVistaSimple.Parent" xml:space="preserve">
+    <value>gbModoVista</value>
+  </data>
+  <data name="&gt;&gt;rbVistaSimple.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="gbModoVista.Location" type="System.Drawing.Point, System.Drawing">
+    <value>397, 525</value>
+  </data>
+  <data name="gbModoVista.Size" type="System.Drawing.Size, System.Drawing">
+    <value>200, 63</value>
+  </data>
+  <data name="gbModoVista.TabIndex" type="System.Int32, mscorlib">
+    <value>6</value>
+  </data>
+  <data name="gbModoVista.Text" xml:space="preserve">
+    <value>Modo Vista</value>
+  </data>
+  <data name="&gt;&gt;gbModoVista.Name" xml:space="preserve">
+    <value>gbModoVista</value>
+  </data>
+  <data name="&gt;&gt;gbModoVista.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;gbModoVista.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;gbModoVista.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
   <data name="rbVistaHorizontal.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
@@ -318,29 +378,8 @@
   <data name="&gt;&gt;rbVistaSimple.ZOrder" xml:space="preserve">
     <value>2</value>
   </data>
-  <data name="gbModoVista.Location" type="System.Drawing.Point, System.Drawing">
-    <value>397, 525</value>
-  </data>
-  <data name="gbModoVista.Size" type="System.Drawing.Size, System.Drawing">
-    <value>200, 63</value>
-  </data>
-  <data name="gbModoVista.TabIndex" type="System.Int32, mscorlib">
-    <value>6</value>
-  </data>
-  <data name="gbModoVista.Text" xml:space="preserve">
-    <value>Modo Vista</value>
-  </data>
-  <data name="&gt;&gt;gbModoVista.Name" xml:space="preserve">
-    <value>gbModoVista</value>
-  </data>
-  <data name="&gt;&gt;gbModoVista.Type" xml:space="preserve">
-    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;gbModoVista.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;gbModoVista.ZOrder" xml:space="preserve">
-    <value>1</value>
+  <data name="btnOpenFile.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Left</value>
   </data>
   <data name="btnOpenFile.Location" type="System.Drawing.Point, System.Drawing">
     <value>125, 565</value>
@@ -379,7 +418,7 @@
     <value>perfectView2</value>
   </data>
   <data name="&gt;&gt;perfectView2.Type" xml:space="preserve">
-    <value>PerfectControls.PerfectView, PerfectControls, Version=1.0.3064.31692, Culture=neutral, PublicKeyToken=null</value>
+    <value>PerfectControls.PerfectView, PerfectControls, Version=1.0.3065.32151, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;perfectView2.Parent" xml:space="preserve">
     <value>$this</value>
@@ -400,7 +439,7 @@
     <value>perfectView1</value>
   </data>
   <data name="&gt;&gt;perfectView1.Type" xml:space="preserve">
-    <value>PerfectControls.PerfectView, PerfectControls, Version=1.0.3064.31692, Culture=neutral, PublicKeyToken=null</value>
+    <value>PerfectControls.PerfectView, PerfectControls, Version=1.0.3065.32151, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;perfectView1.Parent" xml:space="preserve">
     <value>$this</value>
