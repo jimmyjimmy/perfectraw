@@ -15,7 +15,7 @@ CppCompiler=-DBUILDING_DLL=1_@@_
 Linker=--no-export-all-symbols --add-stdcall-alias_@@_
 IsCpp=0
 Icon=
-ExeOutput=
+ExeOutput=..\bin\x86\Debug
 ObjectOutput=
 OverrideOutput=0
 OverrideOutputName=PerfectImageDLL.dll
