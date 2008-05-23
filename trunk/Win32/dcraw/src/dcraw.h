@@ -60,7 +60,6 @@ typedef struct DCRAW_Parameters
 }DLL_PARAMETERS;
 
 // Struct for saving and restoring DLL state
-// Possible missing variables: cam_mul[4], pre_mul[4], cmatrix[3][4], rgb_cam[3][4]
 typedef struct DCRAW_State
 {
        int    filters;
@@ -75,6 +74,10 @@ typedef struct DCRAW_State
        int    top_margin;
        int    left_margin;     
        int    raw_color;  
+       float  cam_mul[4];
+       float  pre_mul[4];
+       float  cmatrix[3][4];
+       float  rgb_cam[3][4];
        unsigned short (*buffer)[4];
 }DLL_STATE;
 
