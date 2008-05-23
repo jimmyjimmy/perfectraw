@@ -56,13 +56,18 @@ namespace PerfectControls
         //Bitmap de la imagen original y de la previa (Old de un anterior revelado)
         Bitmap img,imgOld;
         float zoom;
+        //Dragging state of the image.
         int stateDragging, pX, pY;
         int dragFromX, dragFromY;
         int wDispImg, hDispImg;
         bool bref;
+        //Used to indicate that we want the image with burned pixel marking
+        //and to do the flashing of the burned pixels.
         int showBurnedPixelsFlash;
         Timer timer;
         PerfectViewMode viewMode;
+        //Transformation matrix from image coordinates to display picturebox.
+        Matrix transMat = new Matrix();
 
         public PerfectView()
         {
@@ -145,7 +150,7 @@ namespace PerfectControls
             // Cambiamos este flag para que parpadee (entre -1 y 1)
             showBurnedPixelsFlash = -showBurnedPixelsFlash;
             bref = true;
-            this.Refresh();
+            this.Invalidate();
         }
 
         [Category("Behavior")]
@@ -185,6 +190,7 @@ namespace PerfectControls
             set
             {
                 zoom = value;
+                
                 int bX, bY;
                 bX = (int)(pX + Width / (2 * zoom));
                 bY = (int)(pY + Height / (2 * zoom));
@@ -208,8 +214,11 @@ namespace PerfectControls
 
         }
 
-        //Multiplica el factor de zoom actual por la cantidad que se pasa.
-        //Devuelve el zoom actual una vez efectuado.
+        //Wheel incremente neccesary to produce a zoom step.
+        private const int WHEEL_DELTA = 120;
+
+        //Multiplies zoom by factor zoomQ, and makes the zoom centeres on
+        //centerPoint in viewing coords.
         public float MakeZoom(float zoomQ)
         {
 
@@ -247,6 +256,20 @@ namespace PerfectControls
             this.Load();
         }
 
+        protected override void OnMouseWheel(MouseEventArgs e)
+        {
+            if (e.Delta == WHEEL_DELTA)
+            {
+                MakeZoom(2);
+            }
+
+            if (e.Delta == -WHEEL_DELTA)
+            {
+                MakeZoom(1 / 2F);
+            }
+            base.OnMouseWheel(e);
+            
+        }
         protected override void OnMouseDown(MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
