@@ -104,9 +104,9 @@ namespace perfectRAW
             // button1
             // 
             this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.button1.Location = new System.Drawing.Point(11, 696);
+            this.button1.Location = new System.Drawing.Point(15, 696);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(86, 31);
+            this.button1.Size = new System.Drawing.Size(121, 31);
             this.button1.TabIndex = 0;
             this.button1.Text = "REVELAR";
             this.button1.UseVisualStyleBackColor = true;
@@ -114,27 +114,27 @@ namespace perfectRAW
             // 
             // pictureBox1
             // 
-            this.pictureBox1.Location = new System.Drawing.Point(11, 34);
+            this.pictureBox1.Location = new System.Drawing.Point(15, 34);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(993, 642);
+            this.pictureBox1.Size = new System.Drawing.Size(1391, 642);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1.TabIndex = 1;
             this.pictureBox1.TabStop = false;
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(83, 8);
+            this.textBox1.Location = new System.Drawing.Point(116, 8);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(190, 18);
+            this.textBox1.Size = new System.Drawing.Size(266, 18);
             this.textBox1.TabIndex = 4;
             this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(9, 10);
+            this.label2.Location = new System.Drawing.Point(13, 10);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(69, 15);
+            this.label2.Size = new System.Drawing.Size(85, 11);
             this.label2.TabIndex = 5;
             this.label2.Text = "Archivo RAW:";
             // 
@@ -145,9 +145,9 @@ namespace perfectRAW
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(279, 7);
+            this.button2.Location = new System.Drawing.Point(391, 7);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(82, 20);
+            this.button2.Size = new System.Drawing.Size(114, 20);
             this.button2.TabIndex = 6;
             this.button2.Text = "Buscar...";
             this.button2.UseVisualStyleBackColor = true;
@@ -156,10 +156,10 @@ namespace perfectRAW
             // label3
             // 
             this.label3.BackColor = System.Drawing.Color.Lime;
-            this.label3.Font = new System.Drawing.Font("Trebuchet MS", 8F, System.Drawing.FontStyle.Bold);
-            this.label3.Location = new System.Drawing.Point(493, 5);
+            this.label3.Font = new System.Drawing.Font("Ambitsek", 8F, System.Drawing.FontStyle.Bold);
+            this.label3.Location = new System.Drawing.Point(699, 5);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(89, 23);
+            this.label3.Size = new System.Drawing.Size(124, 23);
             this.label3.TabIndex = 7;
             this.label3.Text = "LISTO";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -167,13 +167,13 @@ namespace perfectRAW
             // numericUpDown1
             // 
             this.numericUpDown1.DecimalPlaces = 2;
-            this.numericUpDown1.Font = new System.Drawing.Font("Arial Narrow", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.numericUpDown1.Font = new System.Drawing.Font("Ambitsek", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.numericUpDown1.Increment = new decimal(new int[] {
             25,
             0,
             0,
             131072});
-            this.numericUpDown1.Location = new System.Drawing.Point(67, 15);
+            this.numericUpDown1.Location = new System.Drawing.Point(94, 15);
             this.numericUpDown1.Maximum = new decimal(new int[] {
             8,
             0,
@@ -185,16 +185,16 @@ namespace perfectRAW
             0,
             -2147483648});
             this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(60, 17);
+            this.numericUpDown1.Size = new System.Drawing.Size(84, 17);
             this.numericUpDown1.TabIndex = 8;
             this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(9, 16);
+            this.label5.Location = new System.Drawing.Point(13, 16);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(57, 15);
+            this.label5.Size = new System.Drawing.Size(70, 11);
             this.label5.TabIndex = 10;
             this.label5.Text = "Exposición:";
             this.label5.Click += new System.EventHandler(this.label5_Click);
@@ -202,9 +202,9 @@ namespace perfectRAW
             // button3
             // 
             this.button3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.button3.Location = new System.Drawing.Point(907, 5);
+            this.button3.Location = new System.Drawing.Point(864, 5);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(97, 23);
+            this.button3.Size = new System.Drawing.Size(136, 23);
             this.button3.TabIndex = 12;
             this.button3.Text = "GRABAR JPEG";
             this.button3.UseVisualStyleBackColor = true;
@@ -212,32 +212,32 @@ namespace perfectRAW
             // 
             // numericUpDown2
             // 
-            this.numericUpDown2.Font = new System.Drawing.Font("Arial Narrow", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.numericUpDown2.Location = new System.Drawing.Point(352, 15);
+            this.numericUpDown2.Font = new System.Drawing.Font("Ambitsek", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.numericUpDown2.Location = new System.Drawing.Point(493, 15);
             this.numericUpDown2.Maximum = new decimal(new int[] {
             2,
             0,
             0,
             0});
             this.numericUpDown2.Name = "numericUpDown2";
-            this.numericUpDown2.Size = new System.Drawing.Size(48, 17);
+            this.numericUpDown2.Size = new System.Drawing.Size(67, 17);
             this.numericUpDown2.TabIndex = 14;
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(133, 17);
+            this.label4.Location = new System.Drawing.Point(186, 17);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(215, 15);
+            this.label4.Size = new System.Drawing.Size(292, 11);
             this.label4.TabIndex = 15;
             this.label4.Text = "Modo de preservación de luces altas (0 = OFF):";
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(378, 11);
+            this.label6.Location = new System.Drawing.Point(529, 11);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(112, 15);
+            this.label6.Size = new System.Drawing.Size(145, 11);
             this.label6.TabIndex = 16;
             this.label6.Text = "Estado de perfectRAW:";
             // 
@@ -245,24 +245,24 @@ namespace perfectRAW
             // 
             this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(112, 722);
+            this.label7.Location = new System.Drawing.Point(157, 722);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(216, 15);
+            this.label7.Size = new System.Drawing.Size(292, 11);
             this.label7.TabIndex = 18;
             this.label7.Text = "Modo de recuperación de luces altas (0 = OFF):";
             // 
             // numericUpDown3
             // 
             this.numericUpDown3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.numericUpDown3.Font = new System.Drawing.Font("Arial Narrow", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.numericUpDown3.Location = new System.Drawing.Point(331, 721);
+            this.numericUpDown3.Font = new System.Drawing.Font("Ambitsek", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.numericUpDown3.Location = new System.Drawing.Point(463, 721);
             this.numericUpDown3.Maximum = new decimal(new int[] {
             9,
             0,
             0,
             0});
             this.numericUpDown3.Name = "numericUpDown3";
-            this.numericUpDown3.Size = new System.Drawing.Size(52, 17);
+            this.numericUpDown3.Size = new System.Drawing.Size(73, 17);
             this.numericUpDown3.TabIndex = 17;
             // 
             // groupBox1
@@ -272,16 +272,16 @@ namespace perfectRAW
             this.groupBox1.Controls.Add(this.numericUpDown1);
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.numericUpDown2);
-            this.groupBox1.Location = new System.Drawing.Point(103, 682);
+            this.groupBox1.Location = new System.Drawing.Point(144, 682);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(409, 37);
+            this.groupBox1.Size = new System.Drawing.Size(573, 37);
             this.groupBox1.TabIndex = 19;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Control de exposición";
             // 
             // MainForm
             // 
-            this.AutoScaleBaseSize = new System.Drawing.Size(5, 11);
+            this.AutoScaleBaseSize = new System.Drawing.Size(7, 11);
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
             this.ClientSize = new System.Drawing.Size(1016, 741);
             this.Controls.Add(this.label7);
@@ -295,8 +295,8 @@ namespace perfectRAW
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.pictureBox1);
-            this.Font = new System.Drawing.Font("Trebuchet MS", 7F);
-            this.MinimumSize = new System.Drawing.Size(800, 600);
+            this.Font = new System.Drawing.Font("Ambitsek", 6F);
+            this.MinimumSize = new System.Drawing.Size(1120, 600);
             this.Name = "MainForm";
             this.Text = "perfectRAW";
             this.Load += new System.EventHandler(this.MainForm_Load);
