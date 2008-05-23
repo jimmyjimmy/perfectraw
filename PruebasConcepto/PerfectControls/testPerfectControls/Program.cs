@@ -19,7 +19,7 @@ namespace test
 
             // Exit application
             //Application.Exit();
-            MessageBox.Show("PerfectRaw GUI Test: v 0.6");
+            MessageBox.Show("PerfectRaw GUI Test: v 0.7");
 
             Application.Run(new Form2());
         }

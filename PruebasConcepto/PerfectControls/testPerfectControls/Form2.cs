@@ -13,7 +13,6 @@ namespace test
 {
     public unsafe partial class Form2 : Form
     {
-        private const int WHEEL_DELTA = 120;
         protected Bitmap img, imgOld;
         private string imgFileName;
 
@@ -109,12 +108,16 @@ namespace test
         {
             ResizeViews();            
         }
+        //Wheel incremente neccesary to produce a zoom step.
+        private const int WHEEL_DELTA = 120;
+
         protected override void OnMouseWheel(MouseEventArgs e)
         {
             Control ctrlOnFocus = this.GetChildAtPoint(e.Location);
             if (!(ctrlOnFocus is PerfectControls.PerfectView))return;
          
             PerfectControls.PerfectView pv= (PerfectControls.PerfectView)ctrlOnFocus;
+            
             if (e.Delta == WHEEL_DELTA)
             {
                 pv.MakeZoom(2);
@@ -199,6 +202,12 @@ namespace test
         private void btnOpenFile_Click(object sender, EventArgs e)
         {
             SelectImageToOpen();
+            this.Invalidate();
+        }
+
+        private void btnOpenFile_Resize(object sender, EventArgs e)
+        {
+            //this.Invalidate();
         }
     }
 }
