@@ -75,6 +75,8 @@ typedef struct DCRAW_State
        int    top_margin;
        int    left_margin;     
        int    raw_color;  
+       int    maximum;
+       int    black;
        float  cam_mul[4];
        float  pre_mul[4];
        float  cmatrix[3][4];

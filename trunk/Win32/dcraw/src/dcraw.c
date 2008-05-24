@@ -8761,6 +8761,8 @@ int SaveState(int ID, int cancel){
         state[ID].top_margin=top_margin;
         state[ID].left_margin=left_margin;    
         state[ID].raw_color=raw_color;
+        state[ID].maximum=maximum;
+        state[ID].black=black;
         memcpy(state[ID].cam_mul,cam_mul,sizeof cam_mul);
         memcpy(state[ID].pre_mul,pre_mul,sizeof pre_mul);    
         memcpy(state[ID].cmatrix,cmatrix,sizeof cmatrix);
@@ -8797,10 +8799,16 @@ void RestoreState(int ID){
         top_margin=state[ID].top_margin;
         left_margin=state[ID].left_margin;    
         raw_color=state[ID].raw_color;
+        maximum=state[ID].maximum;
+        black=state[ID].black;
         memcpy(cam_mul,state[ID].cam_mul,sizeof cam_mul);
         memcpy(pre_mul,state[ID].pre_mul,sizeof pre_mul);    
         memcpy(cmatrix,state[ID].cmatrix,sizeof cmatrix);
-        memcpy(rgb_cam,state[ID].rgb_cam,sizeof cmatrix);
+        memcpy(rgb_cam,state[ID].rgb_cam,sizeof rgb_cam);
+        
+        if (user_qual >= 0) quality = user_qual;
+        if (user_black >= 0) black = user_black;
+        if (user_sat > 0) maximum = user_sat;
         
         if(image){
            free(image);    
@@ -8832,11 +8840,7 @@ void SetParameters(DLL_PARAMETERS *p){
     use_fuji_rotate=p->use_fuji_rotate;
     user_gamma=p->user_gamma;           
     exposure=p->exposure;
-    exposure_mode=p->exposure_mode;
-    
-    if (user_qual >= 0) quality = user_qual;
-    if (user_black >= 0) black = user_black;
-    if (user_sat > 0) maximum = user_sat;
+    exposure_mode=p->exposure_mode;    
     
     // Actual parameters for later comparing
     params.threshold=threshold;
@@ -8918,7 +8922,7 @@ void SetDefaults(void)
     document_mode=0;
     use_camera_matrix=-1;
     output_color=1;
-    no_auto_bright=0;  
+    no_auto_bright=0;      
     exposure=1.0;
     exposure_mode=0;
     memset(cam_mul,0,sizeof cam_mul);
@@ -8965,6 +8969,8 @@ void SetDefaults(void)
         state[c].top_margin=top_margin;
         state[c].left_margin=left_margin;    
         state[c].raw_color=raw_color;
+        state[c].maximum=maximum;
+        state[c].black=black;
         if(state[c].buffer!=NULL) free(state[c].buffer);
         state[c].buffer=NULL;
     }
@@ -9218,8 +9224,8 @@ int CompareParams(DLL_PARAMETERS *p)
     if(params.user_qual!=p->user_qual) {s=3;goto CHECK;}
     if(params.four_color_rgb!=p->four_color_rgb) {s=3;goto CHECK;}
     if(params.med_passes!=p->med_passes) {s=4;goto CHECK;}        
-    if(params.exposure!=p->exposure) {s=4;goto CHECK;}
-    if((params.exposure_mode!=p->exposure_mode)&&(params.exposure!=1)) {s=4;goto CHECK;}
+    if(params.exposure!=p->exposure) {s=5;goto CHECK;}
+    if((params.exposure_mode!=p->exposure_mode)&&(params.exposure!=1)) {s=5;goto CHECK;}
     if(params.output_color!=p->output_color) {s=5;goto CHECK;}
     if(params.use_fuji_rotate!=p->use_fuji_rotate) {s=5;goto CHECK;}
     if(params.user_gamma!=p->user_gamma) {s=5;goto CHECK;}       
@@ -9246,13 +9252,7 @@ DLLIMPORT unsigned short * DCRAW_Process(DLL_PARAMETERS *p, int *cancel, int *st
         *status=s;
         switch(s){
             case 0:
-                 RestoreState(1);
-                 goto STAGE2;            
-                 break;
             case 1:
-                 RestoreState(1);
-                 goto STAGE2;
-                 break;       
             case 2:
                  RestoreState(1);
                  goto STAGE2;
@@ -9270,7 +9270,7 @@ DLLIMPORT unsigned short * DCRAW_Process(DLL_PARAMETERS *p, int *cancel, int *st
                  goto STAGE5;
                  break;
             case 6:             
-                 // Nothing changed                 
+                 // Nothing changed                                  
                  goto STAGE6;
                  break;
         }        
@@ -9307,13 +9307,13 @@ STAGE3:
 STAGE4:           
     if (!is_foveon && colors == 3) median_filter();
     if (!is_foveon && highlight == 2) blend_highlights();
-    if (!is_foveon && highlight > 2) recover_highlights();
-    if (exposure!=1.0) exposure_correction();    
-    if (use_fuji_rotate) fuji_rotate();    
+    if (!is_foveon && highlight > 2) recover_highlights();    
     // Here we take buffer 4        
     if(SaveState(4,*cancel-first_time)!=0) *status=5; else return NULL;
 
 STAGE5:
+    if (exposure!=1.0) exposure_correction();    
+    if (use_fuji_rotate) fuji_rotate();    
     convert_to_rgb();
     if (use_fuji_rotate) stretch();
     ppm = (ushort *) calloc (width, colors*2);    

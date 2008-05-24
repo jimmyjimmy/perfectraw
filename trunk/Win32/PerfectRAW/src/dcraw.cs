@@ -87,6 +87,7 @@ namespace perfectRAW
         string _FileName;
         bool init = false;
         public bool first_time = true;
+        public ushort* image;
 
         public Dcraw()
         {
@@ -135,13 +136,13 @@ namespace perfectRAW
             estado = -1;
             cancel = 0;
             if (!init) Init();
-            img = new Bitmap(w, h);
+            img = new Bitmap(w, h,PixelFormat.Format24bppRgb);
             int extra;
             //BitmapData data = img.LockBits(new Rectangle(0, 0, img.Width, img.Height), ImageLockMode.ReadWrite, PixelFormat.Format48bppRgb);
             BitmapData data = img.LockBits(new Rectangle(0, 0, img.Width, img.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
             unsafe
             {
-                ushort* image = DCRAW_Process(ref parameters,ref cancel, ref estado);
+                image = DCRAW_Process(ref parameters,ref cancel, ref estado);
                 if (estado == 6)
                 {
                     byte* ptr = (byte*)(data.Scan0);
