@@ -60,16 +60,16 @@ namespace perfectRAW
         }
 
         [DllImport(@"dcraw.dll")]
-        static extern void DCRAW_DefaultParameters(ref DLL_PARAMETERS p);
+        static extern void DCRAW_DefaultParameters(ref DLL_PARAMETERS P);
 
         [DllImport(@"dcraw.dll")]
-        static extern int DCRAW_Init(string rawfile, int* Width, int* Height);
+        static extern int DCRAW_Init(string rawfile, ref int width, ref int height, ref int sat_level, ref int black_level);
 
         [DllImport(@"dcraw.dll")]
         static extern void DCRAW_GetInfo(ref IMAGE_INFO info);
 
         [DllImport(@"dcraw.dll")]
-        static extern ushort* DCRAW_Process(ref DLL_PARAMETERS p);
+        static extern ushort* DCRAW_Process(ref DLL_PARAMETERS p, ref int cancel, ref int estado);
 
         [DllImport(@"dcraw.dll")]
         static extern void DCRAW_End();
@@ -80,10 +80,13 @@ namespace perfectRAW
         public IMAGE_INFO info; // Esto hay que convertirlo en propiedad
         public DLL_PARAMETERS parameters;
         public Bitmap img;      // Esto hay que convertirlo en propiedad
+        public int cancel;
+        public int estado;
         int status;
-        int w, h;        
+        public int w, h, sat_level, black_level;        
         string _FileName;
         bool init = false;
+        public bool first_time = true;
 
         public Dcraw()
         {
@@ -96,12 +99,14 @@ namespace perfectRAW
 
         public int Init()
         {
-            int _w, _h;
+            int _w = 0, _h = 0, _sat_level = 0, _black_level=0;
             info = new IMAGE_INFO();
             parameters = new DLL_PARAMETERS();
-            status = DCRAW_Init(_FileName, &_w, &_h);
+            status = DCRAW_Init(_FileName, ref _w, ref _h, ref _sat_level, ref _black_level);
             w = _w;
-            h = _h;            
+            h = _h;
+            sat_level = _sat_level;
+            black_level = _black_level;
             DCRAW_DefaultParameters(ref parameters);
             init = true;            
             return status;
@@ -127,6 +132,8 @@ namespace perfectRAW
 
         public void Process()
         {
+            estado = -1;
+            cancel = 0;
             if (!init) Init();
             img = new Bitmap(w, h);
             int extra;
@@ -134,13 +141,16 @@ namespace perfectRAW
             BitmapData data = img.LockBits(new Rectangle(0, 0, img.Width, img.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
             unsafe
             {
-                ushort* image = DCRAW_Process(ref parameters);
-
-                byte* ptr = (byte*)(data.Scan0);
-                extra = data.Stride - data.Width * 3;
-                Convert48RGBto24BGR(image, ptr, data.Width, data.Height, extra);
+                ushort* image = DCRAW_Process(ref parameters,ref cancel, ref estado);
+                if (estado == 6)
+                {
+                    byte* ptr = (byte*)(data.Scan0);
+                    extra = data.Stride - data.Width * 3;
+                    Convert48RGBto24BGR(image, ptr, data.Width, data.Height, extra);
+                }
             }
             img.UnlockBits(data);
+            first_time = false;
         }
     }
 }
