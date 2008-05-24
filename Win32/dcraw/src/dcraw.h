@@ -62,6 +62,7 @@ typedef struct DCRAW_Parameters
 // Struct for saving and restoring DLL state
 typedef struct DCRAW_State
 {
+       int    valid;       
        int    filters;
        int    colors;
        int    shrink;
@@ -82,9 +83,9 @@ typedef struct DCRAW_State
 }DLL_STATE;
 
 DLLIMPORT void DCRAW_DefaultParameters(DLL_PARAMETERS *);
-DLLIMPORT int  DCRAW_Init(char *,int *,int *);
+DLLIMPORT int  DCRAW_Init(char *,int *,int *,int *, int *);
 DLLIMPORT void DCRAW_GetInfo(IMAGE_INFO *);
-DLLIMPORT unsigned short *DCRAW_Process(DLL_PARAMETERS *);
+DLLIMPORT unsigned short *DCRAW_Process(DLL_PARAMETERS *, int *, int *);
 DLLIMPORT void DCRAW_End();
 DLLIMPORT int Coffin(int, char **);
 

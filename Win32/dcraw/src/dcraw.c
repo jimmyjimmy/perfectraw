@@ -8747,58 +8747,69 @@ float exposure;
 int exposure_mode;
 char sD[1000];
 
-void SaveState(int ID){
-    state[ID].filters=filters;
-    state[ID].colors=colors;
-    state[ID].shrink=shrink;
-    state[ID].half_size=half_size;
-    state[ID].mix_green=mix_green;
-    state[ID].width=width;
-    state[ID].height=height;
-    state[ID].iwidth=iwidth;
-    state[ID].iheight=iheight;
-    state[ID].top_margin=top_margin;
-    state[ID].left_margin=left_margin;    
-    state[ID].raw_color=raw_color;
-    memcpy(state[ID].cam_mul,cam_mul,sizeof cam_mul);
-    memcpy(state[ID].pre_mul,pre_mul,sizeof pre_mul);    
-    memcpy(state[ID].cmatrix,cmatrix,sizeof cmatrix);
-    memcpy(state[ID].rgb_cam,rgb_cam,sizeof rgb_cam);
-                  
-    if(state[ID].buffer!=NULL){
-       free(state[ID].buffer);
-       state[ID].buffer=NULL;
-    }          
-    state[ID].buffer=(ushort (*)[4]) calloc (iheight*iwidth, sizeof *image);
-    memcpy(state[ID].buffer,image,iheight*iwidth*sizeof *image);
-    if(verbose) printf("Saved state %i\n",ID);
+int SaveState(int ID, int cancel){
+    if(cancel!=1){
+        state[ID].filters=filters;
+        state[ID].colors=colors;
+        state[ID].shrink=shrink;
+        state[ID].half_size=half_size;
+        state[ID].mix_green=mix_green;
+        state[ID].width=width;
+        state[ID].height=height;
+        state[ID].iwidth=iwidth;
+        state[ID].iheight=iheight;
+        state[ID].top_margin=top_margin;
+        state[ID].left_margin=left_margin;    
+        state[ID].raw_color=raw_color;
+        memcpy(state[ID].cam_mul,cam_mul,sizeof cam_mul);
+        memcpy(state[ID].pre_mul,pre_mul,sizeof pre_mul);    
+        memcpy(state[ID].cmatrix,cmatrix,sizeof cmatrix);
+        memcpy(state[ID].rgb_cam,rgb_cam,sizeof rgb_cam);
+                      
+        if(state[ID].buffer!=NULL){
+           free(state[ID].buffer);
+           state[ID].buffer=NULL;
+        }          
+        state[ID].buffer=(ushort (*)[4]) calloc (iheight*iwidth, sizeof *image);
+        memcpy(state[ID].buffer,image,iheight*iwidth*sizeof *image);
+        state[ID].valid=1;
+        if(verbose) printf("Saved state %i\n",ID);
+        return 1;
+    }else{
+        // Invalidate this and next states
+        for(ID;ID<6;ID++) state[ID].valid=0;
+        if(verbose) printf("User cancelled at state %i\n",ID);
+        return 0;
+    }
 }
 
 void RestoreState(int ID){    
-    filters=state[ID].filters;
-    colors=state[ID].colors;
-    shrink=state[ID].shrink;
-    half_size=state[ID].half_size;
-    mix_green=state[ID].mix_green;
-    width=state[ID].width;
-    height=state[ID].height;
-    iwidth=state[ID].iwidth;
-    iheight=state[ID].iheight;
-    top_margin=state[ID].top_margin;
-    left_margin=state[ID].left_margin;    
-    raw_color=state[ID].raw_color;
-    memcpy(cam_mul,state[ID].cam_mul,sizeof cam_mul);
-    memcpy(pre_mul,state[ID].pre_mul,sizeof pre_mul);    
-    memcpy(cmatrix,state[ID].cmatrix,sizeof cmatrix);
-    memcpy(rgb_cam,state[ID].rgb_cam,sizeof cmatrix);
-    
-    if(image){
-       free(image);    
-       image=NULL;
+    if(state[ID].valid==1){
+        filters=state[ID].filters;
+        colors=state[ID].colors;
+        shrink=state[ID].shrink;
+        half_size=state[ID].half_size;
+        mix_green=state[ID].mix_green;
+        width=state[ID].width;
+        height=state[ID].height;
+        iwidth=state[ID].iwidth;
+        iheight=state[ID].iheight;
+        top_margin=state[ID].top_margin;
+        left_margin=state[ID].left_margin;    
+        raw_color=state[ID].raw_color;
+        memcpy(cam_mul,state[ID].cam_mul,sizeof cam_mul);
+        memcpy(pre_mul,state[ID].pre_mul,sizeof pre_mul);    
+        memcpy(cmatrix,state[ID].cmatrix,sizeof cmatrix);
+        memcpy(rgb_cam,state[ID].rgb_cam,sizeof cmatrix);
+        
+        if(image){
+           free(image);    
+           image=NULL;
+        }
+        image = (ushort (*)[4]) calloc (iheight*iwidth, sizeof *image);     
+        memcpy(image,state[ID].buffer,iheight*iwidth*sizeof *image);
+        if(verbose) printf("Restored state %i\n",ID);
     }
-    image = (ushort (*)[4]) calloc (iheight*iwidth, sizeof *image);     
-    memcpy(image,state[ID].buffer,iheight*iwidth*sizeof *image);
-    if(verbose) printf("Restored state %i\n",ID);
 }
 
 void SetParameters(DLL_PARAMETERS *p){
@@ -8941,6 +8952,7 @@ void SetDefaults(void)
     
     // Clean up states
     for(c=0;c<6;c++){
+        state[c].valid=0;
         state[c].filters=filters;
         state[c].colors=colors;
         state[c].shrink=shrink;
@@ -8959,32 +8971,6 @@ void SetDefaults(void)
     
     verbose=1;
     write_to_stdout=1;
-}
-
-int CompareParams(DLL_PARAMETERS *p)
-{
-    int c;    
-            
-    if(params.threshold!=p->threshold) return(2);
-    FORC4 if(params.aber[c]!=p->aber[c]) return(2);    
-    if(params.use_auto_wb!=p->use_auto_wb) return(2);    
-    if(params.use_camera_wb!=p->use_camera_wb) return(2);    
-    FORC4 if(params.greybox[c]!=p->greybox[c]) return(2);       
-    if(params.user_black!=p->user_black) return(2);    
-    if(params.user_sat!=p->user_sat) return(2);    
-    if(params.test_pattern!=p->test_pattern) return(2);
-    if(params.level_greens!=p->level_greens) return(2);
-    if(params.highlight!=p->highlight) return(2); 
-    if(params.user_qual!=p->user_qual) return(3);            
-    if(params.four_color_rgb!=p->four_color_rgb) return(3);
-    if(params.exposure!=p->exposure) return(3);
-    if((params.exposure_mode!=p->exposure_mode)&&(params.exposure!=1)) return(3);
-    if(params.med_passes!=p->med_passes) return(4);        
-    if(params.output_color!=p->output_color) return(5);    
-    if(params.use_fuji_rotate!=p->use_fuji_rotate) return(5);    
-    if(params.user_gamma!=p->user_gamma) return(5);           
-    
-    return(6); // Nothing changed
 }
 
 DLLIMPORT void DCRAW_DefaultParameters(DLL_PARAMETERS *p)
@@ -9099,7 +9085,7 @@ void exposure_correction(void){
     }        
 }
 
-DLLIMPORT int DCRAW_Init(char *ifname,int *w,int *h)
+DLLIMPORT int DCRAW_Init(char *ifname,int *w,int *h, int *sat_level, int *black_level)
 {        
     // Still missing: pass user_flip, bpfile, dark_frame and use_camera_matrix as parameters to this function
     int arg, status=0;
@@ -9156,7 +9142,7 @@ DLLIMPORT int DCRAW_Init(char *ifname,int *w,int *h)
     fclose(ifp);
     
     // Here we take buffer 0
-    //SaveState(0);
+    //SaveState(0,0);
     
     if (zero_is_bad) remove_zeroes();
     bad_pixels (bpfile);
@@ -9164,17 +9150,18 @@ DLLIMPORT int DCRAW_Init(char *ifname,int *w,int *h)
     quality = 2 + !fuji_width;
     
     // Here we take buffer 1
-    SaveState(1);
-
+    SaveState(1,0);
+    
+    // Ref variables values
     *w=iwidth;
-    *h=iheight;
+    *h=iheight;    
+    *sat_level=maximum;
+    *black_level=black;
+    
+    if (user_black >= 0) black = user_black;
+    if (user_sat > 0) maximum = user_sat;        
+        
     return status;
-}
-
-DLLIMPORT void test(TEST *t)
-{
-   t->a=5;
-   t->b="¡Hola Fernando!";
 }
 
 DLLIMPORT void DCRAW_GetInfo(IMAGE_INFO *info)
@@ -9213,7 +9200,36 @@ DLLIMPORT void DCRAW_GetInfo(IMAGE_INFO *info)
    }*/			    
 }
 
-DLLIMPORT unsigned short * DCRAW_Process(DLL_PARAMETERS *p)
+int CompareParams(DLL_PARAMETERS *p)
+{
+    int c,s;
+    s=6; // Nothing changed
+            
+    if(params.threshold!=p->threshold) {s=2;goto CHECK;}
+    FORC4 if(params.aber[c]!=p->aber[c]) {s=2;goto CHECK;}    
+    if(params.use_auto_wb!=p->use_auto_wb) {s=2;goto CHECK;}    
+    if(params.use_camera_wb!=p->use_camera_wb) {s=2;goto CHECK;}    
+    FORC4 if(params.greybox[c]!=p->greybox[c]) {s=2;goto CHECK;}       
+    if(params.user_black!=p->user_black) {s=2;goto CHECK;}    
+    if(params.user_sat!=p->user_sat) {s=2;goto CHECK;}    
+    if(params.test_pattern!=p->test_pattern) {s=2;goto CHECK;}
+    if(params.level_greens!=p->level_greens) {s=2;goto CHECK;}
+    if(params.highlight!=p->highlight) {s=2;goto CHECK;} 
+    if(params.user_qual!=p->user_qual) {s=3;goto CHECK;}
+    if(params.four_color_rgb!=p->four_color_rgb) {s=3;goto CHECK;}
+    if(params.med_passes!=p->med_passes) {s=4;goto CHECK;}        
+    if(params.exposure!=p->exposure) {s=4;goto CHECK;}
+    if((params.exposure_mode!=p->exposure_mode)&&(params.exposure!=1)) {s=4;goto CHECK;}
+    if(params.output_color!=p->output_color) {s=5;goto CHECK;}
+    if(params.use_fuji_rotate!=p->use_fuji_rotate) {s=5;goto CHECK;}
+    if(params.user_gamma!=p->user_gamma) {s=5;goto CHECK;}       
+    
+CHECK:    
+    while((state[s-1].valid==0)&&(s>2)) s--; // check down to the last optimal valid state    
+    return(s);
+}
+
+DLLIMPORT unsigned short * DCRAW_Process(DLL_PARAMETERS *p, int *cancel, int *status)
 {    
     ushort *ppm;    
     ushort *img;
@@ -9227,6 +9243,7 @@ DLLIMPORT unsigned short * DCRAW_Process(DLL_PARAMETERS *p)
         if(verbose) printf("Developing again from stage %i\n",s);
         
         SetParameters(p);
+        *status=s;
         switch(s){
             case 0:
                  RestoreState(1);
@@ -9260,8 +9277,8 @@ DLLIMPORT unsigned short * DCRAW_Process(DLL_PARAMETERS *p)
     }else{
           // For the first time
           RestoreState(1);
-          SetParameters(p);
-          first_time=0;
+          SetParameters(p);          
+          *status=2;
     }
     
 STAGE2:
@@ -9269,7 +9286,7 @@ STAGE2:
     if(level_greens) eq_greens();
     if (!is_foveon && document_mode < 2) scale_colors();
     // Here we take buffer 2
-    SaveState(2);
+    if(SaveState(2,*cancel-first_time)!=0) *status=3; else return NULL;
        
 STAGE3:    
     if (is_foveon && !document_mode) foveon_interpolate();  // Beware, this have been changed from it's main() position
@@ -9285,7 +9302,7 @@ STAGE3:
     }
     if (mix_green) for (colors=3, i=0; i < height*width; i++) image[i][1] = (image[i][1] + image[i][3]) >> 1;    
     // Here we take buffer 3
-    SaveState(3);         
+    if(SaveState(3,*cancel-first_time)!=0) *status=4; else return NULL;
     
 STAGE4:           
     if (!is_foveon && colors == 3) median_filter();
@@ -9294,7 +9311,7 @@ STAGE4:
     if (exposure!=1.0) exposure_correction();    
     if (use_fuji_rotate) fuji_rotate();    
     // Here we take buffer 4        
-    SaveState(4);        
+    if(SaveState(4,*cancel-first_time)!=0) *status=5; else return NULL;
 
 STAGE5:
     convert_to_rgb();
@@ -9310,12 +9327,14 @@ STAGE5:
         memcpy(img+row*width*colors,ppm,width*colors*2);
     }      
     // Here we take buffer 5
-    SaveState(5);           
+    SaveState(5,0); // No mean to cancel at this stage    
     
     free(ppm);
     free(image);
     image=img;
 STAGE6:    
+    first_time=0;
+    *status=6;
     return (unsigned short *) image;
 }
 

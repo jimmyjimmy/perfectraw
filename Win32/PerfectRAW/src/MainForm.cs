@@ -33,6 +33,13 @@ namespace perfectRAW
         private Label label7;
         private NumericUpDown numericUpDown3;
         private GroupBox groupBox1;
+        private bool RevState=false;
+        private Label label1;
+        private Label label8;
+        private NumericUpDown numericUpDown4;
+        private NumericUpDown numericUpDown5;
+        private Label label9;
+        private Label label10;
 
         /// <summary>
         /// Variable del diseñador requerida.
@@ -49,7 +56,7 @@ namespace perfectRAW
             //
             // TODO: agregar código de constructor después de llamar a InitializeComponent
             //            
-            MessageBox.Show("perfectRAW\nMódulo revelador\nVersión de prueba nº 4\n23 de mayo de 2008 a las 19:20");
+            MessageBox.Show("perfectRAW\nMódulo revelador\nVersión de prueba nº 5\n24 de mayo de 2008 a las 10:40");
         }
 
         ~MainForm()
@@ -94,19 +101,27 @@ namespace perfectRAW
             this.label7 = new System.Windows.Forms.Label();
             this.numericUpDown3 = new System.Windows.Forms.NumericUpDown();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.numericUpDown4 = new System.Windows.Forms.NumericUpDown();
+            this.numericUpDown5 = new System.Windows.Forms.NumericUpDown();
+            this.label9 = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
             this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown4)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown5)).BeginInit();
             this.SuspendLayout();
             // 
             // button1
             // 
             this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.button1.Location = new System.Drawing.Point(15, 696);
+            this.button1.Location = new System.Drawing.Point(11, 631);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(121, 31);
+            this.button1.Size = new System.Drawing.Size(78, 19);
             this.button1.TabIndex = 0;
             this.button1.Text = "REVELAR";
             this.button1.UseVisualStyleBackColor = true;
@@ -114,27 +129,29 @@ namespace perfectRAW
             // 
             // pictureBox1
             // 
-            this.pictureBox1.Location = new System.Drawing.Point(15, 34);
+            this.pictureBox1.Location = new System.Drawing.Point(13, 31);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(1391, 642);
+            this.pictureBox1.Size = new System.Drawing.Size(1192, 529);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1.TabIndex = 1;
             this.pictureBox1.TabStop = false;
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(116, 8);
+            this.textBox1.Font = new System.Drawing.Font("Victor\'s Pixel Font", 8F);
+            this.textBox1.Location = new System.Drawing.Point(98, 7);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(266, 18);
+            this.textBox1.Size = new System.Drawing.Size(228, 18);
             this.textBox1.TabIndex = 4;
+            this.textBox1.WordWrap = false;
             this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(13, 10);
+            this.label2.Location = new System.Drawing.Point(11, 9);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(85, 11);
+            this.label2.Size = new System.Drawing.Size(79, 9);
             this.label2.TabIndex = 5;
             this.label2.Text = "Archivo RAW:";
             // 
@@ -145,9 +162,9 @@ namespace perfectRAW
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(391, 7);
+            this.button2.Location = new System.Drawing.Point(335, 6);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(114, 20);
+            this.button2.Size = new System.Drawing.Size(98, 19);
             this.button2.TabIndex = 6;
             this.button2.Text = "Buscar...";
             this.button2.UseVisualStyleBackColor = true;
@@ -156,10 +173,9 @@ namespace perfectRAW
             // label3
             // 
             this.label3.BackColor = System.Drawing.Color.Lime;
-            this.label3.Font = new System.Drawing.Font("Ambitsek", 8F, System.Drawing.FontStyle.Bold);
-            this.label3.Location = new System.Drawing.Point(699, 5);
+            this.label3.Location = new System.Drawing.Point(599, 3);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(124, 23);
+            this.label3.Size = new System.Drawing.Size(128, 23);
             this.label3.TabIndex = 7;
             this.label3.Text = "LISTO";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -167,13 +183,13 @@ namespace perfectRAW
             // numericUpDown1
             // 
             this.numericUpDown1.DecimalPlaces = 2;
-            this.numericUpDown1.Font = new System.Drawing.Font("Ambitsek", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.numericUpDown1.Font = new System.Drawing.Font("Victor\'s Pixel Font", 8F);
             this.numericUpDown1.Increment = new decimal(new int[] {
             25,
             0,
             0,
             131072});
-            this.numericUpDown1.Location = new System.Drawing.Point(94, 15);
+            this.numericUpDown1.Location = new System.Drawing.Point(83, 12);
             this.numericUpDown1.Maximum = new decimal(new int[] {
             8,
             0,
@@ -185,16 +201,16 @@ namespace perfectRAW
             0,
             -2147483648});
             this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(84, 17);
+            this.numericUpDown1.Size = new System.Drawing.Size(72, 18);
             this.numericUpDown1.TabIndex = 8;
             this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(13, 16);
+            this.label5.Location = new System.Drawing.Point(11, 16);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(70, 11);
+            this.label5.Size = new System.Drawing.Size(68, 9);
             this.label5.TabIndex = 10;
             this.label5.Text = "Exposición:";
             this.label5.Click += new System.EventHandler(this.label5_Click);
@@ -202,9 +218,9 @@ namespace perfectRAW
             // button3
             // 
             this.button3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.button3.Location = new System.Drawing.Point(864, 5);
+            this.button3.Location = new System.Drawing.Point(828, 5);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(136, 23);
+            this.button3.Size = new System.Drawing.Size(115, 20);
             this.button3.TabIndex = 12;
             this.button3.Text = "GRABAR JPEG";
             this.button3.UseVisualStyleBackColor = true;
@@ -212,32 +228,32 @@ namespace perfectRAW
             // 
             // numericUpDown2
             // 
-            this.numericUpDown2.Font = new System.Drawing.Font("Ambitsek", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.numericUpDown2.Location = new System.Drawing.Point(493, 15);
+            this.numericUpDown2.Font = new System.Drawing.Font("Victor\'s Pixel Font", 8F);
+            this.numericUpDown2.Location = new System.Drawing.Point(445, 12);
             this.numericUpDown2.Maximum = new decimal(new int[] {
             2,
             0,
             0,
             0});
             this.numericUpDown2.Name = "numericUpDown2";
-            this.numericUpDown2.Size = new System.Drawing.Size(67, 17);
+            this.numericUpDown2.Size = new System.Drawing.Size(57, 18);
             this.numericUpDown2.TabIndex = 14;
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(186, 17);
+            this.label4.Location = new System.Drawing.Point(158, 16);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(292, 11);
+            this.label4.Size = new System.Drawing.Size(285, 9);
             this.label4.TabIndex = 15;
             this.label4.Text = "Modo de preservación de luces altas (0 = OFF):";
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(529, 11);
+            this.label6.Location = new System.Drawing.Point(454, 10);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(145, 11);
+            this.label6.Size = new System.Drawing.Size(140, 9);
             this.label6.TabIndex = 16;
             this.label6.Text = "Estado de perfectRAW:";
             // 
@@ -245,24 +261,24 @@ namespace perfectRAW
             // 
             this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(157, 722);
+            this.label7.Location = new System.Drawing.Point(110, 659);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(292, 11);
+            this.label7.Size = new System.Drawing.Size(284, 9);
             this.label7.TabIndex = 18;
             this.label7.Text = "Modo de recuperación de luces altas (0 = OFF):";
             // 
             // numericUpDown3
             // 
             this.numericUpDown3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.numericUpDown3.Font = new System.Drawing.Font("Ambitsek", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.numericUpDown3.Location = new System.Drawing.Point(463, 721);
+            this.numericUpDown3.Font = new System.Drawing.Font("Victor\'s Pixel Font", 8F);
+            this.numericUpDown3.Location = new System.Drawing.Point(397, 657);
             this.numericUpDown3.Maximum = new decimal(new int[] {
             9,
             0,
             0,
             0});
             this.numericUpDown3.Name = "numericUpDown3";
-            this.numericUpDown3.Size = new System.Drawing.Size(73, 17);
+            this.numericUpDown3.Size = new System.Drawing.Size(61, 18);
             this.numericUpDown3.TabIndex = 17;
             // 
             // groupBox1
@@ -272,18 +288,92 @@ namespace perfectRAW
             this.groupBox1.Controls.Add(this.numericUpDown1);
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.numericUpDown2);
-            this.groupBox1.Location = new System.Drawing.Point(144, 682);
+            this.groupBox1.Location = new System.Drawing.Point(100, 622);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(573, 37);
+            this.groupBox1.Size = new System.Drawing.Size(510, 34);
             this.groupBox1.TabIndex = 19;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Control de exposición";
             // 
+            // label1
+            // 
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(619, 626);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(125, 9);
+            this.label1.TabIndex = 20;
+            this.label1.Text = "Nivel de saturación:";
+            // 
+            // label8
+            // 
+            this.label8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(619, 638);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(57, 9);
+            this.label8.TabIndex = 21;
+            this.label8.Text = "(dcraw: )";
+            // 
+            // numericUpDown4
+            // 
+            this.numericUpDown4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.numericUpDown4.Font = new System.Drawing.Font("Victor\'s Pixel Font", 8F);
+            this.numericUpDown4.Location = new System.Drawing.Point(749, 627);
+            this.numericUpDown4.Maximum = new decimal(new int[] {
+            65535,
+            0,
+            0,
+            0});
+            this.numericUpDown4.Name = "numericUpDown4";
+            this.numericUpDown4.Size = new System.Drawing.Size(56, 18);
+            this.numericUpDown4.TabIndex = 22;
+            // 
+            // numericUpDown5
+            // 
+            this.numericUpDown5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.numericUpDown5.Font = new System.Drawing.Font("Victor\'s Pixel Font", 8F);
+            this.numericUpDown5.Location = new System.Drawing.Point(749, 652);
+            this.numericUpDown5.Maximum = new decimal(new int[] {
+            65535,
+            0,
+            0,
+            0});
+            this.numericUpDown5.Name = "numericUpDown5";
+            this.numericUpDown5.Size = new System.Drawing.Size(56, 18);
+            this.numericUpDown5.TabIndex = 25;
+            // 
+            // label9
+            // 
+            this.label9.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(619, 663);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(57, 9);
+            this.label9.TabIndex = 24;
+            this.label9.Text = "(dcraw: )";
+            // 
+            // label10
+            // 
+            this.label10.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(619, 651);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(94, 9);
+            this.label10.TabIndex = 23;
+            this.label10.Text = "Nivel de negro:";
+            // 
             // MainForm
             // 
-            this.AutoScaleBaseSize = new System.Drawing.Size(7, 11);
+            this.AutoScaleBaseSize = new System.Drawing.Size(6, 10);
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
-            this.ClientSize = new System.Drawing.Size(1016, 741);
+            this.ClientSize = new System.Drawing.Size(952, 681);
+            this.Controls.Add(this.numericUpDown5);
+            this.Controls.Add(this.label9);
+            this.Controls.Add(this.label10);
+            this.Controls.Add(this.numericUpDown4);
+            this.Controls.Add(this.label8);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.numericUpDown3);
             this.Controls.Add(this.label6);
@@ -295,8 +385,8 @@ namespace perfectRAW
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.pictureBox1);
-            this.Font = new System.Drawing.Font("Ambitsek", 6F);
-            this.MinimumSize = new System.Drawing.Size(1120, 600);
+            this.Font = new System.Drawing.Font("Victor\'s Pixel Font", 7F);
+            this.MinimumSize = new System.Drawing.Size(960, 545);
             this.Name = "MainForm";
             this.Text = "perfectRAW";
             this.Load += new System.EventHandler(this.MainForm_Load);
@@ -307,21 +397,13 @@ namespace perfectRAW
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown4)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown5)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
         #endregion
-
-        [DllImport(@"dcraw.dll")]
-        static extern unsafe int Coffin(int argc, [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStr, SizeParamIndex = 0)] string[] argv);
-
-        [StructLayout(LayoutKind.Sequential,CharSet=CharSet.Ansi)]
-        public struct TEST
-        {
-            public int a;
-            public String b;
-        }
 
         private void Form1_OnResize(object sender, EventArgs e)
         {
@@ -332,7 +414,7 @@ namespace perfectRAW
         {
             pictureBox1.Width = this.Width;
             pictureBox1.Left = 0;
-            pictureBox1.Height = this.Height - 120;
+            pictureBox1.Height = this.Height - 140;
         }
 
         private void button1_Click(object sender, System.EventArgs e)
@@ -340,49 +422,83 @@ namespace perfectRAW
             /*test(ref t);
             MessageBox.Show(t.a.ToString()+" "+t.b);*/
 
-            if (!File.Exists(textBox1.Text))
+            if (!RevState)
             {
-                MessageBox.Show("No se encuentra el archivo '" + textBox1.Text + "'. Inténtelo de nuevo\n");
-                textBox1.Focus();
-                return;
-            }
+                if (!File.Exists(textBox1.Text))
+                {
+                    MessageBox.Show("No se encuentra el archivo '" + textBox1.Text + "'. Inténtelo de nuevo\n");
+                    textBox1.Focus();
+                    return;
+                }
+                
+                //String []argv={"dcraw.exe","-v","-q","0","-T","-4",@"c:\dcraw\raws\process.dng"};
+                //Coffin(argv.Length, argv);
+                if (!dcraw.first_time)
+                {
+                    RevState = true;
+                    button1.Text = "CANCELAR";
+                    Application.DoEvents();
+                }else{
+                    button1.Enabled = false;
+                }
 
-            //String []argv={"dcraw.exe","-v","-q","0","-T","-4",@"c:\dcraw\raws\process.dng"};
-            //Coffin(argv.Length, argv);
-            button1.Enabled = false;
+                // Process RAW
+                label3.Text = "Obteniendo información del RAW...";
+                dcraw.GetInfo();
+                label8.Text = "(dcraw: "+dcraw.sat_level.ToString()+")";
+                label9.Text = "(dcraw: " + dcraw.black_level.ToString() + ")";
+                if (numericUpDown4.Value == 0) numericUpDown4.Value = dcraw.sat_level;
+                if (numericUpDown5.Value == 0) numericUpDown5.Value = dcraw.black_level;
+                //camera.Text = dcraw.info.camera_make + " " + dcraw.info.camera_model;
+                dcraw.cancel = 0;
+                dcraw.estado = -1;
+                label3.Text = "REVELANDO";
+                this.Cursor = Cursors.WaitCursor;
+                label3.BackColor = Color.Red;
+                //dcraw.parameters.user_qual = 1;
+                dcraw.parameters.user_gamma = 1; // Sin aplicar gamma
+                dcraw.parameters.output_color = 1; // Convertimos a sRGB
+                dcraw.parameters.exposure = (float)Math.Pow(2.0, (double)numericUpDown1.Value);
+                dcraw.parameters.exposure_mode = (int)numericUpDown2.Value;
+                dcraw.parameters.highlight = (int)numericUpDown3.Value;
+                if (((int)numericUpDown4.Value)!= dcraw.sat_level) dcraw.parameters.user_sat = (int)numericUpDown4.Value;
+                if (((int)numericUpDown5.Value) != dcraw.black_level) dcraw.parameters.user_black = (int)numericUpDown5.Value;
+                Thread thread1 = new Thread(new ThreadStart(dcraw.Process));
+                thread1.Priority = ThreadPriority.Normal;                
+                thread1.Start();
+                do
+                {
+                    if (dcraw.estado > 0)
+                    {
+                        if (dcraw.cancel == 0) label3.Text = "REVELANDO ETAPA " + dcraw.estado.ToString(); else label3.Text = "CANCELANDO: " + dcraw.estado.ToString();
+                    }
+                    Application.DoEvents();
+                    Thread.Sleep(100);
+                } while (thread1.IsAlive);
+                if (dcraw.estado == 6)
+                {
+                    if (pictureBox1.Image != null) pictureBox1.Image.Dispose();
+                    pictureBox1.Image = (Image)dcraw.img;
+                }
+                //Clipboard.Clear();
+                //Application.DoEvents();
+                //Clipboard.SetImage(pictureBox1.Image);
 
-            // Process RAW
-            label3.Text = "Obteniendo información del RAW...";
-            dcraw.GetInfo();
-            //camera.Text = dcraw.info.camera_make + " " + dcraw.info.camera_model;
-
-            label3.Text = "REVELANDO";
-            this.Cursor = Cursors.WaitCursor;
-            label3.BackColor = Color.Red;
-            //dcraw.parameters.user_qual = 1;
-            dcraw.parameters.user_gamma = 1; // Sin aplicar gamma
-            dcraw.parameters.output_color = 1; // Convertimos a sRGB
-            dcraw.parameters.exposure = (float)Math.Pow(2.0, (double)numericUpDown1.Value);
-            dcraw.parameters.exposure_mode =(int)numericUpDown2.Value;
-            dcraw.parameters.highlight = (int)numericUpDown3.Value;
-            Thread thread1 = new Thread(new ThreadStart(dcraw.Process));
-            thread1.Priority = ThreadPriority.Normal;
-            thread1.Start();
-            do
-            {
+                label3.Text = "LISTO";
+                this.Cursor = Cursors.Arrow;
+                label3.BackColor = Color.Lime;
+                button1.Text="REVELAR";                
                 Application.DoEvents();
-                Thread.Sleep(100);
-            } while (thread1.IsAlive);
-            if (pictureBox1.Image != null) pictureBox1.Image.Dispose();
-            pictureBox1.Image = (Image)dcraw.img;
-            //Clipboard.Clear();
-            //Application.DoEvents();
-            //Clipboard.SetImage(pictureBox1.Image);
-            
-            label3.Text = "LISTO";
-            this.Cursor = Cursors.Arrow;
-            label3.BackColor = Color.Lime;
-            button1.Enabled = true;
+                RevState = false;
+                button1.Enabled = true;
+            }else{
+                // Cancelar
+                label3.BackColor = Color.Orange;
+                label3.Text = "CANCELANDO";
+                button1.Enabled = false;
+                dcraw.cancel = 1;
+                Application.DoEvents();
+            }
         }
 
         private string GetFileName()
@@ -402,7 +518,7 @@ namespace perfectRAW
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            textBox1.Text = @"C:\test\a_1.dng";
+            textBox1.Text = @"C:\test\julia.orf";
             dcraw.SetRAWFile(textBox1.Text);
             ResizeViews();
         }
@@ -411,6 +527,7 @@ namespace perfectRAW
         {
             dcraw.End();
             dcraw.SetRAWFile(textBox1.Text);
+            dcraw.first_time = true;
         }
 
         private void button3_Click(object sender, EventArgs e)
