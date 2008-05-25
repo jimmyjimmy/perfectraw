@@ -42,8 +42,26 @@ namespace perfectRAW
         private Label label10;
         private GroupBox groupBox2;
         private Label FreeMem;
-        private System.Diagnostics.PerformanceCounter performanceCounter1;
         private System.Windows.Forms.Timer Clock;
+        private bool InitCounter = false;
+
+        // Código no portable a otras plataformas
+        [DllImport("kernel32")]
+        static extern void GlobalMemoryStatus(ref MEMORYSTATUS buf);
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct MEMORYSTATUS
+        {
+            public uint dwLength;
+            public uint dwMemoryLoad;
+            public uint dwTotalPhys;
+            public uint dwAvailPhys;
+            public uint dwTotalPageFile;
+            public uint dwAvailPageFile;
+            public uint dwTotalVirtual;
+            public uint dwAvailVirtual;
+        }
+        // Código no portable a otras plataformas
 
         /// <summary>
         /// Variable del diseñador requerida.
@@ -60,7 +78,7 @@ namespace perfectRAW
             //
             // TODO: agregar código de constructor después de llamar a InitializeComponent
             //            
-            MessageBox.Show("perfectRAW\nMódulo revelador\nVersión de prueba nº 6\n25 de mayo de 2008 a las 1:10");
+            MessageBox.Show("perfectRAW\nMódulo revelador\nVersión de prueba nº 7\n25 de mayo de 2008 a las 10:40");
         }
 
         ~MainForm()
@@ -111,7 +129,6 @@ namespace perfectRAW
             this.label9 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.performanceCounter1 = new System.Diagnostics.PerformanceCounter();
             this.FreeMem = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
@@ -121,7 +138,6 @@ namespace perfectRAW
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown5)).BeginInit();
             this.groupBox2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.performanceCounter1)).BeginInit();
             this.SuspendLayout();
             // 
             // button1
@@ -184,7 +200,7 @@ namespace perfectRAW
             this.label3.BackColor = System.Drawing.Color.Lime;
             this.label3.Location = new System.Drawing.Point(3, 8);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(128, 15);
+            this.label3.Size = new System.Drawing.Size(136, 15);
             this.label3.TabIndex = 7;
             this.label3.Text = "LISTO";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -368,16 +384,11 @@ namespace perfectRAW
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox2.Controls.Add(this.FreeMem);
             this.groupBox2.Controls.Add(this.label3);
-            this.groupBox2.Location = new System.Drawing.Point(817, -4);
+            this.groupBox2.Location = new System.Drawing.Point(809, -4);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(134, 34);
+            this.groupBox2.Size = new System.Drawing.Size(142, 34);
             this.groupBox2.TabIndex = 26;
             this.groupBox2.TabStop = false;
-            // 
-            // performanceCounter1
-            // 
-            this.performanceCounter1.CategoryName = "Memoria";
-            this.performanceCounter1.CounterName = "Bytes disponibles";
             // 
             // FreeMem
             // 
@@ -425,7 +436,6 @@ namespace perfectRAW
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown5)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.performanceCounter1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -441,7 +451,7 @@ namespace perfectRAW
         {
             pictureBox1.Width = this.Width;
             pictureBox1.Left = 0;
-            pictureBox1.Height = this.Height - 140;
+            pictureBox1.Height = this.Height - 250;
         }
 
         private void button1_Click(object sender, System.EventArgs e)
@@ -548,10 +558,10 @@ namespace perfectRAW
             dcraw.SetRAWFile(textBox1.Text);            
             ResizeViews();
             Clock = new System.Windows.Forms.Timer();
-            Clock.Interval = 3000;
+            Clock.Interval = 2000;
             Clock.Start();
             Clock.Tick += new EventHandler(CheckMemTimer);
-            CheckMem();
+            CheckMem();            
         }
 
         private void CheckMemTimer(object sender, EventArgs eArgs)
@@ -561,8 +571,31 @@ namespace perfectRAW
 
         private void CheckMem()
         {
-            int FreeMb = (int)(performanceCounter1.NextValue() / 1000000.0);
-            FreeMem.Text = "FREE MEM: " + FreeMb.ToString() + " Mb";
+            /* Versión portable 
+            if (!InitCounter)
+            {
+                Thread t = new Thread(InitializeCounter);
+                t.Priority = ThreadPriority.Lowest;                
+                t.Start();
+            }
+            if (InitCounter)
+            {
+                int FreeMb = (int)(performanceCounter1.NextValue() / 1000000.0);
+                FreeMem.Text = "FREE MEM: " + FreeMb.ToString() + " Mb";
+            }*/
+            // Versión no portable
+            MEMORYSTATUS buf=new MEMORYSTATUS();
+            GlobalMemoryStatus(ref buf);
+
+            uint FreeMb = buf.dwAvailPhys/1000000;
+            uint TotalMb = (uint)((float)buf.dwAvailPhys*100/(float)buf.dwTotalPhys);            
+            FreeMem.Text = "FREEMEM " +FreeMb.ToString() + " Mb (" + TotalMb.ToString() + "%)";
+        }
+
+        private void InitializeCounter()
+        {
+            //((System.ComponentModel.ISupportInitialize)(this.performanceCounter1)).EndInit();
+            InitCounter = true;            
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
