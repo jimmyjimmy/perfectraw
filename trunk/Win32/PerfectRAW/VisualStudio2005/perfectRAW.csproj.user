@@ -13,4 +13,7 @@
     <FallbackCulture>es-ES</FallbackCulture>
     <VerifyUploadedFiles>true</VerifyUploadedFiles>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <StartArguments>c:\test\julia.orf</StartArguments>
+  </PropertyGroup>
 </Project>

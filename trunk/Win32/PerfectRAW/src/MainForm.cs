@@ -77,8 +77,7 @@ namespace perfectRAW
 
             //
             // TODO: agregar código de constructor después de llamar a InitializeComponent
-            //            
-            MessageBox.Show("perfectRAW\nMódulo revelador\nVersión de prueba nº 7\n25 de mayo de 2008 a las 10:40");
+            //                        
         }
 
         ~MainForm()
@@ -424,7 +423,7 @@ namespace perfectRAW
             this.MinimumSize = new System.Drawing.Size(960, 545);
             this.Name = "MainForm";
             this.Text = "perfectRAW";
-            this.Load += new System.EventHandler(this.MainForm_Load);
+            this.Activated += new System.EventHandler(this.MainForm_Activated);
             this.Resize += new System.EventHandler(this.Form1_OnResize);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
@@ -455,10 +454,15 @@ namespace perfectRAW
         }
 
         private void button1_Click(object sender, System.EventArgs e)
-        {            
-            /*test(ref t);
-            MessageBox.Show(t.a.ToString()+" "+t.b);*/
+        {
+            Revelar();
+        }
 
+        private void Revelar()
+        {
+                        /*test(ref t);
+            MessageBox.Show(t.a.ToString()+" "+t.b);*/
+            Application.DoEvents();
             if (!RevState)
             {
                 if (!File.Exists(textBox1.Text))
@@ -552,16 +556,24 @@ namespace perfectRAW
             textBox1.Text = openFileDialog1.FileName;
         }
 
-        private void MainForm_Load(object sender, EventArgs e)
+        private void MainForm_Activated(object sender, EventArgs e)
         {
-            textBox1.Text = @"C:\test\julia.orf";
+            string []args=Environment.GetCommandLineArgs();
+            
             dcraw.SetRAWFile(textBox1.Text);            
             ResizeViews();
             Clock = new System.Windows.Forms.Timer();
             Clock.Interval = 2000;
             Clock.Start();
             Clock.Tick += new EventHandler(CheckMemTimer);
-            CheckMem();            
+            CheckMem();
+            if (args.Length>1)
+            {
+                textBox1.Text = args[1];
+                Application.DoEvents();
+                Revelar();
+            }
+            else MessageBox.Show("perfectRAW\nMódulo revelador\nVersión de prueba nº 7\n25 de mayo de 2008 a las 10:40");
         }
 
         private void CheckMemTimer(object sender, EventArgs eArgs)
