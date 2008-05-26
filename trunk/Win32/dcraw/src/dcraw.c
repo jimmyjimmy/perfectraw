@@ -8736,6 +8736,10 @@ cleanup:
 // ************************************************************************************
 // ************************************************************************************
 // ************************************************************************************
+// ************************************************************************************
+// ************************************************************************************
+// ************************************************************************************
+
 #ifdef BUILDING_DLL // From here to end of dcraw.c has been added by Manuel Llorens
 
 /// DLL global variables and functions
@@ -8743,8 +8747,7 @@ DLL_STATE state[6];
 DLL_PARAMETERS params;
 int user_black,user_sat,user_qual,level_greens,use_fuji_rotate,quality,test_pattern;
 int first_time,write_to_stdout;
-float exposure;
-int exposure_mode;
+float exposure,preserve;
 char sD[1000];
 
 int SaveState(int ID, int cancel){
@@ -8840,7 +8843,7 @@ void SetParameters(DLL_PARAMETERS *p){
     use_fuji_rotate=p->use_fuji_rotate;
     user_gamma=p->user_gamma;           
     exposure=p->exposure;
-    exposure_mode=p->exposure_mode;    
+    preserve=p->preserve;    
     
     // Actual parameters for later comparing
     params.threshold=threshold;
@@ -8860,7 +8863,7 @@ void SetParameters(DLL_PARAMETERS *p){
     params.use_fuji_rotate=use_fuji_rotate;
     params.user_gamma=user_gamma;           
     params.exposure=exposure;
-    params.exposure_mode=exposure_mode;
+    params.preserve=preserve;
 }
 
 void SetDefaults(void)
@@ -8889,7 +8892,7 @@ void SetDefaults(void)
     med_passes=0;
     highlight=0;
     output_color=0;    
-    use_fuji_rotate=0;                         
+    use_fuji_rotate=1;
     black=0;
     maximum=0;
     mix_green=0;
@@ -8924,7 +8927,7 @@ void SetDefaults(void)
     output_color=1;
     no_auto_bright=0;      
     exposure=1.0;
-    exposure_mode=0;
+    preserve=0;
     memset(cam_mul,0,sizeof cam_mul);
     memset(pre_mul,0,sizeof pre_mul);
     memset(cmatrix,0,sizeof cmatrix);
@@ -8948,7 +8951,7 @@ void SetDefaults(void)
     params.use_fuji_rotate=use_fuji_rotate;
     params.user_gamma=user_gamma;
     params.exposure=exposure;
-    params.exposure_mode=exposure_mode;
+    params.preserve=preserve;
     
     if (user_qual >= 0) quality = user_qual;
     if (user_black >= 0) black = user_black;
@@ -9003,15 +9006,15 @@ DLLIMPORT void DCRAW_DefaultParameters(DLL_PARAMETERS *p)
     p->use_fuji_rotate=0;              
     p->user_gamma=1;    
     p->exposure=1.0;
-    p->exposure_mode=0;    
+    p->preserve=0;    
 }
 
 void exposure_correction(void){
-    int i;
+   /* int i;
     float Y, Yp, exposure2, K1, K2, EV;
     
     if(verbose) printf("Exposure correction ");
-    switch(exposure_mode){
+    switch(preserve){
        case 0:
            // Exposure correction without highlight preservation
            if(verbose) printf("without highlight preservation\n");
@@ -9088,14 +9091,67 @@ void exposure_correction(void){
                }             
            }
            break;                
-    }        
+    }*/
+        
+    // This function uses parameters:            
+    //      exposure (lineal): 2^(-8..0..8)
+    //      preserve (log)   : 0..8
+    int i;
+    float Y, Yp, exposure2, K, EV;
+    
+    if(verbose) printf("Exposure correction ");
+       if(preserve==0.0){
+       // Exposure correction without highlight preservation
+       if(verbose) printf("without highlight preservation\n");
+       for(i=0;i<height*width;i++){
+         image[i][0]=CLIP((float)image[i][0]*exposure); // R
+         image[i][1]=CLIP((float)image[i][1]*exposure); // G (mixed)
+         image[i][2]=CLIP((float)image[i][2]*exposure); // B
+       }
+    }else{
+       // Exposure correction with highlight preservation
+       if(verbose) printf("with highlight preservation\n");
+       if(exposure>1){
+           K=65535/exposure*powF(2,-preserve);
+           for(i=0;i<height*width;i++){
+             Y=0.299*(float)image[i][0]+0.587*(float)image[i][1]+0.114*(float)image[i][2]; // CIE luminosity
+             if(Y<K){
+                image[i][0]=CLIP((float)image[i][0]*exposure); // R
+                image[i][1]=CLIP((float)image[i][1]*exposure); // G (mixed)
+                image[i][2]=CLIP((float)image[i][2]*exposure); // B
+             }else{
+                Yp=(65535-K*exposure)/(65535-K)*(Y-65535)+65535;       
+                exposure2=Yp/Y;
+                image[i][0]=CLIP((float)image[i][0]*exposure2); // R
+                image[i][1]=CLIP((float)image[i][1]*exposure2); // G (mixed)
+                image[i][2]=CLIP((float)image[i][2]*exposure2); // B
+             }
+           }
+       }else{             
+           EV=log(exposure)/log(2);                              // Convertimos exp. lineal a EV
+           K=powF(2,-preserve);           
+             for(i=0;i<height*width;i++){
+             Y=0.299*(float)image[i][0]+0.587*(float)image[i][1]+0.114*(float)image[i][2]; // CIE luminosity
+             if(Y<K){
+                image[i][0]=CLIP((float)image[i][0]*exposure); // R
+                image[i][1]=CLIP((float)image[i][1]*exposure); // G (mixed)
+                image[i][2]=CLIP((float)image[i][2]*exposure); // B
+             }else{
+                exposure2=powF(2,EV*(1-Y/65535)/(1-K));
+                image[i][0]=CLIP((float)image[i][0]*exposure2); // R
+                image[i][1]=CLIP((float)image[i][1]*exposure2); // G (mixed)
+                image[i][2]=CLIP((float)image[i][2]*exposure2); // B
+             }
+           }             
+       }
+    }               
 }
 
 DLLIMPORT int DCRAW_Init(char *ifname,int *w,int *h, int *sat_level, int *black_level)
 {        
     // Still missing: pass user_flip, bpfile, dark_frame and use_camera_matrix as parameters to this function
     int arg, status=0;
-    int i, c,user_flip=0;  
+    int i, c,user_flip=-1;  
     char opm, opt, *ofname, *sp, *cp, *bpfile=0, *dark_frame=0;    
     
     SetDefaults();
@@ -9120,9 +9176,11 @@ DLLIMPORT int DCRAW_Init(char *ifname,int *w,int *h, int *sat_level, int *black_
     if (!(ifp = fopen (ifname, "rb"))) {
       perror (ifname);      
     }    
-    status = (identify(),!is_raw);    
+    status = (identify(),!is_raw);        
+    
     if (user_flip >= 0)
       flip = user_flip;
+    
     switch ((flip+3600) % 360) {
       case 270:  flip = 5;  break;
       case 180:  flip = 3;  break;
@@ -9145,7 +9203,7 @@ DLLIMPORT int DCRAW_Init(char *ifname,int *w,int *h, int *sat_level, int *black_
     }
     fseeko (ifp, data_offset, SEEK_SET);    
     (*load_raw)();    
-    fclose(ifp);
+    fclose(ifp);    
     
     // Here we take buffer 0
     //SaveState(0,0);
@@ -9159,8 +9217,13 @@ DLLIMPORT int DCRAW_Init(char *ifname,int *w,int *h, int *sat_level, int *black_
     SaveState(1,0);
     
     // Ref variables values
-    *w=iwidth;
-    *h=iheight;    
+    if (flip & 4){
+       *w=iheight;
+       *h=iwidth;    
+    }else{
+       *w=iwidth;
+       *h=iheight;    
+    }    
     *sat_level=maximum;
     *black_level=black;
     
@@ -9225,7 +9288,7 @@ int CompareParams(DLL_PARAMETERS *p)
     if(params.four_color_rgb!=p->four_color_rgb) {s=3;goto CHECK;}
     if(params.med_passes!=p->med_passes) {s=4;goto CHECK;}        
     if(params.exposure!=p->exposure) {s=5;goto CHECK;}
-    if((params.exposure_mode!=p->exposure_mode)&&(params.exposure!=1)) {s=5;goto CHECK;}
+    if((params.preserve!=p->preserve)&&(params.exposure!=1)) {s=5;goto CHECK;}
     if(params.output_color!=p->output_color) {s=5;goto CHECK;}
     if(params.use_fuji_rotate!=p->use_fuji_rotate) {s=5;goto CHECK;}
     if(params.user_gamma!=p->user_gamma) {s=5;goto CHECK;}       
@@ -9315,7 +9378,9 @@ STAGE5:
     if (exposure!=1.0) exposure_correction();    
     if (use_fuji_rotate) fuji_rotate();    
     convert_to_rgb();
-    if (use_fuji_rotate) stretch();
+    if (use_fuji_rotate) stretch();    
+    
+    if (flip & 4) SWAP(height,width);
     ppm = (ushort *) calloc (width, colors*2);    
     img = (ushort *) calloc (width*height, colors*2);
     soff  = flip_index (0, 0);

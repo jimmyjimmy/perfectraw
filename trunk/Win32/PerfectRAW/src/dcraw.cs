@@ -56,7 +56,7 @@ namespace perfectRAW
             public int use_fuji_rotate;
             public float user_gamma;
             public float exposure;
-            public int exposure_mode;
+            public float preserve;
         }
 
         [DllImport(@"dcraw.dll")]
