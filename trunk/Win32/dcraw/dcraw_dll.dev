@@ -10,7 +10,7 @@ Libs=
 PrivateResource=
 ResourceIncludes=
 MakeIncludes=copydll.mak
-Compiler=-DBUILDING_DLL=1_@@_-lm -DNO_LCMS -DNO_JPEG -D_MINGW__@@__@@_
+Compiler=-ffast-math_@@_-DBUILDING_DLL=1_@@_-lm -DNO_LCMS -DNO_JPEG -D_MINGW__@@__@@_
 CppCompiler=-DBUILDING_DLL=1_@@_
 Linker=--no-export-all-symbols --add-stdcall-alias_@@_
 IsCpp=0
