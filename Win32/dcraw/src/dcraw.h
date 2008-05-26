@@ -55,8 +55,8 @@ typedef struct DCRAW_Parameters
        int      output_color;      // -o -> buffer 5                     
        int      use_fuji_rotate;   // -J -> buffer 5
        float    user_gamma;        // -g -> buffer 5       
-       float    exposure;          //    -> buffer 3
-       int      exposure_mode;     //    -> buffer 3
+       float    exposure;          //    -> buffer 4
+       float    preserve;          //    -> buffer 4
 }DLL_PARAMETERS;
 
 // Struct for saving and restoring DLL state

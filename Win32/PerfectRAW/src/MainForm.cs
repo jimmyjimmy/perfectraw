@@ -17,8 +17,6 @@ namespace perfectRAW
     /// </summary>
     unsafe public class MainForm : System.Windows.Forms.Form
     {
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.PictureBox pictureBox1;
         private TextBox textBox1;
         private Label label2;
         private OpenFileDialog openFileDialog1;
@@ -43,7 +41,10 @@ namespace perfectRAW
         private GroupBox groupBox2;
         private Label FreeMem;
         private System.Windows.Forms.Timer Clock;
+        private Button button1;
+        private PictureBox pictureBox1;
         private bool InitCounter = false;
+        private bool Init = false;
 
         // Código no portable a otras plataformas
         [DllImport("kernel32")]
@@ -77,7 +78,8 @@ namespace perfectRAW
 
             //
             // TODO: agregar código de constructor después de llamar a InitializeComponent
-            //                        
+            //
+            if (Environment.GetCommandLineArgs().Length==1) MessageBox.Show("perfectRAW\nMódulo revelador\nVersión de prueba nº 9\n26 de mayo de 2008 a las 23:00");
         }
 
         ~MainForm()
@@ -106,8 +108,6 @@ namespace perfectRAW
         /// </summary>
         private void InitializeComponent()
         {
-            this.button1 = new System.Windows.Forms.Button();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
@@ -129,7 +129,8 @@ namespace perfectRAW
             this.label10 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.FreeMem = new System.Windows.Forms.Label();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.button1 = new System.Windows.Forms.Button();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
@@ -137,27 +138,8 @@ namespace perfectRAW
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown5)).BeginInit();
             this.groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
-            // 
-            // button1
-            // 
-            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.button1.Location = new System.Drawing.Point(11, 631);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(78, 19);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "REVELAR";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Location = new System.Drawing.Point(13, 31);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(1192, 529);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox1.TabIndex = 1;
-            this.pictureBox1.TabStop = false;
             // 
             // textBox1
             // 
@@ -252,15 +234,16 @@ namespace perfectRAW
             // 
             // numericUpDown2
             // 
+            this.numericUpDown2.DecimalPlaces = 2;
             this.numericUpDown2.Font = new System.Drawing.Font("Victor\'s Pixel Font", 8F);
-            this.numericUpDown2.Location = new System.Drawing.Point(447, 11);
+            this.numericUpDown2.Location = new System.Drawing.Point(367, 11);
             this.numericUpDown2.Maximum = new decimal(new int[] {
-            2,
+            8,
             0,
             0,
             0});
             this.numericUpDown2.Name = "numericUpDown2";
-            this.numericUpDown2.Size = new System.Drawing.Size(57, 18);
+            this.numericUpDown2.Size = new System.Drawing.Size(48, 18);
             this.numericUpDown2.TabIndex = 14;
             // 
             // label4
@@ -268,9 +251,9 @@ namespace perfectRAW
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(158, 15);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(285, 9);
+            this.label4.Size = new System.Drawing.Size(206, 9);
             this.label4.TabIndex = 15;
-            this.label4.Text = "Modo de preservación de luces altas (0 = OFF):";
+            this.label4.Text = "Diafragmas a preservar (0 = OFF):";
             // 
             // label7
             // 
@@ -305,7 +288,7 @@ namespace perfectRAW
             this.groupBox1.Controls.Add(this.numericUpDown2);
             this.groupBox1.Location = new System.Drawing.Point(100, 622);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(510, 34);
+            this.groupBox1.Size = new System.Drawing.Size(425, 34);
             this.groupBox1.TabIndex = 19;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Control de exposición";
@@ -314,7 +297,7 @@ namespace perfectRAW
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(619, 626);
+            this.label1.Location = new System.Drawing.Point(534, 628);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(125, 9);
             this.label1.TabIndex = 20;
@@ -324,7 +307,7 @@ namespace perfectRAW
             // 
             this.label8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(619, 638);
+            this.label8.Location = new System.Drawing.Point(534, 640);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(57, 9);
             this.label8.TabIndex = 21;
@@ -334,35 +317,35 @@ namespace perfectRAW
             // 
             this.numericUpDown4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.numericUpDown4.Font = new System.Drawing.Font("Victor\'s Pixel Font", 8F);
-            this.numericUpDown4.Location = new System.Drawing.Point(749, 627);
+            this.numericUpDown4.Location = new System.Drawing.Point(664, 629);
             this.numericUpDown4.Maximum = new decimal(new int[] {
             65535,
             0,
             0,
             0});
             this.numericUpDown4.Name = "numericUpDown4";
-            this.numericUpDown4.Size = new System.Drawing.Size(56, 18);
+            this.numericUpDown4.Size = new System.Drawing.Size(59, 18);
             this.numericUpDown4.TabIndex = 22;
             // 
             // numericUpDown5
             // 
             this.numericUpDown5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.numericUpDown5.Font = new System.Drawing.Font("Victor\'s Pixel Font", 8F);
-            this.numericUpDown5.Location = new System.Drawing.Point(749, 652);
+            this.numericUpDown5.Location = new System.Drawing.Point(664, 654);
             this.numericUpDown5.Maximum = new decimal(new int[] {
             65535,
             0,
             0,
             0});
             this.numericUpDown5.Name = "numericUpDown5";
-            this.numericUpDown5.Size = new System.Drawing.Size(56, 18);
+            this.numericUpDown5.Size = new System.Drawing.Size(59, 18);
             this.numericUpDown5.TabIndex = 25;
             // 
             // label9
             // 
             this.label9.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(619, 663);
+            this.label9.Location = new System.Drawing.Point(534, 665);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(57, 9);
             this.label9.TabIndex = 24;
@@ -372,7 +355,7 @@ namespace perfectRAW
             // 
             this.label10.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(619, 651);
+            this.label10.Location = new System.Drawing.Point(534, 653);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(94, 9);
             this.label10.TabIndex = 23;
@@ -397,6 +380,26 @@ namespace perfectRAW
             this.FreeMem.Size = new System.Drawing.Size(78, 9);
             this.FreeMem.TabIndex = 27;
             this.FreeMem.Text = "FREE RAM: Mb";
+            // 
+            // button1
+            // 
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.button1.Location = new System.Drawing.Point(11, 631);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(78, 19);
+            this.button1.TabIndex = 0;
+            this.button1.Text = "REVELAR";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Location = new System.Drawing.Point(13, 31);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(1192, 529);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBox1.TabIndex = 1;
+            this.pictureBox1.TabStop = false;
             // 
             // MainForm
             // 
@@ -425,7 +428,6 @@ namespace perfectRAW
             this.Text = "perfectRAW";
             this.Activated += new System.EventHandler(this.MainForm_Activated);
             this.Resize += new System.EventHandler(this.Form1_OnResize);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).EndInit();
@@ -435,6 +437,7 @@ namespace perfectRAW
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown5)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -460,9 +463,6 @@ namespace perfectRAW
 
         private void Revelar()
         {
-                        /*test(ref t);
-            MessageBox.Show(t.a.ToString()+" "+t.b);*/
-            Application.DoEvents();
             if (!RevState)
             {
                 if (!File.Exists(textBox1.Text))
@@ -499,7 +499,7 @@ namespace perfectRAW
                 dcraw.parameters.user_gamma = 1; // Sin aplicar gamma
                 dcraw.parameters.output_color = 1; // Convertimos a sRGB
                 dcraw.parameters.exposure = (float)Math.Pow(2.0, (double)numericUpDown1.Value);
-                dcraw.parameters.exposure_mode = (int)numericUpDown2.Value;
+                dcraw.parameters.preserve = (float)numericUpDown2.Value;
                 dcraw.parameters.highlight = (int)numericUpDown3.Value;
                 if (((int)numericUpDown4.Value) != dcraw.parameters.user_sat) dcraw.parameters.user_sat = (int)numericUpDown4.Value;
                 if (((int)numericUpDown5.Value) != dcraw.parameters.user_black) dcraw.parameters.user_black = (int)numericUpDown5.Value;
@@ -536,8 +536,7 @@ namespace perfectRAW
                 label3.BackColor = Color.Orange;
                 label3.Text = "CANCELANDO";
                 button1.Enabled = false;
-                dcraw.cancel = 1;
-                Application.DoEvents();
+                dcraw.cancel = 1;                
             }
         }
 
@@ -559,21 +558,24 @@ namespace perfectRAW
         private void MainForm_Activated(object sender, EventArgs e)
         {
             string []args=Environment.GetCommandLineArgs();
-            
-            dcraw.SetRAWFile(textBox1.Text);            
-            ResizeViews();
-            Clock = new System.Windows.Forms.Timer();
-            Clock.Interval = 2000;
-            Clock.Start();
-            Clock.Tick += new EventHandler(CheckMemTimer);
-            CheckMem();
-            if (args.Length>1)
+
+            if (!Init)
             {
-                textBox1.Text = args[1];
-                Application.DoEvents();
-                Revelar();
+                Init = true;
+                dcraw.SetRAWFile(textBox1.Text);
+                ResizeViews();
+                Clock = new System.Windows.Forms.Timer();
+                Clock.Interval = 2000;
+                Clock.Start();
+                Clock.Tick += new EventHandler(CheckMemTimer);
+                CheckMem();
+                if (args.Length > 1)
+                {
+                    textBox1.Text = args[1];
+                    Application.DoEvents();
+                    Revelar();
+                }                
             }
-            else MessageBox.Show("perfectRAW\nMódulo revelador\nVersión de prueba nº 7\n25 de mayo de 2008 a las 10:40");
         }
 
         private void CheckMemTimer(object sender, EventArgs eArgs)
