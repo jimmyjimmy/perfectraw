@@ -10,7 +10,7 @@ Libs=
 PrivateResource=
 ResourceIncludes=
 MakeIncludes=copydll.mak
-Compiler=-ffast-math_@@_-DBUILDING_DLL=1_@@_-lm -DNO_LCMS -DNO_JPEG -D_MINGW__@@__@@_
+Compiler=-ffast-math -mfpmath=sse_@@_-DBUILDING_DLL=1_@@_-lm -DNO_LCMS -DNO_JPEG -D_MINGW__@@__@@_
 CppCompiler=-DBUILDING_DLL=1_@@_
 Linker=--no-export-all-symbols --add-stdcall-alias_@@_
 IsCpp=0
@@ -27,7 +27,7 @@ CustomMakefile=
 IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=0
-CompilerSettings=0010000001100000000000
+CompilerSettings=0010000001001000000000
 
 [Unit1]
 FileName=src\dll.c

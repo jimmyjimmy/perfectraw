@@ -9129,7 +9129,7 @@ void exposure_correction(void){
            }
        }else{             
            EV=log(exposure)/log(2);                              // Convertimos exp. lineal a EV
-           K=powF(2,-preserve);           
+           K=65535.0*powF(2,-preserve);           
              for(i=0;i<height*width;i++){
              Y=0.299*(float)image[i][0]+0.587*(float)image[i][1]+0.114*(float)image[i][2]; // CIE luminosity
              if(Y<K){
@@ -9137,7 +9137,7 @@ void exposure_correction(void){
                 image[i][1]=CLIP((float)image[i][1]*exposure); // G (mixed)
                 image[i][2]=CLIP((float)image[i][2]*exposure); // B
              }else{
-                exposure2=powF(2,EV*(1-Y/65535)/(1-K));
+                exposure2=powF(2,EV*(65535.0-Y)/(65535.0-K));
                 image[i][0]=CLIP((float)image[i][0]*exposure2); // R
                 image[i][1]=CLIP((float)image[i][1]*exposure2); // G (mixed)
                 image[i][2]=CLIP((float)image[i][2]*exposure2); // B
