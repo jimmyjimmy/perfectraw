@@ -238,7 +238,7 @@ namespace perfectRAW
             this.numericUpDown2.Font = new System.Drawing.Font("Victor\'s Pixel Font", 8F);
             this.numericUpDown2.Location = new System.Drawing.Point(367, 11);
             this.numericUpDown2.Maximum = new decimal(new int[] {
-            8,
+            12,
             0,
             0,
             0});
@@ -495,9 +495,10 @@ namespace perfectRAW
                 label3.Text = "REVELANDO";
                 this.Cursor = Cursors.WaitCursor;
                 label3.BackColor = Color.Red;
+                Application.DoEvents();
                 //dcraw.parameters.user_qual = 1;
                 dcraw.parameters.user_gamma = 1; // Sin aplicar gamma
-                dcraw.parameters.output_color = 1; // Convertimos a sRGB
+                dcraw.parameters.output_color = 0; // Pedimos color RAW a dcraw.dll
                 dcraw.parameters.exposure = (float)Math.Pow(2.0, (double)numericUpDown1.Value);
                 dcraw.parameters.preserve = (float)numericUpDown2.Value;
                 dcraw.parameters.highlight = (int)numericUpDown3.Value;
