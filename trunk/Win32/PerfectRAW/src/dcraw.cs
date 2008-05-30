@@ -63,7 +63,7 @@ namespace perfectRAW
         static extern void DCRAW_DefaultParameters(ref DLL_PARAMETERS P);
 
         [DllImport(@"dcraw.dll")]
-        static extern int DCRAW_Init(string rawfile, ref int width, ref int height, ref int sat_level, ref int black_level);
+        static extern int DCRAW_Init(string rawfile, ref int width, ref int height, ref int sat_level, ref int black_level, float[] cam_WB, float[,] cam_RGB);
 
         [DllImport(@"dcraw.dll")]
         static extern void DCRAW_GetInfo(ref IMAGE_INFO info);
@@ -74,8 +74,8 @@ namespace perfectRAW
         [DllImport(@"dcraw.dll")]
         static extern void DCRAW_End();
 
-        [DllImport(@"image.dll")]
-        static extern void Convert48RGBto24BGR(ushort* buffer16, byte* buffer8, int width, int height, int extra);
+        [DllImport(@"colormng.dll",CharSet=CharSet.Ansi)]
+        static extern void Convert48RGBto24BGR(ushort* buffer16, byte* buffer8, int width, int height, int extra, float[,] cam_RGB, int colorspace, float gamma, string inProfileFile, string outProfileFile);
 
         public IMAGE_INFO info; // Esto hay que convertirlo en propiedad
         public DLL_PARAMETERS parameters;
@@ -88,6 +88,8 @@ namespace perfectRAW
         bool init = false;
         public bool first_time = true;
         public ushort* image;
+        float[] cam_WB = { 1F, 1F, 1F, 1F };
+        float[,] cam_RGB = { { 0.0F, 0.0F, 0.0F, 0.0F }, { 0.0F, 0.0F, 0.0F, 0.0F }, { 0.0F, 0.0F, 0.0F, 0.0F } };
 
         public Dcraw()
         {
@@ -101,13 +103,21 @@ namespace perfectRAW
         public int Init()
         {
             int _w = 0, _h = 0, _sat_level = 0, _black_level=0;
+            float[] _cam_WB = {0.0F,0.0F,0.0F,0.0F};
+            float[,] _cam_RGB = { { 0.0F, 0.0F, 0.0F, 0.0F }, { 0.0F, 0.0F, 0.0F, 0.0F }, { 0.0F, 0.0F, 0.0F, 0.0F } };
+
             info = new IMAGE_INFO();
             parameters = new DLL_PARAMETERS();
-            status = DCRAW_Init(_FileName, ref _w, ref _h, ref _sat_level, ref _black_level);
+            status = DCRAW_Init(_FileName, ref _w, ref _h, ref _sat_level, ref _black_level, _cam_WB, _cam_RGB);
             w = _w;
             h = _h;
             sat_level = _sat_level;
             black_level = _black_level;
+            for (int i = 0; i < 4; i++)
+            {
+                cam_WB[i] = _cam_WB[i];
+                for (int j = 0; j < 3; j++) cam_RGB[j,i] = _cam_RGB[j,i];                   
+            }
             DCRAW_DefaultParameters(ref parameters);
             init = true;            
             return status;
@@ -128,11 +138,15 @@ namespace perfectRAW
         {
             if (!init) Init();            
             //DCRAW_GetInfo(ref info);
-
         }
 
         public void Process()
         {
+            //string InProfile = @"";
+            //string OutProfile = @"";
+            string InProfile = @"c:\windows\system32\spool\drivers\color\Spyder2express.icm";
+            string OutProfile = @"c:\windows\system32\spool\drivers\color\sRGB Color Space Profile.icm";            
+            
             estado = -1;
             cancel = 0;
             if (!init) Init();
@@ -147,7 +161,7 @@ namespace perfectRAW
                 {
                     byte* ptr = (byte*)(data.Scan0);
                     extra = data.Stride - data.Width * 3;
-                    Convert48RGBto24BGR(image, ptr, data.Width, data.Height, extra);
+                    Convert48RGBto24BGR(image, ptr, data.Width, data.Height, extra, cam_RGB, 1, 0F, InProfile, OutProfile);
                 }
             }
             img.UnlockBits(data);
