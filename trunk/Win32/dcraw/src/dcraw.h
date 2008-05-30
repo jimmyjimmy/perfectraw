@@ -85,7 +85,7 @@ typedef struct DCRAW_State
 }DLL_STATE;
 
 DLLIMPORT void DCRAW_DefaultParameters(DLL_PARAMETERS *);
-DLLIMPORT int  DCRAW_Init(char *,int *,int *,int *, int *);
+DLLIMPORT int  DCRAW_Init(char *,int *,int *,int *, int *, float *, float *);
 DLLIMPORT void DCRAW_GetInfo(IMAGE_INFO *);
 DLLIMPORT unsigned short *DCRAW_Process(DLL_PARAMETERS *, int *, int *);
 DLLIMPORT void DCRAW_End();
