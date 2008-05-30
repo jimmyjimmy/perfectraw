@@ -9147,7 +9147,7 @@ void exposure_correction(void){
     }               
 }
 
-DLLIMPORT int DCRAW_Init(char *ifname,int *w,int *h, int *sat_level, int *black_level)
+DLLIMPORT int DCRAW_Init(char *ifname,int *w,int *h, int *sat_level, int *black_level, float *cam_WB, float *cam_RGB)
 {        
     // Still missing: pass user_flip, bpfile, dark_frame and use_camera_matrix as parameters to this function
     int arg, status=0;
@@ -9226,6 +9226,8 @@ DLLIMPORT int DCRAW_Init(char *ifname,int *w,int *h, int *sat_level, int *black_
     }    
     *sat_level=maximum;
     *black_level=black;
+    memcpy(cam_WB,cam_mul,sizeof cam_mul);
+    memcpy(cam_RGB,rgb_cam,sizeof rgb_cam);
     
     if (user_black >= 0) black = user_black;
     if (user_sat > 0) maximum = user_sat;        
