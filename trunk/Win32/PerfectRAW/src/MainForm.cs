@@ -483,7 +483,11 @@ namespace perfectRAW
                     button1.Enabled = false;
                 }
 
-                // Process RAW                
+                // Process RAW   
+                if (dcraw.first_time) label3.Text = "LEYENDO RAW";
+                this.Cursor = Cursors.WaitCursor;
+                label3.BackColor = Color.Red;
+                Application.DoEvents();
                 dcraw.GetInfo();
                 label8.Text = "(dcraw: " + dcraw.sat_level.ToString() + ")";
                 label9.Text = "(dcraw: " + dcraw.black_level.ToString() + ")";
@@ -492,7 +496,7 @@ namespace perfectRAW
                 //camera.Text = dcraw.info.camera_make + " " + dcraw.info.camera_model;
                 dcraw.cancel = 0;
                 dcraw.estado = -1;
-                label3.Text = "REVELANDO";
+                if (dcraw.first_time) label3.Text = "REVELANDO ETAPA 1";
                 this.Cursor = Cursors.WaitCursor;
                 label3.BackColor = Color.Red;
                 Application.DoEvents();
