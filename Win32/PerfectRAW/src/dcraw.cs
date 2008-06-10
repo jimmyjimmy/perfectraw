@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using System.Data;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Text;
 
 namespace perfectRAW
 {
@@ -17,10 +18,10 @@ namespace perfectRAW
         [StructLayout(LayoutKind.Sequential)]
         public struct IMAGE_INFO
         {
-            public String timestamp;
-            public String camera_make;
-            public String camera_model;
-            public String artist;
+            public StringBuilder timestamp;
+            public StringBuilder camera_make;
+            public StringBuilder camera_model;
+            public StringBuilder artist;
             public int iso_speed;
             public float shutter;
             public float aperture;
@@ -33,7 +34,7 @@ namespace perfectRAW
             public int out_width;
             public int out_height;
             public int raw_colors;
-            public String filter_pattern;
+            public StringBuilder filter_pattern;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -48,6 +49,8 @@ namespace perfectRAW
             public int user_sat;
             public int test_pattern;
             public int level_greens;
+            public float level_edge;
+            public int level_cell;
             public int user_qual;
             public int four_color_rgb;
             public int med_passes;
@@ -88,7 +91,7 @@ namespace perfectRAW
         bool init = false;
         public bool first_time = true;
         public ushort* image;
-        float[] cam_WB = { 1F, 1F, 1F, 1F };
+        public float[] cam_WB = { 1F, 1F, 1F, 1F };
         float[,] cam_RGB = { { 0.0F, 0.0F, 0.0F, 0.0F }, { 0.0F, 0.0F, 0.0F, 0.0F }, { 0.0F, 0.0F, 0.0F, 0.0F } };
 
         public Dcraw()

@@ -28,5 +28,6 @@ PX16 Gamma(PX16 , float );
 double powF (double , double );
 
 DLLIMPORT void Convert48RGBto24BGR(PX16 *, PX8 *, int, int, int, float *, int, float, char *, char *);
+DLLIMPORT void DrawImage(PX8 *, PX8 *, int , int , int , int , int , int , int , int , float , PX8 );
 
 #endif /* _COLORMNG_H_ */
