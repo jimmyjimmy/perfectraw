@@ -194,6 +194,8 @@ int flip, tiff_flip, colors;
 double pixel_aspect, aber[4]={1,1,1,1};
 float user_gamma=1; // added by Manuel Llorens
 int level_greens=0; // added by Manuel Llorens
+float level_edge=1.0; // added by Manuel Llorens
+int level_cell=8; // added by Manuel Llorens
 ushort (*image)[4], white[8][8], curve[0x4001], cr2_slice[3], sraw_mul[4];
 float bright=1, user_mul[4]={0,0,0,0}, threshold=0;
 int half_size=0, four_color_rgb=0, document_mode=0, highlight=0;
@@ -235,8 +237,10 @@ struct {
 
 #define SQR(x) ((x)*(x))
 #define ABS(x) (((int)(x) ^ ((int)(x) >> 31)) - ((int)(x) >> 31))
+#define ABSF(x) (x<0 ? -x : x)
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
+#define MAX3(a,b,c) MAX(a,MAX(b,c)) // Added by Manuel Llorens
 #define LIM(x,min,max) MAX(min,MIN(x,max))
 #define ULIM(x,y,z) ((y) < (z) ? LIM(x,y,z) : LIM(x,z,y))
 #define CLIP(x) LIM(x,0,65535)
@@ -3968,42 +3972,119 @@ void CLASS test_patterns()
     void CLASS eq_greens()
     {
       int row, col, c;
-      int h,w;
+      ushort sat_max,sat_min;
+      double val[2];
+      double cnt;
+      ushort v[2];
+      double f1,f2;
+      int ival[2];
       
-      h = height;
-      w = width;
+      // Get channel sub-coordinates inside 2x2 RAW pixels
+      // This makes code more readeable, at least for me,
+      // maybe just a bit slower
+      int x[4],y[4];
+
+      for(c=0;c<4;c++){
+         if(FC(0,0)==c){y[c]=0;x[c]=0;}
+         if(FC(0,1)==c){y[c]=0;x[c]=1;}
+         if(FC(1,1)==c){y[c]=1;x[c]=1;}
+         if(FC(1,0)==c){y[c]=1;x[c]=0;}
+      }
+
+      sat_max=maximum-25;
     	
-      // Equilibrado de canales verdes G1 y G2
-      if(level_greens>0){    
-          if (verbose) fprintf (stderr,_("Equilibrating green channels with mode "));
-          // Calculamos los valores medios quitando los muy bajos y los muy altos
-          long double val[3];
-          long double cnt[3];
-          double v[3];
-          cnt[1]=cnt[3]=0;
-          val[1]=val[3]=0;
-          for (row=0; row < h; row++)
-        	for (col=0; col < w; col++) {
-        	  c = FC(row,col);
-          	  if((c==1)||(c==3)) if((BAYER(row,col)>50)&&(BAYER(row,col)<65435)) {val[c]+=(long double)BAYER(row,col);cnt[c]++;}
-        	}
-         v[1]=(long double)val[1]/(long double)cnt[1];
-         v[3]=(long double)val[3]/(long double)cnt[3];     
-        	
-         long double fc1,fc2;
-         if(level_greens==2) {fc1=v[1]/v[3];if (verbose) fprintf (stderr,_("G2->G1. G2-G1 distance %f\n"),v[3]-v[1]);}
-         if(level_greens==1) {fc2=v[3]/v[1];if (verbose) fprintf (stderr,_("G1->G2. G2-G1 distance %f\n"),v[3]-v[1]);}
-         if(level_greens==3) {fc1=((v[1]+v[3])/2)/v[3];fc2=((v[1]+v[3])/2)/v[1];if (verbose) fprintf (stderr,_("G1-><-G2. G2-G1 distance %f\n"),v[3]-v[1]);}
+      // Green channels global equilibration
+      if (verbose) fprintf (stderr,_("Equilibrating green channels globaly"));
+      
+      for (cnt=val[0]=val[1]=row=0; row < height; row+=2)
+    	for (col=0; col < width; col+=2){
+          v[0]=BAYER(row+y[1],col+x[1]);
+    	  v[1]=BAYER(row+y[3],col+x[3]);
+      	  if((v[0]<sat_max)&&(v[1]<sat_max)) {val[0]+=v[0];val[1]+=v[1];cnt++;}
+    	}
+    	
+      if((cnt!=0)&&(val[0]!=0)&&(val[1]!=0)){
+          v[0]=val[0]/cnt;
+          v[1]=val[1]/cnt;
+
+          f1=(v[0]+v[1])/2;
+          f2=f1/v[1];
+          f1/=v[0];
+
+          for (row=0; row < height; row+=2)
+            for (col=0; col < width; col+=2) {
+           	  if((BAYER(row+y[1],col+x[1])<sat_max)) BAYER(row+y[1],col+x[1])*=f1;
+          	  if((BAYER(row+y[3],col+x[3])<sat_max)) BAYER(row+y[3],col+x[3])*=f2;
+            }
+      }
+      
+      // Green channels local equilibration
+      if(level_greens>1){
+         ushort *bufferG1, *bufferG2, pix;
+         int i,j,offset;
+         int S=level_cell;
+
+         bufferG1=calloc(width*height,sizeof *bufferG1);
+         bufferG2=calloc(width*height,sizeof *bufferG2);
          
-         // Reequilibramos los niveles
-         for (row=0; row < h; row++)
-           for (col=0; col < w; col++) {
-             c = FC(row,col);
-             if((c==3)&&(level_greens==2)) BAYER(row,col)=(ushort)CLIPF((double)BAYER(row,col)*fc1);
-        	 if((c==1)&&(level_greens==1)) BAYER(row,col)=(ushort)CLIPF((double)BAYER(row,col)*fc2);
-        	 if((c==3)&&(level_greens==3)) BAYER(row,col)=(ushort)CLIPF((double)BAYER(row,col)*fc1);
-          	 if((c==1)&&(level_greens==3)) BAYER(row,col)=(ushort)CLIPF((double)BAYER(row,col)*fc2);
-           }
+         // Bilinear interpolate G1 and G2 in two passes
+         for(row=0;row<height-2;row+=2)
+            for(col=0;col<width-2;col+=2){
+               // G1, right, then down
+               offset=(row+y[1])*width+col+x[1];
+               pix=BAYER(row+y[1],col+x[1]);
+               bufferG1[offset]=pix;
+               bufferG1[offset+1]=(pix + BAYER(row+y[1],col+x[1]+2)) >> 1;
+               bufferG1[offset+width]=(pix + BAYER(row+y[1]+2,col+x[1])) >> 1;
+               
+               // G2, right, then down
+               offset=(row+y[3])*width+col+x[3];
+               pix=BAYER(row+y[3],col+x[3]);
+               bufferG2[offset]=v;
+               bufferG2[offset+1]=(pix + BAYER(row+y[3],col+x[3]+2)) >> 1;
+               bufferG2[offset+width]=(pix + BAYER(row+y[3]+2,col+x[3])) >> 1;
+            }
+         for(row=0;row<height-2;row+=2)
+            for(col=0;col<width-2;col+=2){
+               // G1, right and down
+               bufferG1[(row+y[1]+1)*width+col+x[1]+1]=(bufferG1[(row+y[1])*width+col+x[1]+1] + bufferG1[(row+y[1]+1)*width+col+x[1]] + bufferG1[(row+y[1])*width+col+x[1]+2] + bufferG1[(row+y[1]+2)*width+col+x[1]]) >> 2;
+               
+               // G2, right and down
+               bufferG2[(row+y[3]+1)*width+col+x[3]+1]=(bufferG2[(row+y[3])*width+col+x[3]+1] + bufferG2[(row+y[3]+1)*width+col+x[3]] + bufferG2[(row+y[3])*width+col+x[3]+2] + bufferG2[(row+y[3]+2)*width+col+x[3]]) >> 2;
+            }
+
+         // Perform local equilibration with mean grean leves in S*S square cells around each pixel
+         for(row=S;row<height-S;row+=2)
+            for(col=S;col<width-S;col+=2){
+                v[0]=BAYER(row+y[1],col+x[1]);
+                v[1]=BAYER(row+y[3],col+x[3]);
+                // Check if green channels are saturated for this raw pixel
+                if((v[0]<sat_max)&&(v[1]<sat_max)){
+                  // Calculate G1 and G2 mean value around pixel
+                  for(cnt=ival[0]=ival[1]=0,i=row-S;(i<row+S)&&(i<height);i++){
+                     for(j=col-S,offset=i*width+j;(j<col+S)&&(j<width);j++,offset++){
+                        if(((v[0]=bufferG1[offset])<sat_max)&&((v[1]=bufferG2[offset])<sat_max)){
+                           cnt++;
+                           ival[0]+=v[0];
+                           ival[1]+=v[1];
+                        }
+                     }
+                  }
+                  val[0]=(double)ival[0];
+                  val[1]=(double)ival[1];
+                  if((cnt!=0)&&(val[0]!=0)&&(val[1]!=0)){
+                     val[0]/=cnt;
+                     val[1]/=cnt;
+                     f1=(val[0]+val[1])/2;
+                     f2=f1/val[1];
+                     f1/=val[0];
+                     BAYER(row+y[1],col+x[1])*=f1;
+                     BAYER(row+y[3],col+x[3])*=f2;
+                  }
+               }
+            }
+         if (bufferG1) free (bufferG1);
+         if (bufferG2) free (bufferG2);
       }
 }
 // End: added by Manuel Llorens
@@ -4030,14 +4111,14 @@ void CLASS pre_interpolate()
       shrink = 0;
     }
   }
-    
+      
   if (filters && colors == 3) {
     if ((mix_green = four_color_rgb)) colors++;
     else {      
       for (row = FC(1,0) >> 1; row < height; row+=2)     
 	for (col = FC(row,1) & 1; col < width; col+=2)            
        image[row*width+col][1] = image[row*width+col][3];
-      filters &= ~((filters & 0x55555555) << 1);      
+      filters &= ~((filters & 0x55555555) << 1);            
     }
   }  
   if (half_size) filters = 0;
@@ -4441,6 +4522,129 @@ void CLASS ahd_interpolate()
     }
   free (buffer);
 }
+
+#undef TS
+
+#define TS 256		/* Tile Size */
+
+void CLASS cpm_interpolate ()
+{
+   // Deal with Coffin filters system
+   int x[4],y[4];
+   int c;
+   
+   for(c=0;c<colors;c++){
+      if(FC(0,0)==c){y[c]=0;x[c]=0;}
+      if(FC(0,1)==c){y[c]=0;x[c]=1;}
+      if(FC(1,1)==c){y[c]=1;x[c]=1;}
+      if(FC(1,0)==c){y[c]=1;x[c]=0;}
+   }
+   
+   int w,h;
+   w=width;
+   h=height;
+   
+   // Prepare color propagation maps (H and V)
+   int i,j,rm,offset;
+   ushort *cpmH, *cpmV, (*buffer)[4], pix;
+   int scl=(int)(100.0/(float)maximum);
+   
+   cpmH=calloc(w*h,2);
+   cpmV=calloc(w*h,2);
+   buffer = (ushort (*)[4]) calloc (iheight*iwidth, sizeof *image);
+
+   for(i=1;i<h-1;i++){
+      rm=i*w;
+      for(j=1;j<w-1;j++){
+         cpmH[rm+j]=ABS((int)BAYER(i,j-1)-(int)BAYER(i,j+1))*scl;
+         cpmV[rm+j]=ABS((int)BAYER(i-1,j)-(int)BAYER(i+1,j))*scl;
+      }
+   }
+
+   // Interpolate 2 pixels in the border
+   border_interpolate(2);
+   
+   // Prepare image with a bit sharper bilineal interpolation
+   for(i=0;i<h-2;i+=2){
+      for(j=0;j<w-2;j+=2){
+         for(c=0;c<colors;c++){
+            offset=(i+y[c])*w+j+x[c];
+            pix=BAYER(i+y[c],j+x[c]);
+            image[offset][c]=pix;
+            image[offset+1][c]=(pix + BAYER(i+y[c],j+x[c]+2)) >> 1;
+            image[offset+width][c]=(pix + BAYER(i+y[c]+2,j+x[c])) >> 1;
+         }
+      }
+   }
+
+   for(i=0;i<h-2;i+=2){
+      for(j=0;j<w-2;j+=2){
+         for(c=0;c<colors;c++){
+            offset=(i+y[c])*w+j+x[c];
+            if(cpmH[offset+1]<cpmH[offset+1]){
+               image[offset+width+1][c]=(image[offset+width][c]+image[offset+width+2][c]) >> 1;
+            }else{
+               image[offset+width+1][c]=(image[offset+1][c]+image[offset+2*width+1][c]) >> 1;
+            }
+         }
+      }
+   }
+
+/*   memcpy(buffer,image,w*h*8);
+
+   // Perform cpm interpolation
+   // 1st pass
+   for(i=4;i<h-4;i+=2){
+      for(j=4;j<w-4;j+=2){
+         for(c=0;c<colors;c++){
+            offset=(i+y[c])*w+j+x[c];
+            if(cpmH[offset+1]<cpmV[offset+1]){
+               buffer[offset+1][c]=(buffer[offset][c]+buffer[offset+2][c]) >> 1;
+            }
+            if(cpmV[offset+width]<cpmH[offset+width]){
+               buffer[offset+width][c]=(buffer[offset][c]+buffer[offset+2*width][c]) >> 1;
+            }
+         }
+      }
+   }
+
+   // 2nd pass
+   for(i=4;i<h-4;i+=2){
+      for(j=4;j<w-4;j+=2){
+         for(c=0;c<colors;c++){
+            offset=(i+y[c])*w+j+x[c];
+            if(cpmH[offset+1]>cpmV[offset+1]){
+               buffer[offset+1][c]=(buffer[offset-width+1][c]+buffer[offset+width+1][c]) >> 1;
+            }
+            if(cpmV[offset+width]>cpmH[offset+width]){
+               buffer[offset+width][c]=(buffer[offset+width-1][c]+buffer[offset+width+1][c]) >> 1;
+            }
+         }
+      }
+   }
+   
+   // 3rd pass
+   for(i=4;i<h-4;i+=2){
+      for(j=4;j<w-4;j+=2){
+         for(c=0;c<colors;c++){
+            offset=(i+y[c])*w+j+x[c];
+            if(cpmH[offset+width+1]<cpmV[offset+width+1]){
+               buffer[offset+width+1][c]=(buffer[offset+width][c]+buffer[offset+width+2][c]) >> 1;
+            }
+            if(cpmV[offset+width+1]<cpmH[offset+width+1]){
+               buffer[offset+width+1][c]=(buffer[offset+1][c]+buffer[offset+2*width+1][c]) >> 1;
+            }
+         }
+      }
+   }
+
+   memcpy(image,buffer,w*h*8);*/
+
+   free (cpmH);
+   free (cpmV);
+   free (buffer);
+}
+
 #undef TS
 
 void CLASS median_filter ()
@@ -8814,10 +9018,10 @@ void RestoreState(int ID){
         if (user_sat > 0) maximum = user_sat;
         
         if(image){
-           free(image);    
+           free(image);
            image=NULL;
         }
-        image = (ushort (*)[4]) calloc (iheight*iwidth, sizeof *image);     
+        image = (ushort (*)[4]) calloc (iheight*iwidth, sizeof *image);
         memcpy(image,state[ID].buffer,iheight*iwidth*sizeof *image);
         if(verbose) printf("Restored state %i\n",ID);
     }
@@ -8835,6 +9039,8 @@ void SetParameters(DLL_PARAMETERS *p){
     user_sat=p->user_sat;
     test_pattern=p->test_pattern;
     level_greens=p->level_greens;
+    level_edge=p->level_edge;
+    level_cell=p->level_cell;
     user_qual=p->user_qual;
     four_color_rgb=p->four_color_rgb;
     med_passes=p->med_passes;
@@ -8855,6 +9061,8 @@ void SetParameters(DLL_PARAMETERS *p){
     params.user_sat=user_sat;
     params.test_pattern=test_pattern;
     params.level_greens=level_greens;
+    params.level_edge=level_edge;
+    params.level_cell=level_cell;
     params.user_qual=user_qual;
     params.four_color_rgb=four_color_rgb;
     params.med_passes=med_passes;
@@ -8864,6 +9072,15 @@ void SetParameters(DLL_PARAMETERS *p){
     params.user_gamma=user_gamma;           
     params.exposure=exposure;
     params.preserve=preserve;
+    
+    // Set calculated parameters
+    if (user_qual >= 0) quality = user_qual;
+    if (user_black >= 0) black = user_black;
+    if (user_sat > 0) maximum = user_sat;
+    
+    shrink = filters &&	(half_size || threshold || aber[0] != 1 || aber[2] != 1);
+    iheight = (height + shrink) >> shrink;
+    iwidth  = (width  + shrink) >> shrink;
 }
 
 void SetDefaults(void)
@@ -8887,6 +9104,8 @@ void SetDefaults(void)
     user_sat=-1;
     test_pattern=0;
     level_greens=0;
+    level_edge=1.0;
+    level_cell=8;
     user_qual=0;
     four_color_rgb=0;
     med_passes=0;
@@ -8943,6 +9162,8 @@ void SetDefaults(void)
     params.user_sat=user_sat;
     params.test_pattern=test_pattern;
     params.level_greens=level_greens;
+    params.level_edge=level_edge;
+    params.level_cell=level_cell;
     params.user_qual=user_qual;
     params.four_color_rgb=four_color_rgb;
     params.med_passes=med_passes;
@@ -8998,6 +9219,8 @@ DLLIMPORT void DCRAW_DefaultParameters(DLL_PARAMETERS *p)
     p->user_sat=-1;    
     p->test_pattern=0;
     p->level_greens=0;
+    p->level_edge=1.0;
+    p->level_cell=8;
     p->user_qual=0;
     p->four_color_rgb=0;
     p->med_passes=0;
@@ -9009,90 +9232,7 @@ DLLIMPORT void DCRAW_DefaultParameters(DLL_PARAMETERS *p)
     p->preserve=0;    
 }
 
-void exposure_correction(void){
-   /* int i;
-    float Y, Yp, exposure2, K1, K2, EV;
-    
-    if(verbose) printf("Exposure correction ");
-    switch(preserve){
-       case 0:
-           // Exposure correction without highlight preservation
-           if(verbose) printf("without highlight preservation\n");
-           for(i=0;i<height*width;i++){
-             image[i][0]=CLIP((float)image[i][0]*exposure); // R
-             image[i][1]=CLIP((float)image[i][1]*exposure); // G (mixed)
-             image[i][2]=CLIP((float)image[i][2]*exposure); // B
-           }
-           break;
-       case 1:
-           // Exposure correction with highlight preservation, CIE luminosty
-           if(verbose) printf("with highlight preservation: CIE luminosity\n");
-           if(exposure>1){
-               K1=32768/exposure;
-               K2=65535-K1;
-               for(i=0;i<height*width;i++){
-                 Y=0.299*(float)image[i][0]+0.587*(float)image[i][1]+0.114*(float)image[i][2]; // CIE luminosity
-                 if(Y<K1){
-                    image[i][0]=CLIP((float)image[i][0]*exposure); // R
-                    image[i][1]=CLIP((float)image[i][1]*exposure); // G (mixed)
-                    image[i][2]=CLIP((float)image[i][2]*exposure); // B
-                 }else{
-                    Yp=32767*(Y-65535)/K2+65535;
-                    exposure2=Yp/Y;
-                    image[i][0]=CLIP((float)image[i][0]*exposure2); // R
-                    image[i][1]=CLIP((float)image[i][1]*exposure2); // G (mixed)
-                    image[i][2]=CLIP((float)image[i][2]*exposure2); // B
-                 }
-               }
-           }else{
-               EV=log(exposure)/log(2.0);
-               for(i=0;i<height*width;i++){
-                 Y=0.299*(float)image[i][0]+0.587*(float)image[i][1]+0.114*(float)image[i][2]; // CIE luminosity
-                 if(Y<32768){
-                    image[i][0]=CLIP((float)image[i][0]*exposure); // R
-                    image[i][1]=CLIP((float)image[i][1]*exposure); // G (mixed)
-                    image[i][2]=CLIP((float)image[i][2]*exposure); // B
-                 }else{                    
-                    exposure2=powF(2,-2*EV*(Y/65535.0-1));
-                    image[i][0]=CLIP((float)image[i][0]*exposure2); // R
-                    image[i][1]=CLIP((float)image[i][1]*exposure2); // G (mixed)
-                    image[i][2]=CLIP((float)image[i][2]*exposure2); // B
-                 }
-               }             
-           }
-           break;                
-       case 2:
-           // Exposure correction with highlight preservation, HSV luminosity
-           if(verbose) printf("with highlight preservation: : HSV luminosity\n");
-           if(exposure>1){
-               K1=32768/exposure;
-               K2=65535-K1;
-               for(i=0;i<height*width;i++){
-                 Y=MAX((float)image[i][0],MAX((float)image[i][1],(float)image[i][2])); // HSV luminosity
-                 exposure2=MIN(exposure,65535.0/Y);
-                 image[i][0]=CLIP((float)image[i][0]*exposure2); // R
-                 image[i][1]=CLIP((float)image[i][1]*exposure2); // G (mixed)
-                 image[i][2]=CLIP((float)image[i][2]*exposure2); // B
-               }
-           }else{
-               EV=log(exposure)/log(2.0);
-               for(i=0;i<height*width;i++){
-                 Y=0.299*(float)image[i][0]+0.587*(float)image[i][1]+0.114*(float)image[i][2]; // CIE luminosity
-                 if(Y<32768){
-                    image[i][0]=CLIP((float)image[i][0]*exposure); // R
-                    image[i][1]=CLIP((float)image[i][1]*exposure); // G (mixed)
-                    image[i][2]=CLIP((float)image[i][2]*exposure); // B
-                 }else{                    
-                    exposure2=powF(2,-2*EV*(Y/65535.0-1));
-                    image[i][0]=CLIP((float)image[i][0]*exposure2); // R
-                    image[i][1]=CLIP((float)image[i][1]*exposure2); // G (mixed)
-                    image[i][2]=CLIP((float)image[i][2]*exposure2); // B
-                 }
-               }             
-           }
-           break;                
-    }*/
-        
+void exposure_correction(void){        
     // This function uses parameters:            
     //      exposure (lineal): 2^(-8..0..8)
     //      preserve (log)   : 0..8
@@ -9201,7 +9341,7 @@ DLLIMPORT int DCRAW_Init(char *ifname,int *w,int *h, int *sat_level, int *black_
       meta_data = (char *) malloc (meta_length);
       merror (meta_data, "main()");
     }
-    fseeko (ifp, data_offset, SEEK_SET);    
+    fseeko (ifp, data_offset, SEEK_SET);
     (*load_raw)();    
     fclose(ifp);    
     
@@ -9285,6 +9425,8 @@ int CompareParams(DLL_PARAMETERS *p)
     if(params.user_sat!=p->user_sat) {s=2;goto CHECK;}    
     if(params.test_pattern!=p->test_pattern) {s=2;goto CHECK;}
     if(params.level_greens!=p->level_greens) {s=2;goto CHECK;}
+    if(params.level_edge!=p->level_edge) {s=2;goto CHECK;}
+    if(params.level_cell!=p->level_cell) {s=2;goto CHECK;}
     if(params.highlight!=p->highlight) {s=2;goto CHECK;} 
     if(params.user_qual!=p->user_qual) {s=3;goto CHECK;}
     if(params.four_color_rgb!=p->four_color_rgb) {s=3;goto CHECK;}
@@ -9298,6 +9440,66 @@ int CompareParams(DLL_PARAMETERS *p)
 CHECK:    
     while((state[s-1].valid==0)&&(s>2)) s--; // check down to the last optimal valid state    
     return(s);
+}
+
+inline float CIE_L(int offset)
+{
+    return 0.299*(float)image[offset][0]+0.587*(float)image[offset][1]+0.114*(float)image[offset][2]; // CIE luminosity
+}
+
+CLASS void sharpen()
+{
+    int i,j,offset,c,k;
+    int thres1,thres2,thres3;
+    float g;
+    ushort u;
+
+    thres1=20;
+    thres2=4;
+    thres3=10;
+
+    ushort (*bufferH)[4], (*bufferV)[4];
+    int *gradH, *gradV;
+    
+    bufferH=calloc(width*height,sizeof *bufferH);
+    bufferV=calloc(width*height,sizeof *bufferV);
+    gradH=calloc(width,sizeof *gradH);
+    gradV=calloc(height,sizeof *gradV);
+    
+    memset(bufferH,0,width*height*2*3);
+    memset(bufferV,0,width*height*2*3);
+    for(offset=i=0;i<height-1;i++){
+       for(j=0;j<width-1;j++,offset++){
+          /*// Create medium H gradients for CIE luminosity
+          gradH[j]=(int)(CIE_L(offset)-CIE_L(offset+1));
+          if(j==width/2){
+             if(gradH[j]>0)
+                for(k=0;(k<(gradH[j]>>8)&&(k<i));k++) image[offset-k*width][0]=65535;
+             else
+                for(k=0;(k>(gradH[j]>>8)&&(k+i<height));k--) image[offset-k*width][0]=65535;
+          }*/
+          //g=CIE_L(offset+1)-CIE_L(offset);
+          g=MAX3(ABS(image[offset+1][0]-image[offset][0]),ABS(image[offset+1][1]-image[offset][1]),ABS(image[offset+1][2]-image[offset][2]));
+          u=(ushort)ABSF(g);
+          bufferH[offset][0]=u;
+          
+          //g=CIE_L(offset+width)-CIE_L(offset);
+          g=MAX3(ABS(image[offset+width][0]-image[offset][0]),ABS(image[offset+width][1]-image[offset][1]),ABS(image[offset+width][2]-image[offset][2]));
+          u=(ushort)ABSF(g);
+          bufferV[offset][0]=u;
+       }
+       offset++;
+    }
+    
+    for(i=0;i<width*height;i++){
+       u=MAX(bufferV[i][0],bufferH[i][0]);
+       if(u>1050) FORCC image[i][c]=0;
+    }
+    
+    free (bufferV);
+    free (bufferH);
+    free (gradH);
+    free (gradV);
 }
 
 DLLIMPORT unsigned short * DCRAW_Process(DLL_PARAMETERS *p, int *cancel, int *status)
@@ -9347,25 +9549,26 @@ DLLIMPORT unsigned short * DCRAW_Process(DLL_PARAMETERS *p, int *cancel, int *st
     }
     
 STAGE2:
-    if(test_pattern) test_patterns();
-    if(level_greens) eq_greens();
-    if (!is_foveon && document_mode < 2) scale_colors();
+    if(test_pattern) test_patterns();    
+    if(level_greens) eq_greens();    
+    if (!is_foveon && document_mode < 2) scale_colors();        
     // Here we take buffer 2
     if(SaveState(2,*cancel-first_time)!=0) *status=3; else return NULL;
        
 STAGE3:    
+
     if (is_foveon && !document_mode) foveon_interpolate();  // Beware, this have been changed from it's main() position
     pre_interpolate();    
     if (filters && !document_mode) {
-      if (quality == 0)
-	lin_interpolate();
-      else if (quality == 1 || colors > 3)      
-	vng_interpolate();
-      else if (quality == 2)
-	ppg_interpolate();
-      else ahd_interpolate();
+      if (quality == 0) lin_interpolate();
+      if (quality == 1) vng_interpolate();
+      if (quality == 2) ppg_interpolate();
+      if (quality == 3) ahd_interpolate();
+      if (quality == 4) cpm_interpolate();
     }
-    if (mix_green) for (colors=3, i=0; i < height*width; i++) image[i][1] = (image[i][1] + image[i][3]) >> 1;    
+
+    if (mix_green) for (colors=3, i=0; i < height*width; i++) image[i][1] = (image[i][1] + image[i][3]) >> 1;
+    //sharpen();
     // Here we take buffer 3
     if(SaveState(3,*cancel-first_time)!=0) *status=4; else return NULL;
     
@@ -9411,7 +9614,7 @@ DLLIMPORT void DCRAW_End(void)
     
     if (indpow01) free (indpow01);
     if (meta_data) free (meta_data);
-    if (image) free (image);        
+    if (image) free (image);
     indpow01=NULL;
     meta_data=NULL;
     image=NULL;

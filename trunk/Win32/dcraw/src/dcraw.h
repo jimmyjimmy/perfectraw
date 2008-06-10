@@ -29,34 +29,31 @@ typedef struct DCRAW_ImageInfo
        int   raw_colors;
        char  *filter_pattern;
 }IMAGE_INFO;
-
-typedef struct DLL_TEST
-{
-        int  a;
-        char *b;
-}TEST;
             
 // Struct for passing parameters to the development process
+// * implemented in perfectRAW
 typedef struct DCRAW_Parameters
 {       
-       float    threshold;         // -n -> buffer 2
-       double   aber[4];           // -r -> buffer 2
-       int      use_auto_wb;       // -a -> buffer 2
-       int      use_camera_wb;     // -w -> buffer 2
-       unsigned greybox[4];        // -A -> buffer 2      
-       int      user_black;        // -K -> buffer 2
-       int      user_sat;          // -S -> buffer 2
-       int      test_pattern;      //    -> buffer 2       
-       int      level_greens;      // -l -> buffer 2       
-       int      user_qual;         // -q -> buffer 3
-       int      four_color_rgb;    // -f -> buffer 3
-       int      med_passes;        // -m -> buffer 4
-       int      highlight;         // -H -> buffer 4
-       int      output_color;      // -o -> buffer 5                     
-       int      use_fuji_rotate;   // -J -> buffer 5
-       float    user_gamma;        // -g -> buffer 5       
-       float    exposure;          //    -> buffer 4
-       float    preserve;          //    -> buffer 4
+       float    threshold;         // -n    -> buffer 2 *
+       double   aber[4];           // -r/-C -> buffer 2 *
+       int      use_auto_wb;       // -a    -> buffer 2 *
+       int      use_camera_wb;     // -w    -> buffer 2 *
+       unsigned greybox[4];        // -A    -> buffer 2      
+       int      user_black;        // -K    -> buffer 2 *
+       int      user_sat;          // -S    -> buffer 2 *
+       int      test_pattern;      //       -> buffer 2 -
+       int      level_greens;      // -l    -> buffer 2 *       
+       float    level_edge;        //       -> buffer 2 *
+       int      level_cell;        //       -> buffer 2 *
+       int      user_qual;         // -q    -> buffer 3 *
+       int      four_color_rgb;    // -f    -> buffer 3 *
+       int      med_passes;        // -m    -> buffer 4 *
+       int      highlight;         // -H    -> buffer 4 *
+       int      output_color;      // -o    -> buffer 5                   
+       int      use_fuji_rotate;   // -J    -> buffer 5 
+       float    user_gamma;        // -g    -> buffer 5       
+       float    exposure;          //       -> buffer 4 *
+       float    preserve;          //       -> buffer 4 *
 }DLL_PARAMETERS;
 
 // Struct for saving and restoring DLL state
