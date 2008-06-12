@@ -4053,23 +4053,52 @@ void CLASS test_patterns()
                bufferG2[(row+y[3]+1)*width+col+x[3]+1]=(bufferG2[(row+y[3])*width+col+x[3]+1] + bufferG2[(row+y[3]+1)*width+col+x[3]] + bufferG2[(row+y[3])*width+col+x[3]+2] + bufferG2[(row+y[3]+2)*width+col+x[3]]) >> 2;
             }
 
-         // Perform local equilibration with mean grean leves in S*S square cells around each pixel
-         for(row=S;row<height-S;row+=2)
+         // Perform local equilibration with mean green levels in S*S square cells around each pixel
+         for(row=S;row<height-S;row+=2){
+            // Calculate G1 and G2 mean value around pixel
+            for(cnt=ival[0]=ival[1]=0,i=row-S;i<row+S;i++){
+               for(offset=i*width;offset<i*width+2*S;offset++){
+                  if(((v[0]=bufferG1[offset])<sat_max)&&((v[1]=bufferG2[offset])<sat_max)){
+                     cnt++;
+                     ival[0]+=v[0];
+                     ival[1]+=v[1];
+                  }
+               }
+            }
             for(col=S;col<width-S;col+=2){
-                v[0]=BAYER(row+y[1],col+x[1]);
-                v[1]=BAYER(row+y[3],col+x[3]);
-                // Check if green channels are saturated for this raw pixel
-                if((v[0]<sat_max)&&(v[1]<sat_max)){
-                  // Calculate G1 and G2 mean value around pixel
-                  for(cnt=ival[0]=ival[1]=0,i=row-S;(i<row+S)&&(i<height);i++){
-                     for(j=col-S,offset=i*width+j;(j<col+S)&&(j<width);j++,offset++){
-                        if(((v[0]=bufferG1[offset])<sat_max)&&((v[1]=bufferG2[offset])<sat_max)){
-                           cnt++;
-                           ival[0]+=v[0];
-                           ival[1]+=v[1];
-                        }
+               if(col!=S){
+                  // Recalculate mean value of G1 and G2
+                  for(offset=(row-S)*width+col-S;offset<(row+S)*width+col-S;offset+=width){
+                     // Subtract left column
+                     if(((v[0]=bufferG1[offset-2])<sat_max)&&((v[1]=bufferG2[offset-2])<sat_max)){
+                        cnt--;
+                        ival[0]-=v[0];
+                        ival[1]-=v[1];
+                     }
+                     if(((v[0]=bufferG1[offset-1])<sat_max)&&((v[1]=bufferG2[offset-1])<sat_max)){
+                        cnt--;
+                        ival[0]-=v[0];
+                        ival[1]-=v[1];
+                     }
+                     // Add right column
+                     if(((v[0]=bufferG1[offset+2*S-1])<sat_max)&&((v[1]=bufferG2[offset+2*S-1])<sat_max)){
+                        cnt++;
+                        ival[0]+=v[0];
+                        ival[1]+=v[1];
+                     }
+                     if(((v[0]=bufferG1[offset+2*S])<sat_max)&&((v[1]=bufferG2[offset+2*S])<sat_max)){
+                        cnt++;
+                        ival[0]+=v[0];
+                        ival[1]+=v[1];
                      }
                   }
+               }
+
+               v[0]=BAYER(row+y[1],col+x[1]);
+               v[1]=BAYER(row+y[3],col+x[3]);
+
+               // Check if green channels are saturated for this raw pixel
+               if((v[0]<sat_max)&&(v[1]<sat_max)){
                   val[0]=(double)ival[0];
                   val[1]=(double)ival[1];
                   if((cnt!=0)&&(val[0]!=0)&&(val[1]!=0)){
@@ -4083,6 +4112,7 @@ void CLASS test_patterns()
                   }
                }
             }
+         }
          if (bufferG1) free (bufferG1);
          if (bufferG2) free (bufferG2);
       }
@@ -4564,7 +4594,7 @@ void CLASS cpm_interpolate ()
    // Interpolate 2 pixels in the border
    border_interpolate(2);
    
-   // Prepare image with a bit sharper bilineal interpolation
+   // Prepare image with a bit of sharper bilineal interpolation
    for(i=0;i<h-2;i+=2){
       for(j=0;j<w-2;j+=2){
          for(c=0;c<colors;c++){
@@ -9398,7 +9428,7 @@ DLLIMPORT void DCRAW_GetInfo(IMAGE_INFO *info)
    info->raw_colors=colors;
    info->filter_pattern="";
    
-   // More info to implement later plus camera white balance coefs.
+   // More info to implement later
 /*      if (dng_version) {
 	printf (_("DNG Version: "));
 	for (i=24; i >= 0; i -= 8)
@@ -9449,57 +9479,143 @@ inline float CIE_L(int offset)
 
 CLASS void sharpen()
 {
-    int i,j,offset,c,k;
-    int thres1,thres2,thres3;
-    float g;
-    ushort u;
-
-    thres1=20;
-    thres2=4;
-    thres3=10;
-
-    ushort (*bufferH)[4], (*bufferV)[4];
-    int *gradH, *gradV;
+    int i,j,offset,c;
+    float g[4];
+    float v[5];
+    int gi[4];
+    ushort (*bufferH)[4], (*bufferV)[4], (*bufferD1)[4], (*bufferD2)[4], *bufferL;
     
     bufferH=calloc(width*height,sizeof *bufferH);
     bufferV=calloc(width*height,sizeof *bufferV);
-    gradH=calloc(width,sizeof *gradH);
-    gradV=calloc(height,sizeof *gradV);
+    bufferD1=calloc(width*height,sizeof *bufferD1);
+    bufferD2=calloc(width*height,sizeof *bufferD2);
+    bufferL=calloc(width*height,sizeof *bufferL);
     
-    memset(bufferH,0,width*height*2*3);
-    memset(bufferV,0,width*height*2*3);
-    for(offset=i=0;i<height-1;i++){
-       for(j=0;j<width-1;j++,offset++){
-          /*// Create medium H gradients for CIE luminosity
-          gradH[j]=(int)(CIE_L(offset)-CIE_L(offset+1));
-          if(j==width/2){
-             if(gradH[j]>0)
-                for(k=0;(k<(gradH[j]>>8)&&(k<i));k++) image[offset-k*width][0]=65535;
-             else
-                for(k=0;(k>(gradH[j]>>8)&&(k+i<height));k--) image[offset-k*width][0]=65535;
-          }*/
-          //g=CIE_L(offset+1)-CIE_L(offset);
-          g=MAX3(ABS(image[offset+1][0]-image[offset][0]),ABS(image[offset+1][1]-image[offset][1]),ABS(image[offset+1][2]-image[offset][2]));
-          u=(ushort)ABSF(g);
-          bufferH[offset][0]=u;
+    for(offset=0;offset<width*height;offset++) bufferL[offset]=(ushort)CIE_L(offset);
+
+    for(i=2;i<height-2;i++){
+       for(offset=i*width+2,j=2;j<width-2;j++,offset++){
+          g[0]=ABS(bufferL[offset-2]-bufferL[offset-1]);
+          g[1]=ABS(bufferL[offset+1]-bufferL[offset]);
+          g[2]=ABS(bufferL[offset-1]-bufferL[offset]);
+          g[3]=ABS(bufferL[offset+2]-bufferL[offset+1]);
           
-          //g=CIE_L(offset+width)-CIE_L(offset);
-          g=MAX3(ABS(image[offset+width][0]-image[offset][0]),ABS(image[offset+width][1]-image[offset][1]),ABS(image[offset+width][2]-image[offset][2]));
-          u=(ushort)ABSF(g);
-          bufferV[offset][0]=u;
+          if(g[1]<g[0]){
+             gi[1]=gi[0]=0;
+          }else{
+             gi[0]=1;
+             if(g[1]*2>g[0]) gi[1]=1; else gi[1]=0;
+          }
+          if(g[2]<g[3]){
+             gi[2]=gi[3]=0;
+          }else{
+             gi[3]=1;
+             if(g[2]*2>g[3]) gi[2]=1; else gi[2]=0;
+          }
+          
+          FORCC {
+             if(gi[0]==1) v[0]=image[offset-1][c]; else v[0]=image[offset][c];
+             if(gi[1]==1) v[1]=image[offset-1][c]; else v[1]=image[offset][c];
+             v[2]=image[offset][c];
+             if(gi[2]==1) v[3]=image[offset+1][c]; else v[3]=image[offset][c];
+             if(gi[3]==1) v[4]=image[offset+1][c]; else v[4]=image[offset][c];
+             bufferH[offset][c]=(v[0]+v[1]+v[2]+v[3]+v[4]) / 5;
+          }
+          
+          g[0]=ABS(bufferL[offset-2*width]-bufferL[offset-width]);
+          g[1]=ABS(bufferL[offset+width]-bufferL[offset]);
+          g[2]=ABS(bufferL[offset-width]-bufferL[offset]);
+          g[3]=ABS(bufferL[offset+2*width]-bufferL[offset+width]);
+          
+          if(g[1]<g[0]){
+             gi[1]=gi[0]=0;
+          }else{
+             gi[0]=1;
+             if(g[1]*2>g[0]) gi[1]=1; else gi[1]=0;
+          }
+          if(g[2]<g[3]){
+             gi[2]=gi[3]=0;
+          }else{
+             gi[3]=1;
+             if(g[2]*2>g[3]) gi[2]=1; else gi[2]=0;
+          }
+
+          FORCC {
+             if(gi[0]==1) v[0]=image[offset-width][c]; else v[0]=image[offset][c];
+             if(gi[1]==1) v[1]=image[offset-width][c]; else v[1]=image[offset][c];
+             v[2]=image[offset][c];
+             if(gi[2]==1) v[3]=image[offset+width][c]; else v[3]=image[offset][c];
+             if(gi[3]==1) v[4]=image[offset+width][c]; else v[4]=image[offset][c];
+             bufferV[offset][c]=(v[0]+v[1]+v[2]+v[3]+v[4]) / 5;
+          }
+          
+          g[0]=ABS(bufferL[offset-2*width-2]-bufferL[offset-width-1]);
+          g[1]=ABS(bufferL[offset+width+1]-bufferL[offset]);
+          g[2]=ABS(bufferL[offset-width-1]-bufferL[offset]);
+          g[3]=ABS(bufferL[offset+2*width-2]-bufferL[offset+width+1]);
+
+          if(g[1]<g[0]){
+             gi[1]=gi[0]=0;
+          }else{
+             gi[0]=1;
+             if(g[1]*2>g[0]) gi[1]=1; else gi[1]=0;
+          }
+          if(g[2]<g[3]){
+             gi[2]=gi[3]=0;
+          }else{
+             gi[3]=1;
+             if(g[2]*2>g[3]) gi[2]=1; else gi[2]=0;
+          }
+
+          FORCC {
+             if(gi[0]==1) v[0]=image[offset-width-1][c]; else v[0]=image[offset][c];
+             if(gi[1]==1) v[1]=image[offset-width-1][c]; else v[1]=image[offset][c];
+             v[2]=image[offset][c];
+             if(gi[2]==1) v[3]=image[offset+width+1][c]; else v[3]=image[offset][c];
+             if(gi[3]==1) v[4]=image[offset+width+1][c]; else v[4]=image[offset][c];
+             bufferD1[offset][c]=(v[0]+v[1]+v[2]+v[3]+v[4]) / 5;
+          }
+          
+          g[0]=ABS(bufferL[offset-2*width+2]-bufferL[offset-width+1]);
+          g[1]=ABS(bufferL[offset+width-1]-bufferL[offset]);
+          g[2]=ABS(bufferL[offset-width+1]-bufferL[offset]);
+          g[3]=ABS(bufferL[offset+2*width-2]-bufferL[offset+width-1]);
+
+          if(g[1]<g[0]){
+             gi[1]=gi[0]=0;
+          }else{
+             gi[0]=1;
+             if(g[1]*2>g[0]) gi[1]=1; else gi[1]=0;
+          }
+          if(g[2]<g[3]){
+             gi[2]=gi[3]=0;
+          }else{
+             gi[3]=1;
+             if(g[2]*2>g[3]) gi[2]=1; else gi[2]=0;
+          }
+
+          FORCC {
+             if(gi[0]==1) v[0]=image[offset-width+1][c]; else v[0]=image[offset][c];
+             if(gi[1]==1) v[1]=image[offset-width+1][c]; else v[1]=image[offset][c];
+             v[2]=image[offset][c];
+             if(gi[2]==1) v[3]=image[offset+width-1][c]; else v[3]=image[offset][c];
+             if(gi[3]==1) v[4]=image[offset+width-1][c]; else v[4]=image[offset][c];
+             bufferD2[offset][c]=(v[0]+v[1]+v[2]+v[3]+v[4]) / 5;
+          }
+
        }
-       offset++;
     }
     
-    for(i=0;i<width*height;i++){
-       u=MAX(bufferV[i][0],bufferH[i][0]);
-       if(u>1050) FORCC image[i][c]=0;
-    }
+    // Obtain mean image from H, V, D1 and D2 sharpened versions
+    for(i=2;i<height-2;i++)
+       for(offset=i*width+2,j=2;j<width-2;j++,offset++)
+         FORCC image[offset][c]=(bufferH[offset][c]+bufferV[offset][c]+0.7071067812*bufferD1[offset][c]+0.7071067812*bufferD2[offset][c]) / 3.4142135624;
     
     free (bufferV);
     free (bufferH);
-    free (gradH);
-    free (gradV);
+    free (bufferD1);
+    free (bufferD2);
+    free (bufferL);
 }
 
 DLLIMPORT unsigned short * DCRAW_Process(DLL_PARAMETERS *p, int *cancel, int *status)
@@ -9550,7 +9666,7 @@ DLLIMPORT unsigned short * DCRAW_Process(DLL_PARAMETERS *p, int *cancel, int *st
     
 STAGE2:
     if(test_pattern) test_patterns();    
-    if(level_greens) eq_greens();    
+    if(level_greens) eq_greens();
     if (!is_foveon && document_mode < 2) scale_colors();        
     // Here we take buffer 2
     if(SaveState(2,*cancel-first_time)!=0) *status=3; else return NULL;
@@ -9568,7 +9684,10 @@ STAGE3:
     }
 
     if (mix_green) for (colors=3, i=0; i < height*width; i++) image[i][1] = (image[i][1] + image[i][3]) >> 1;
-    //sharpen();
+    /*if(level_greens){
+       sharpen();
+       sharpen();
+    }*/
     // Here we take buffer 3
     if(SaveState(3,*cancel-first_time)!=0) *status=4; else return NULL;
     
