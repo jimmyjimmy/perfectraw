@@ -4054,10 +4054,10 @@ void CLASS test_patterns()
             }
 
          // Perform local equilibration with mean green levels in S*S square cells around each pixel
-         for(row=S;row<height-S;row+=2){
+         for(row=S+2;row<height-S-2;row+=2){
             // Calculate G1 and G2 mean value around pixel
             for(cnt=ival[0]=ival[1]=0,i=row-S;i<row+S;i++){
-               for(offset=i*width;offset<i*width+2*S;offset++){
+               for(offset=i*width+2;offset<i*width+2*S+2;offset++){
                   if(((v[0]=bufferG1[offset])<sat_max)&&((v[1]=bufferG2[offset])<sat_max)){
                      cnt++;
                      ival[0]+=v[0];
@@ -4065,8 +4065,8 @@ void CLASS test_patterns()
                   }
                }
             }
-            for(col=S;col<width-S;col+=2){
-               if(col!=S){
+            for(col=S+2;col<width-S-2;col+=2){
+               if(col!=S+2){
                   // Recalculate mean value of G1 and G2
                   for(offset=(row-S)*width+col-S;offset<(row+S)*width+col-S;offset+=width){
                      // Subtract left column
@@ -9725,6 +9725,28 @@ STAGE6:
     first_time=0;
     *status=6;
     return (unsigned short *) image;
+}
+
+DLLIMPORT void DCRAW_SaveTIFF16(char *outfname, int color_space, float gamma)
+{
+    FILE *ofp;
+    
+    // Save actual state
+    RestoreState(4);
+    output_color=color_space;
+    user_gamma=gamma;
+    output_tiff=1;
+    output_bps=16;
+    if (exposure!=1.0) exposure_correction();
+    if (use_fuji_rotate) fuji_rotate();
+    convert_to_rgb();
+    if (use_fuji_rotate) stretch();
+    ofp = fopen (outfname, "wb");
+    write_ppm_tiff(ofp);
+    fclose(ofp);
+
+    // Restore state
+    RestoreState(4);
 }
 
 DLLIMPORT void DCRAW_End(void)

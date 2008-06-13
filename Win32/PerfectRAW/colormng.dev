@@ -27,7 +27,7 @@ CustomMakefile=
 IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=0
-CompilerSettings=001000000101000000000a
+CompilerSettings=00100000010010000000ea
 
 [Unit1]
 FileName=src\colormng.c

@@ -150,7 +150,7 @@ DLLIMPORT void Convert48RGBto24BGR(PX16 *buffer16, PX8 *buffer8, int width, int 
    // Color manage: colorspace, gamma and convert to color profile of output device
    if(colorspace!=0)       ApplyColorSpace16RGB(buffer16,width,height,cam_RGB,colorspace);
    if(gamma!=1)            ApplyGamma16RGB(buffer16,width,height,gamma);   
-   //if(inProfileFile[0]!=0) ApplyColorProfile16RGB(buffer16,width,height,inProfileFile,outProfileFile);
+   if(inProfileFile[0]!=0) ApplyColorProfile16RGB(buffer16,width,height,inProfileFile,outProfileFile);
       
    // Convert from 16 RGB to 8 BGR
    w = width*3;   
