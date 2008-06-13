@@ -85,10 +85,13 @@ namespace perfectRAW
         private Label label20;
         private ListBox listBox3;
         private Label levelEdgeStr;
-        private TrackBar levelEdgeSld;
         private TrackBar levelCellSld;
         private NumericUpDown levelCellNum;
+        private pButton pButton2;
+        private pButton pButton3;
         int ZoomIndex = 9;
+        int[] InterpolationMethod={0,4,1,1,2,3};
+        int[] InterpolationColors={0,1,0,1,0,0};
 
         // Código no portable a otras plataformas
         [DllImport("kernel32")]
@@ -126,7 +129,7 @@ namespace perfectRAW
             //
             // TODO: agregar código de constructor después de llamar a InitializeComponent
             //
-            if (Environment.GetCommandLineArgs().Length==1) MessageBox.Show("perfectRAW\nMódulo revelador\nVersión de prueba nº 10\n3 de junio de 2008 a las 21:15");
+            //if (Environment.GetCommandLineArgs().Length==1) MessageBox.Show("perfectRAW\nMódulo revelador\nVersión de prueba nº 10\n3 de junio de 2008 a las 21:15");
         }
 
         ~MainForm()
@@ -200,9 +203,10 @@ namespace perfectRAW
             this.label20 = new System.Windows.Forms.Label();
             this.listBox3 = new System.Windows.Forms.ListBox();
             this.levelEdgeStr = new System.Windows.Forms.Label();
-            this.levelEdgeSld = new System.Windows.Forms.TrackBar();
             this.levelCellSld = new System.Windows.Forms.TrackBar();
             this.levelCellNum = new System.Windows.Forms.NumericUpDown();
+            this.pButton2 = new WindowsApplication4.pButton();
+            this.pButton3 = new WindowsApplication4.pButton();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
@@ -219,7 +223,6 @@ namespace perfectRAW
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown7)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown8)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown9)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.levelEdgeSld)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.levelCellSld)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.levelCellNum)).BeginInit();
             this.SuspendLayout();
@@ -244,6 +247,7 @@ namespace perfectRAW
             // 
             this.button3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.button3.Cursor = System.Windows.Forms.Cursors.Default;
+            this.button3.Enabled = false;
             this.button3.HaveState = false;
             this.button3.Location = new System.Drawing.Point(835, 659);
             this.button3.Name = "button3";
@@ -251,7 +255,7 @@ namespace perfectRAW
             this.button3.State = false;
             this.button3.TabIndex = 12;
             this.button3.TabStop = false;
-            this.button3.Text = "GRABAR JPEG";
+            this.button3.Text = "GRABAR VISTA";
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
@@ -325,7 +329,7 @@ namespace perfectRAW
             0,
             0});
             this.numericUpDown3.Name = "numericUpDown3";
-            this.numericUpDown3.Size = new System.Drawing.Size(39, 18);
+            this.numericUpDown3.Size = new System.Drawing.Size(63, 18);
             this.numericUpDown3.TabIndex = 17;
             // 
             // label7
@@ -342,7 +346,7 @@ namespace perfectRAW
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(363, 588);
+            this.label1.Location = new System.Drawing.Point(375, 588);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(125, 9);
             this.label1.TabIndex = 20;
@@ -352,7 +356,7 @@ namespace perfectRAW
             // 
             this.label8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(363, 600);
+            this.label8.Location = new System.Drawing.Point(375, 600);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(57, 9);
             this.label8.TabIndex = 21;
@@ -362,7 +366,7 @@ namespace perfectRAW
             // 
             this.numericUpDown4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.numericUpDown4.Font = new System.Drawing.Font("Victor\'s Pixel Font", 8F);
-            this.numericUpDown4.Location = new System.Drawing.Point(493, 589);
+            this.numericUpDown4.Location = new System.Drawing.Point(505, 589);
             this.numericUpDown4.Maximum = new decimal(new int[] {
             65535,
             0,
@@ -377,7 +381,7 @@ namespace perfectRAW
             // 
             this.label10.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(363, 613);
+            this.label10.Location = new System.Drawing.Point(375, 613);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(94, 9);
             this.label10.TabIndex = 23;
@@ -387,7 +391,7 @@ namespace perfectRAW
             // 
             this.label9.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(363, 625);
+            this.label9.Location = new System.Drawing.Point(375, 625);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(57, 9);
             this.label9.TabIndex = 24;
@@ -397,7 +401,7 @@ namespace perfectRAW
             // 
             this.numericUpDown5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.numericUpDown5.Font = new System.Drawing.Font("Victor\'s Pixel Font", 8F);
-            this.numericUpDown5.Location = new System.Drawing.Point(493, 614);
+            this.numericUpDown5.Location = new System.Drawing.Point(505, 614);
             this.numericUpDown5.Maximum = new decimal(new int[] {
             65535,
             0,
@@ -585,7 +589,7 @@ namespace perfectRAW
             0,
             0});
             this.medianControl.Name = "medianControl";
-            this.medianControl.Size = new System.Drawing.Size(39, 18);
+            this.medianControl.Size = new System.Drawing.Size(63, 18);
             this.medianControl.TabIndex = 33;
             this.medianControl.TabStop = false;
             this.medianControl.ValueChanged += new System.EventHandler(this.medianControl_ValueChanged);
@@ -617,15 +621,15 @@ namespace perfectRAW
             this.listBox1.FormattingEnabled = true;
             this.listBox1.ItemHeight = 9;
             this.listBox1.Items.AddRange(new object[] {
-            "BILINEAL",
-            "VNG",
+            "BILINEAL-3",
+            "BILINEAL-4",
+            "VNG-3",
             "VNG-4",
-            "PPG",
-            "AHD",
-            "CPM-4"});
+            "PPG-3",
+            "AHD-3"});
             this.listBox1.Location = new System.Drawing.Point(306, 601);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(53, 58);
+            this.listBox1.Size = new System.Drawing.Size(63, 58);
             this.listBox1.TabIndex = 35;
             this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
             // 
@@ -684,6 +688,7 @@ namespace perfectRAW
             0,
             0,
             0});
+            this.numericUpDown6.Visible = false;
             // 
             // numericUpDown7
             // 
@@ -715,6 +720,7 @@ namespace perfectRAW
             0,
             0,
             0});
+            this.numericUpDown7.Visible = false;
             // 
             // numericUpDown8
             // 
@@ -746,6 +752,7 @@ namespace perfectRAW
             0,
             0,
             0});
+            this.numericUpDown8.Visible = false;
             // 
             // numericUpDown9
             // 
@@ -777,6 +784,7 @@ namespace perfectRAW
             0,
             0,
             0});
+            this.numericUpDown9.Visible = false;
             // 
             // label15
             // 
@@ -827,7 +835,7 @@ namespace perfectRAW
             // 
             this.label20.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label20.AutoSize = true;
-            this.label20.Location = new System.Drawing.Point(352, 531);
+            this.label20.Location = new System.Drawing.Point(352, 537);
             this.label20.Name = "label20";
             this.label20.Size = new System.Drawing.Size(135, 9);
             this.label20.TabIndex = 46;
@@ -843,7 +851,7 @@ namespace perfectRAW
             "Ninguno",
             "Equilibrado global",
             "Equilibrado global+local"});
-            this.listBox3.Location = new System.Drawing.Point(493, 540);
+            this.listBox3.Location = new System.Drawing.Point(488, 535);
             this.listBox3.Name = "listBox3";
             this.listBox3.Size = new System.Drawing.Size(163, 31);
             this.listBox3.TabIndex = 47;
@@ -853,29 +861,17 @@ namespace perfectRAW
             // 
             this.levelEdgeStr.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.levelEdgeStr.AutoSize = true;
-            this.levelEdgeStr.Location = new System.Drawing.Point(352, 543);
+            this.levelEdgeStr.Location = new System.Drawing.Point(664, 535);
             this.levelEdgeStr.Name = "levelEdgeStr";
             this.levelEdgeStr.Size = new System.Drawing.Size(112, 9);
             this.levelEdgeStr.TabIndex = 48;
             this.levelEdgeStr.Text = "preservar bordes";
             this.levelEdgeStr.Visible = false;
             // 
-            // levelEdgeSld
-            // 
-            this.levelEdgeSld.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.levelEdgeSld.Location = new System.Drawing.Point(397, 555);
-            this.levelEdgeSld.Minimum = -10;
-            this.levelEdgeSld.Name = "levelEdgeSld";
-            this.levelEdgeSld.Size = new System.Drawing.Size(91, 34);
-            this.levelEdgeSld.TabIndex = 18;
-            this.levelEdgeSld.TabStop = false;
-            this.levelEdgeSld.Visible = false;
-            this.levelEdgeSld.Scroll += new System.EventHandler(this.levelEdgeSld_Scroll);
-            // 
             // levelCellSld
             // 
             this.levelCellSld.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.levelCellSld.Location = new System.Drawing.Point(397, 555);
+            this.levelCellSld.Location = new System.Drawing.Point(697, 543);
             this.levelCellSld.Maximum = 16;
             this.levelCellSld.Minimum = 2;
             this.levelCellSld.Name = "levelCellSld";
@@ -890,7 +886,7 @@ namespace perfectRAW
             // 
             this.levelCellNum.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.levelCellNum.Font = new System.Drawing.Font("Victor\'s Pixel Font", 8F);
-            this.levelCellNum.Location = new System.Drawing.Point(355, 556);
+            this.levelCellNum.Location = new System.Drawing.Point(655, 548);
             this.levelCellNum.Maximum = new decimal(new int[] {
             16,
             0,
@@ -913,16 +909,49 @@ namespace perfectRAW
             this.levelCellNum.Visible = false;
             this.levelCellNum.ValueChanged += new System.EventHandler(this.numericUpDown10_ValueChanged);
             // 
+            // pButton2
+            // 
+            this.pButton2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.pButton2.Cursor = System.Windows.Forms.Cursors.Default;
+            this.pButton2.Enabled = false;
+            this.pButton2.HaveState = false;
+            this.pButton2.Location = new System.Drawing.Point(835, 638);
+            this.pButton2.Name = "pButton2";
+            this.pButton2.Size = new System.Drawing.Size(115, 20);
+            this.pButton2.State = false;
+            this.pButton2.TabIndex = 52;
+            this.pButton2.TabStop = false;
+            this.pButton2.Text = "GRABAR JPEG 8";
+            this.pButton2.UseVisualStyleBackColor = true;
+            this.pButton2.Click += new System.EventHandler(this.pButton2_Click);
+            // 
+            // pButton3
+            // 
+            this.pButton3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.pButton3.Cursor = System.Windows.Forms.Cursors.Default;
+            this.pButton3.Enabled = false;
+            this.pButton3.HaveState = false;
+            this.pButton3.Location = new System.Drawing.Point(835, 617);
+            this.pButton3.Name = "pButton3";
+            this.pButton3.Size = new System.Drawing.Size(115, 20);
+            this.pButton3.State = false;
+            this.pButton3.TabIndex = 53;
+            this.pButton3.TabStop = false;
+            this.pButton3.Text = "GRABAR TIFF 16";
+            this.pButton3.UseVisualStyleBackColor = true;
+            this.pButton3.Click += new System.EventHandler(this.pButton3_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(6, 10);
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
             this.ClientSize = new System.Drawing.Size(952, 681);
+            this.Controls.Add(this.pictureBox1);
+            this.Controls.Add(this.pButton3);
+            this.Controls.Add(this.pButton2);
             this.Controls.Add(this.levelCellNum);
             this.Controls.Add(this.levelCellSld);
-            this.Controls.Add(this.levelEdgeSld);
             this.Controls.Add(this.levelEdgeStr);
-            this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.listBox3);
             this.Controls.Add(this.label20);
             this.Controls.Add(this.label18);
@@ -962,7 +991,7 @@ namespace perfectRAW
             this.MinimumSize = new System.Drawing.Size(960, 545);
             this.Name = "MainForm";
             this.TabText = "perfectRAW";
-            this.Text = "perfectRAW";
+            this.Text = "perfectRAW 0.5 alfa 1";
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.Form1_OnPaint);
             this.Activated += new System.EventHandler(this.MainForm_Activated);
@@ -985,7 +1014,6 @@ namespace perfectRAW
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown7)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown8)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown9)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.levelEdgeSld)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.levelCellSld)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.levelCellNum)).EndInit();
             this.ResumeLayout(false);
@@ -1024,6 +1052,7 @@ namespace perfectRAW
         private void button1_Click(object sender, System.EventArgs e)
         {
             Revelar();
+            pictureBox1.Focus();
         }
 
         private void Revelar()
@@ -1078,32 +1107,8 @@ namespace perfectRAW
                 dcraw.parameters.med_passes = (int)medianControl.Value;
                 dcraw.parameters.level_greens = (int)listBox3.SelectedIndex;
                 dcraw.parameters.level_cell = (int)levelCellNum.Value;
-                if (listBox1.SelectedIndex < 2)
-                {
-                    dcraw.parameters.user_qual = (int)listBox1.SelectedIndex;
-                    dcraw.parameters.four_color_rgb=0;
-                }
-                else
-                {
-                    if (listBox1.SelectedIndex == 2)
-                    {
-                        dcraw.parameters.user_qual = 1;
-                        dcraw.parameters.four_color_rgb = 1;
-                    }
-                    else
-                    {
-                        if (listBox1.SelectedIndex < 5)
-                        {
-                            dcraw.parameters.user_qual = (int)listBox1.SelectedIndex - 1;
-                            dcraw.parameters.four_color_rgb = 0;
-                        }
-                        else
-                        {
-                            dcraw.parameters.user_qual = (int)listBox1.SelectedIndex - 1;
-                            dcraw.parameters.four_color_rgb = 1;
-                        }
-                    }
-                }
+                dcraw.parameters.user_qual = InterpolationMethod[listBox1.SelectedIndex];
+                dcraw.parameters.four_color_rgb = InterpolationColors[listBox1.SelectedIndex];
                 switch (listBox2.SelectedIndex)
                 {
                     case 0:
@@ -1175,6 +1180,9 @@ namespace perfectRAW
                 Application.DoEvents();
                 RevState = false;
                 button1.Enabled = true;
+                button3.Enabled = true;
+                pButton2.Enabled = true;
+                pButton3.Enabled = true;
             }else{
                 // Cancelar
                 label3.BackColor = Color.Orange;
@@ -1487,9 +1495,9 @@ namespace perfectRAW
         private void listBox3_SelectedIndexChanged(object sender, EventArgs e)
         {
             if(listBox3.SelectedIndex>1){
-                levelEdgeStr.Text = "Tamaño de celda";
-                levelCellNum.Visible = false;
-                levelCellSld.Visible = false;                
+                levelEdgeStr.Visible = true;
+                levelCellNum.Visible = true;
+                levelCellSld.Visible = true;                
             }else{
                 levelEdgeStr.Visible = false;
                 levelCellNum.Visible = false;
@@ -1520,6 +1528,19 @@ namespace perfectRAW
         private void levelCellSld_Scroll(object sender, EventArgs e)
         {
             levelCellNum.Value = (decimal)levelCellSld.Value;
+        }
+
+        private void pButton2_Click(object sender, EventArgs e)
+        {
+            SaveJPGWithCompressionSetting(dcraw.img, textBox1.Text + ".jpg", 100);
+        }
+
+        private void pButton3_Click(object sender, EventArgs e)
+        {
+            if (dcraw.estado == 6)
+            {
+                dcraw.SaveTIFF(textBox1.Text + ".tiff", 1, 0);
+            }
         }
 
     }

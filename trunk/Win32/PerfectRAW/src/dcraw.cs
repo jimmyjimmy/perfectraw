@@ -8,6 +8,7 @@ using System.Data;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Text;
+using System.Xml;
 
 namespace perfectRAW
 {
@@ -74,6 +75,9 @@ namespace perfectRAW
         [DllImport(@"dcraw.dll")]
         static extern ushort* DCRAW_Process(ref DLL_PARAMETERS p, ref int cancel, ref int estado);
 
+        [DllImport(@"dcraw.dll")]
+        static extern void DCRAW_SaveTIFF16(string filename, int colorspace, float gamma);
+        
         [DllImport(@"dcraw.dll")]
         static extern void DCRAW_End();
 
@@ -143,19 +147,26 @@ namespace perfectRAW
             //DCRAW_GetInfo(ref info);
         }
 
+        public void SaveTIFF(string filename, int colorspace, float gamma)
+        {
+            DCRAW_SaveTIFF16(filename, colorspace, gamma);
+        }
+
         public void Process()
         {
-            //string InProfile = @"";
-            //string OutProfile = @"";
-            string InProfile = @"c:\windows\system32\spool\drivers\color\Spyder2express.icm";
-            string OutProfile = @"c:\windows\system32\spool\drivers\color\sRGB Color Space Profile.icm";            
+            XmlDocument config = new XmlDocument();
+            config.Load(Application.StartupPath + "\\config.xml");
+            
+            string InProfile;
+            string OutProfile;
+            InProfile=config.GetElementsByTagName("InputProfile").Item(0).InnerText.ToString();
+            OutProfile = config.GetElementsByTagName("OutputProfile").Item(0).InnerText.ToString();
             
             estado = -1;
             cancel = 0;
             if (!init) Init();
             img = new Bitmap(w, h,PixelFormat.Format24bppRgb);
-            int extra;
-            //BitmapData data = img.LockBits(new Rectangle(0, 0, img.Width, img.Height), ImageLockMode.ReadWrite, PixelFormat.Format48bppRgb);
+            int extra;            
             BitmapData data = img.LockBits(new Rectangle(0, 0, img.Width, img.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
             unsafe
             {
