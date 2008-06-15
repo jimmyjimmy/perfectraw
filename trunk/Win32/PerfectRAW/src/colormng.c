@@ -50,7 +50,7 @@ void ApplyColorProfile16RGB(PX16 *buffer16, int width, int height, char *inProfi
            MessageBox(0,sError,"ERROR",0);                                              
            break;
         case 2:
-           sprintf(sError,"ERROR applying ICC profile. Error description:\noutput ICC Profile not found '%s'",inProfileFile);                                           
+           sprintf(sError,"ERROR applying ICC profile. Error description:\noutput ICC Profile not found '%s'",outProfileFile);
            MessageBox(0,sError,"ERROR",0);                                             
            break;
         case 3:
@@ -267,9 +267,9 @@ PX16 sRGBgamma(PX16 value){
       double c1;
       
       f=1.0/2.4;  
-      c1=12.92*65535.0;          
+      c1=12.92;          
       r=(double)value/65535.0;
-      if(r<=0.0031308) return (PX16)(c1*r); else return (PX16)((1.055*pow(r,f)-0.055)*65535.0);
+      if(r<=0.0031308) return (PX16)(c1*value); else return (PX16)((1.055*pow(r,f)-0.055)*65535.0);
 }
 
 // Calculate any other gamma
