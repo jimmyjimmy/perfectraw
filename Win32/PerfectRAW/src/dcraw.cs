@@ -105,6 +105,7 @@ namespace perfectRAW
         ~Dcraw()
         {
             DCRAW_End();
+            init = false;
         }
 
         public int Init()
@@ -137,7 +138,7 @@ namespace perfectRAW
 
         public void End()
         {
-            DCRAW_End();
+            if(init) DCRAW_End();
             init = false;
         }
 
